@@ -53,8 +53,12 @@ public class MouseHandlerMixin {
      */
     @Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
     private void interceptGlobalScroll(long window, double xOffset, double yOffset, CallbackInfo ci) {
-        // 处理模组 Core 逻辑层面的滚动需求
-        if (!com.mohuia.better_looting.client.Core.INSTANCE.shouldIgnoreScroll()) {
+        // 1. 获取玩家是否按下了潜行键 (Shift)
+        boolean isShiftDown = this.minecraft.options.keyShift.isDown();
+
+        // 2. 处理模组 Core 逻辑层面的滚动需求
+        // 如果玩家没有按下 Shift 键，且 Core 认为不应该忽略滚动，则模组接管滚轮
+        if (!isShiftDown && !com.mohuia.better_looting.client.Core.INSTANCE.shouldIgnoreScroll()) {
             com.mohuia.better_looting.client.Core.INSTANCE.performScroll(yOffset);
             ci.cancel();
             return;
@@ -68,6 +72,7 @@ public class MouseHandlerMixin {
 
         // 如果鼠标悬停在过滤面板上，将滚轮事件传递给面板并取消原版响应
         if (FilterPanel.isOpen() && FilterEvents.isMouseOverPanel(mouseX, mouseY, screen)) {
+            // 提示：如果你希望在过滤面板上按 Shift 也能滚动其他东西，也可以把 isShiftDown 加到这里
             if (FilterPanel.scroll(yOffset)) {
                 ci.cancel();
             }
