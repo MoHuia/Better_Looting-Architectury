@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "com.mohuia.better_looting.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+    "ACSDragMixin",
+    "MixinMinecraft",
+    "MouseHandlerMixin"
+  ],
+  "mixins": [
+    "ACSAccessor",
+    "ItemEntityAccessor",
+    "ItemEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

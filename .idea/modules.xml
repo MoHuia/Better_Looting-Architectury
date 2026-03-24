@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/better_looting.common.iml" filepath="$PROJECT_DIR$/.idea/modules/common/better_looting.common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/better_looting.common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common/better_looting.common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/better_looting.common.test.iml" filepath="$PROJECT_DIR$/.idea/modules/common/better_looting.common.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fabric/better_looting.fabric.main.iml" filepath="$PROJECT_DIR$/.idea/modules/fabric/better_looting.fabric.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fabric/better_looting.fabric.test.iml" filepath="$PROJECT_DIR$/.idea/modules/fabric/better_looting.fabric.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/forge/better_looting.forge.main.iml" filepath="$PROJECT_DIR$/.idea/modules/forge/better_looting.forge.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/forge/better_looting.forge.test.iml" filepath="$PROJECT_DIR$/.idea/modules/forge/better_looting.forge.test.iml" />
+    </modules>
+  </component>
+</project>
