@@ -74,7 +74,7 @@ public class PacketBatchPickup {
                 // 安全检查：目标必须是掉落物，存活，且距离玩家的平方小于 100（约 10 格内）防作弊
                 if (target instanceof ItemEntity item && item.isAlive() && player.distanceToSqr(target) < 100.0) {
                     // 如果物品还在拾取冷却中，则跳过
-                    if (((ItemEntityAccessor)item).getPickupDelay() > 0) continue;
+                    if (this.isAuto && ((ItemEntityAccessor)item).getPickupDelay() > 0) continue;
 
                     ItemStack stack = item.getItem();
                     ISuperStack superStack = (ISuperStack) item;
