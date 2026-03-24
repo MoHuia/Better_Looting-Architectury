@@ -4,7 +4,50 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ea9d72a-456e-4326-888f-5ffbc001bc39" name="更改" comment="多平台兼容" />
+    <list default="true" id="8ea9d72a-456e-4326-888f-5ffbc001bc39" name="更改" comment="多平台兼容">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/common/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/BetterLooting.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/BetterLooting.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/BetterLootingClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/BetterLootingClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/Core.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/Core.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/KeyInit.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/KeyInit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/ActionDispatcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/ActionDispatcher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/KeyTracker.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/KeyTracker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/LootScanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/LootScanner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/PickupHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/PickupHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/SelectionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/SelectionManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/VisualItemEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/core/VisualItemEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/filter/FilterEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/filter/FilterEvents.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/filter/FilterPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/filter/FilterPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/filter/FilterWhitelist.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/filter/FilterWhitelist.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/gui/CommonSlider.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/gui/CommonSlider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/jei/JeiCompat.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/jei/JeiCompat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/jei/JeiPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/jei/JeiPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/HotbarIndicator.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/HotbarIndicator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/Overlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/Overlay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/OverlayLayout.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/OverlayLayout.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/OverlayRenderer.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/OverlayRenderer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/OverlayState.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/client/overlay/OverlayState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/BetterLootingConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/BetterLootingConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/ConditionsScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/ConditionsScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/ConfigScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/ConfigScreen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/ConfigViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/ConfigViewModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/DragController.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/config/DragController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/event/CommonEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/event/CommonEvents.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ACSAccessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ACSAccessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ACSDragMixin.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ACSDragMixin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ItemEntityAccessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ItemEntityAccessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ItemEntityMixin.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/ItemEntityMixin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/MixinMinecraft.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/MixinMinecraft.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/MouseHandlerMixin.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/mixin/MouseHandlerMixin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/network/C2S/PacketBatchPickup.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/network/C2S/PacketBatchPickup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/network/NetworkHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/com/mohuia/better_looting/network/NetworkHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fabric/src/main/java/com/mohuia/better_looting/fabric/BetterLootingFabric.java" beforeDir="false" afterPath="$PROJECT_DIR$/fabric/src/main/java/com/mohuia/better_looting/fabric/BetterLootingFabric.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fabric/src/main/java/com/mohuia/better_looting/fabric/client/BetterLootingFabricClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/fabric/src/main/java/com/mohuia/better_looting/fabric/client/BetterLootingFabricClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/forge/src/main/java/com/mohuia/better_looting/forge/BetterLootingForge.java" beforeDir="false" afterPath="$PROJECT_DIR$/forge/src/main/java/com/mohuia/better_looting/forge/BetterLootingForge.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,6 +104,9 @@
   &quot;associatedIndex&quot;: 5
 }</component>
   <component name="ProjectId" id="3BL4Pc3m8ovCAjZNwPgy9fXQqKB" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
@@ -207,7 +253,7 @@
       <workItem from="1774361104643" duration="206000" />
       <workItem from="1774361319207" duration="16000" />
       <workItem from="1774361344585" duration="29000" />
-      <workItem from="1774361410928" duration="117000" />
+      <workItem from="1774361410928" duration="3138000" />
     </task>
     <servers />
   </component>

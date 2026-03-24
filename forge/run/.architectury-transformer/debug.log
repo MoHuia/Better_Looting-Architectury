@@ -108,9 +108,9 @@
 [Architectury Transformer DEBUG]  - D:\Mods create\Better_Looting-Architectury\.gradle\loom-cache\remapped_mods\remapped\me\shedaniel\cloth\cloth-config-forge-0cd3bb3a\11.1.106\cloth-config-forge-0cd3bb3a-11.1.106.jar
 [Architectury Transformer DEBUG]  - D:\Mods create\Better_Looting-Architectury\.gradle\loom-cache\remapped_mods\remapped\mezz\jei\jei-1.20.1-forge-api-0cd3bb3a\15.3.0.4\jei-1.20.1-forge-api-0cd3bb3a-15.3.0.4.jar
 [Architectury Transformer DEBUG]  - D:\Mods create\Better_Looting-Architectury\.gradle\loom-cache\remapped_mods\remapped\mezz\jei\jei-1.20.1-common-api-0cd3bb3a\15.3.0.4\jei-1.20.1-common-api-0cd3bb3a-15.3.0.4.jar
-[Architectury Transformer] Read classpath in 850.5 ms
+[Architectury Transformer] Read classpath in 875.5 ms
 [Architectury Transformer DEBUG] Closed File Systems for D:\Mods create\Better_Looting-Architectury\common\build\devlibs\better_looting-common-1.0.0-dev.jar
-[Architectury Transformer DEBUG] Transforming 8 transformer(s) from D:\Mods create\Better_Looting-Architectury\common\build\devlibs\better_looting-common-1.0.0-dev.jar to C:\Users\35916\AppData\Local\Temp\15836527077397421520.jar: 
+[Architectury Transformer DEBUG] Transforming 8 transformer(s) from D:\Mods create\Better_Looting-Architectury\common\build\devlibs\better_looting-common-1.0.0-dev.jar to C:\Users\35916\AppData\Local\Temp\1093444819081224451.jar: 
 [Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.RuntimeMixinRefmapDetector@5b0abc94
 [Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformExpectPlatform@75c072cb
 [Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.RemapInjectables@1f1c7bf6
@@ -119,9 +119,9 @@
 [Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment@5d740a0f
 [Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.GenerateFakeForgeMod@214b199c
 [Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.FixForgeMixin@20d3d15a
-[Architectury Transformer DEBUG] Transforming from D:\Mods create\Better_Looting-Architectury\common\build\devlibs\better_looting-common-1.0.0-dev.jar to C:\Users\35916\AppData\Local\Temp\15836527077397421520.jar with 8 transformer(s) on dev.architectury.transformer.handler.SimpleTransformerHandler
+[Architectury Transformer DEBUG] Transforming from D:\Mods create\Better_Looting-Architectury\common\build\devlibs\better_looting-common-1.0.0-dev.jar to C:\Users\35916\AppData\Local\Temp\1093444819081224451.jar with 8 transformer(s) on dev.architectury.transformer.handler.SimpleTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
@@ -131,35 +131,35 @@
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/BetterLootingClient with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Constants with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Utils with maxs=true frames=true
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/KeyInit with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Core$1 with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Core$FilterMode with maxs=true frames=true
-[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/KeyInit with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/LootScanner with maxs=true frames=true
-[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/ActionDispatcher with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/VisualItemEntry with maxs=true frames=true
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/ActionDispatcher with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/SelectionManager with maxs=true frames=true
-[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/PickupHandler$PickupAction with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/KeyTracker with maxs=true frames=true
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/PickupHandler$PickupAction with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/ISuperStack with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/PickupHandler with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/LootScanner$MergeKey with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterEvents with maxs=true frames=true
-[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterPanel with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterWhitelist with maxs=true frames=true
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterPanel with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterWhitelist$WhitelistEntry with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterWhitelist$1 with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/gui/CommonSlider with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/jei/JeiPlugin with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/jei/JeiCompat$Internal with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/jei/JeiCompat with maxs=true frames=true
-[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayRenderer with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/Overlay with maxs=true frames=true
-[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayState with maxs=true frames=true
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayRenderer with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/HotbarIndicator with maxs=true frames=true
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayState with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/Overlay$1 with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayLayout with maxs=true frames=true
-[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConditionsScreen with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConfigScreen with maxs=true frames=true
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConditionsScreen with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/BetterLootingConfig with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConfigViewModel with maxs=true frames=true
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConfigViewModel$PreviewBounds with maxs=true frames=true
@@ -183,14 +183,14 @@
 [Architectury Transformer DEBUG] Found mixin config(s): better_looting.mixins.json
 [Architectury Transformer DEBUG] Appended Launch Argument: [--mixin.config, better_looting.mixins.json]
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Closed File Systems for C:\Users\35916\AppData\Local\Temp\15836527077397421520.jar
+[Architectury Transformer DEBUG] Closed File Systems for C:\Users\35916\AppData\Local\Temp\1093444819081224451.jar
 [Architectury Transformer] Listening at D:\Mods create\Better_Looting-Architectury\common\build\devlibs\better_looting-common-1.0.0-dev.jar
-[Architectury Transformer DEBUG] Temporary jar [C:\Users\35916\AppData\Local\Temp\15836527077397421520.jar] contains packages: com.mohuia.better_looting.network.C2S, com.mohuia.better_looting.client.overlay, com.mohuia.better_looting.network, com.mohuia.better_looting.client.jei, com.mohuia.better_looting.event, com.mohuia.better_looting.client, com.mohuia.better_looting.client.gui, com.mohuia.better_looting.mixin, com.mohuia.better_looting.client.core, com.mohuia.better_looting, com.mohuia.better_looting.client.filter, com.mohuia.better_looting.config
+[Architectury Transformer DEBUG] Temporary jar [C:\Users\35916\AppData\Local\Temp\1093444819081224451.jar] contains packages: com.mohuia.better_looting.network.C2S, com.mohuia.better_looting.client.overlay, com.mohuia.better_looting.network, com.mohuia.better_looting.client.jei, com.mohuia.better_looting.event, com.mohuia.better_looting.client, com.mohuia.better_looting.client.gui, com.mohuia.better_looting.mixin, com.mohuia.better_looting.client.core, com.mohuia.better_looting, com.mohuia.better_looting.client.filter, com.mohuia.better_looting.config
 [Architectury Transformer DEBUG] Closed File Systems for D:\Mods create\Better_Looting-Architectury\common\build\devlibs\better_looting-common-1.0.0-dev.jar
 [Architectury Transformer DEBUG] Classpath entry [D:\Mods create\Better_Looting-Architectury\forge\build\resources\main] contains packages: 
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/mixin/ItemEntityAccessor.class to com/mohuia/better_looting/mixin/ItemEntityAccessor.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping with Dirty Mappings...
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
@@ -198,364 +198,424 @@
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/mixin/ItemEntityAccessor with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/mixin/ItemEntityAccessor in 52.57 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/mixin/ItemEntityAccessor in 47.88 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/ISuperStack.class to com/mohuia/better_looting/client/core/ISuperStack.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/ISuperStack with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/ISuperStack in 15.69 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/ISuperStack in 6.190 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/mixin/ACSAccessor.class to com/mohuia/better_looting/mixin/ACSAccessor.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/mixin/ACSAccessor with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/mixin/ACSAccessor in 4.661 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/mixin/ACSAccessor in 5.905 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/BetterLooting.class to com/mohuia/better_looting/BetterLooting.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/BetterLooting with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/BetterLooting in 8.206 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/BetterLooting in 6.964 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/BetterLootingConfig.class to com/mohuia/better_looting/config/BetterLootingConfig.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/BetterLootingConfig with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/BetterLootingConfig in 5.938 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/BetterLootingConfig in 4.932 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/BetterLootingConfig$ActivationMode.class to com/mohuia/better_looting/config/BetterLootingConfig$ActivationMode.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/BetterLootingConfig$ActivationMode with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/BetterLootingConfig$ActivationMode in 4.410 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/BetterLootingConfig$ActivationMode in 5.084 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/BetterLootingConfig$ScrollMode.class to com/mohuia/better_looting/config/BetterLootingConfig$ScrollMode.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/BetterLootingConfig$ScrollMode with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/BetterLootingConfig$ScrollMode in 4.878 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/BetterLootingConfig$ScrollMode in 3.833 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/network/NetworkHandler.class to com/mohuia/better_looting/network/NetworkHandler.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/network/NetworkHandler with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/network/NetworkHandler in 5.285 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/network/NetworkHandler in 4.352 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/network/C2S/PacketBatchPickup.class to com/mohuia/better_looting/network/C2S/PacketBatchPickup.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/network/C2S/PacketBatchPickup with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/network/C2S/PacketBatchPickup in 5.094 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/network/C2S/PacketBatchPickup in 3.393 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/event/CommonEvents.class to com/mohuia/better_looting/event/CommonEvents.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/event/CommonEvents with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/event/CommonEvents in 4.552 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/event/CommonEvents in 3.937 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/jei/JeiPlugin.class to com/mohuia/better_looting/client/jei/JeiPlugin.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/jei/JeiPlugin with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/jei/JeiPlugin in 5.553 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/jei/JeiPlugin in 4.497 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/BetterLootingClient.class to com/mohuia/better_looting/client/BetterLootingClient.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/BetterLootingClient with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/BetterLootingClient in 5.005 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/BetterLootingClient in 2.937 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/KeyInit.class to com/mohuia/better_looting/client/KeyInit.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/KeyInit with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/KeyInit in 4.888 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/KeyInit in 4.309 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/Core.class to com/mohuia/better_looting/client/Core.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Core with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Core in 5.104 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Core in 3.879 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/PickupHandler.class to com/mohuia/better_looting/client/core/PickupHandler.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/PickupHandler with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/PickupHandler in 4.718 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/PickupHandler in 3.197 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/SelectionManager.class to com/mohuia/better_looting/client/core/SelectionManager.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/SelectionManager with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/SelectionManager in 4.793 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/SelectionManager in 2.709 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/KeyTracker.class to com/mohuia/better_looting/client/core/KeyTracker.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/KeyTracker with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/KeyTracker in 3.750 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/KeyTracker in 4.008 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/ConfigScreen.class to com/mohuia/better_looting/config/ConfigScreen.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConfigScreen with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/ConfigScreen in 4.528 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/ConfigScreen in 3.939 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/Core$FilterMode.class to com/mohuia/better_looting/client/Core$FilterMode.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Core$FilterMode with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Core$FilterMode in 4.222 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Core$FilterMode in 4.209 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/filter/FilterWhitelist.class to com/mohuia/better_looting/client/filter/FilterWhitelist.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterWhitelist with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterWhitelist in 3.492 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterWhitelist in 3.362 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/filter/FilterWhitelist$1.class to com/mohuia/better_looting/client/filter/FilterWhitelist$1.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterWhitelist$1 with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterWhitelist$1 in 4.513 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterWhitelist$1 in 4.432 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/filter/FilterWhitelist$WhitelistEntry.class to com/mohuia/better_looting/client/filter/FilterWhitelist$WhitelistEntry.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterWhitelist$WhitelistEntry with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterWhitelist$WhitelistEntry in 3.300 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterWhitelist$WhitelistEntry in 4.693 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/filter/FilterEvents.class to com/mohuia/better_looting/client/filter/FilterEvents.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterEvents with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterEvents in 4.622 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterEvents in 4.373 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/filter/FilterPanel.class to com/mohuia/better_looting/client/filter/FilterPanel.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/filter/FilterPanel with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterPanel in 8.801 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/filter/FilterPanel in 8.406 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/overlay/Overlay.class to com/mohuia/better_looting/client/overlay/Overlay.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/Overlay with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/Overlay in 19.42 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/Overlay in 22.30 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/overlay/OverlayState.class to com/mohuia/better_looting/client/overlay/OverlayState.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayState with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/OverlayState in 18.52 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/OverlayState in 21.77 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/overlay/HotbarIndicator.class to com/mohuia/better_looting/client/overlay/HotbarIndicator.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/HotbarIndicator with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/HotbarIndicator in 15.28 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/HotbarIndicator in 16.34 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/LootScanner.class to com/mohuia/better_looting/client/core/LootScanner.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/LootScanner with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/LootScanner in 4.549 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/LootScanner in 5.756 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/VisualItemEntry.class to com/mohuia/better_looting/client/core/VisualItemEntry.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/VisualItemEntry with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/VisualItemEntry in 2.164 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/VisualItemEntry in 4.060 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/PickupHandler$PickupAction.class to com/mohuia/better_looting/client/core/PickupHandler$PickupAction.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/PickupHandler$PickupAction with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/PickupHandler$PickupAction in 3.149 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/PickupHandler$PickupAction in 5.039 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/Core$1.class to com/mohuia/better_looting/client/Core$1.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Core$1 with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Core$1 in 3.395 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Core$1 in 4.260 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/overlay/OverlayLayout.class to com/mohuia/better_looting/client/overlay/OverlayLayout.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayLayout with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/OverlayLayout in 4.041 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/OverlayLayout in 5.796 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/Utils.class to com/mohuia/better_looting/client/Utils.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/Utils with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Utils in 2.136 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/Utils in 4.470 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/LootScanner$MergeKey.class to com/mohuia/better_looting/client/core/LootScanner$MergeKey.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/LootScanner$MergeKey with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/LootScanner$MergeKey in 3.150 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/LootScanner$MergeKey in 3.352 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/overlay/Overlay$1.class to com/mohuia/better_looting/client/overlay/Overlay$1.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/Overlay$1 with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/Overlay$1 in 2.663 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/Overlay$1 in 3.374 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/overlay/OverlayRenderer.class to com/mohuia/better_looting/client/overlay/OverlayRenderer.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/overlay/OverlayRenderer with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/OverlayRenderer in 2.447 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/overlay/OverlayRenderer in 2.929 ms
 [Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/core/ActionDispatcher.class to com/mohuia/better_looting/client/core/ActionDispatcher.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
 [Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
-[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x00000205ae08e200@54c562f7
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
 [Architectury Transformer DEBUG] Remapping Classes:
 [Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
 [Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
 [Architectury Transformer DEBUG] Found class transformer
 [Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/core/ActionDispatcher with maxs=true frames=true
 [Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
-[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/ActionDispatcher in 2.894 ms
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/core/ActionDispatcher in 3.402 ms
+[Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/ConditionsScreen.class to com/mohuia/better_looting/config/ConditionsScreen.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
+[Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
+[Architectury Transformer DEBUG] Remapping Classes:
+[Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
+[Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
+[Architectury Transformer DEBUG] Found class transformer
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConditionsScreen with maxs=true frames=true
+[Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/ConditionsScreen in 3.914 ms
+[Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/ConfigViewModel.class to com/mohuia/better_looting/config/ConfigViewModel.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
+[Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
+[Architectury Transformer DEBUG] Remapping Classes:
+[Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
+[Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
+[Architectury Transformer DEBUG] Found class transformer
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConfigViewModel with maxs=true frames=true
+[Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/ConfigViewModel in 2.190 ms
+[Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/DragController.class to com/mohuia/better_looting/config/DragController.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
+[Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
+[Architectury Transformer DEBUG] Remapping Classes:
+[Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
+[Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
+[Architectury Transformer DEBUG] Found class transformer
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/DragController with maxs=true frames=true
+[Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/DragController in 2.148 ms
+[Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/DragController$DragMode.class to com/mohuia/better_looting/config/DragController$DragMode.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
+[Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
+[Architectury Transformer DEBUG] Remapping Classes:
+[Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
+[Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
+[Architectury Transformer DEBUG] Found class transformer
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/DragController$DragMode with maxs=true frames=true
+[Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/DragController$DragMode in 2.092 ms
+[Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/client/gui/CommonSlider.class to com/mohuia/better_looting/client/gui/CommonSlider.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
+[Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
+[Architectury Transformer DEBUG] Remapping Classes:
+[Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
+[Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
+[Architectury Transformer DEBUG] Found class transformer
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/client/gui/CommonSlider with maxs=true frames=true
+[Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/client/gui/CommonSlider in 2.829 ms
+[Architectury Transformer DEBUG] Transforming from com/mohuia/better_looting/config/ConfigViewModel$PreviewBounds.class to com/mohuia/better_looting/config/ConfigViewModel$PreviewBounds.class with 8 transformer(s) on dev.architectury.transformer.handler.TinyRemapperPreparedTransformerHandler
+[Architectury Transformer DEBUG] Remapping with 1 mapping provider(s):
+[Architectury Transformer DEBUG]  - dev.architectury.transformer.transformers.TransformForgeEnvironment$$Lambda/0x000002572608e200@54c562f7
+[Architectury Transformer DEBUG] Remapping Classes:
+[Architectury Transformer DEBUG] net/fabricmc/api/EnvType -> net/minecraftforge/api/distmarker/Dist
+[Architectury Transformer DEBUG] net/fabricmc/api/Environment -> net/minecraftforge/api/distmarker/OnlyIn
+[Architectury Transformer DEBUG] Found class transformer
+[Architectury Transformer DEBUG] Writing com/mohuia/better_looting/config/ConfigViewModel$PreviewBounds with maxs=true frames=true
+[Architectury Transformer DEBUG] Remapping refmap from intermediary to srg: better_looting-forge-forge-refmap.json
+[Architectury Transformer DEBUG] Transformed com/mohuia/better_looting/config/ConfigViewModel$PreviewBounds in 3.878 ms

@@ -14,6 +14,10 @@ import net.minecraft.util.Mth;
 
 import java.util.List;
 
+/**
+ * 负责控制战利品悬浮窗 (Overlay) 的核心渲染逻辑与状态管理。
+ * 采用单例模式，通过监听游戏 Tick 和 Render 事件来触发界面的更新与绘制。
+ */
 public class Overlay {
     public static final Overlay INSTANCE = new Overlay();
 
@@ -23,10 +27,12 @@ public class Overlay {
 
     private Overlay() {}
 
+    /**
+     * 处理客户端 Tick 逻辑，主要用于捕获按键状态以切换 UI 显示模式。
+     */
     public void onTick(Minecraft mc) {
         if (mc.level == null) return;
 
-        // 处理切换显示模式
         if (BetterLootingConfig.get().activationMode == BetterLootingConfig.ActivationMode.KEY_TOGGLE) {
             while (KeyInit.SHOW_OVERLAY.consumeClick()) {
                 isOverlayToggled = !isOverlayToggled;
@@ -34,13 +40,19 @@ public class Overlay {
         }
     }
 
+    /**
+     * UI 渲染的主入口。检查显示条件并协调状态更新与实际渲染流程。
+     */
     public void render(GuiGraphics gui, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
 
+        // 隐藏 GUI (F1) 或打开了其他菜单时暂停渲染
         if (mc.options.hideGui || mc.screen != null) return;
 
         Core core = Core.INSTANCE;
         List<VisualItemEntry> nearbyItems = core.getNearbyItems();
+
+        // 当周围没有战利品时，快速收起动画并清空渲染
         if (nearbyItems == null || nearbyItems.isEmpty()) {
             state.tick(false, 0, 0, 5);
             renderFlow(gui, mc, core, List.of());
@@ -53,22 +65,29 @@ public class Overlay {
         if (this.renderer == null) this.renderer = new OverlayRenderer(mc);
         OverlayLayout layout = new OverlayLayout(mc, state.popupProgress);
 
+        // 更新动画与滚动状态
         state.tick(shouldShow, core.getTargetScrollOffset(), nearbyItems.size(), layout.visibleRows);
 
+        // 只有当 UI 弹出进度大于 0 时才进行渲染，优化性能
         if (state.popupProgress > 0.001f) {
             renderFlow(gui, mc, core, nearbyItems);
         }
 
+        // 定期清理失效的物品动画缓存（每秒 1 次）
         if (mc.level != null && mc.level.getGameTime() % 20 == 0) {
             state.cleanupAnimations(nearbyItems);
         }
     }
 
+    /**
+     * 控制渲染的整体层级：设置矩阵位移 -> 渲染标题头 -> 渲染物品列表 -> 渲染 Tooltip。
+     */
     private void renderFlow(GuiGraphics gui, Minecraft mc, Core core, List<VisualItemEntry> nearbyItems) {
         OverlayLayout layout = new OverlayLayout(mc, state.popupProgress);
         var pose = gui.pose();
 
         pose.pushPose();
+        // 应用基于动画进度的整体偏移与缩放
         pose.translate(layout.baseX + layout.slideOffset, layout.baseY, 0);
         pose.scale(layout.finalScale, layout.finalScale, 1.0f);
 
@@ -82,11 +101,15 @@ public class Overlay {
 
         pose.popPose();
 
+        // Tooltip 需要在矩阵恢复后独立渲染，以避免跟随列表缩放导致文字模糊或错位
         if (state.popupProgress > 0.9f && !nearbyItems.isEmpty()) {
             renderSelectedTooltip(gui, mc, core, nearbyItems, layout);
         }
     }
 
+    /**
+     * 渲染滚动列表中的物品项，包含平滑滚动、边缘透明度衰减和列表裁剪 (Scissor) 逻辑。
+     */
     private void renderItemList(GuiGraphics gui, Core core, List<VisualItemEntry> nearbyItems, OverlayLayout layout) {
         int startIdx = Mth.floor(state.currentScroll);
         int endIdx = Mth.ceil(state.currentScroll + layout.visibleRows);
@@ -94,17 +117,21 @@ public class Overlay {
         boolean renderPrompt = false;
         float selectedBgAlpha = 0f;
 
+        // 开启严格裁剪区域，防止列表项超出规定显示范围
         layout.applyStrictScissor();
 
         for (int i = 0; i < nearbyItems.size(); i++) {
+            // 剔除完全不可见的物品，优化渲染性能
             if (i < startIdx - 1 || i > endIdx + 1) continue;
 
             VisualItemEntry entry = nearbyItems.get(i);
             boolean isSelected = (i == core.getSelectedIndex());
 
+            // 计算单个物品入场时的滑入动画偏移量
             float entryProgress = state.getItemEntryProgress(entry.getPrimaryId());
             float entryOffset = (1.0f - Utils.easeOutCubic(entryProgress)) * 40.0f;
 
+            // 计算列表顶部和底部的透明度衰减效果
             float itemAlpha = calculateListEdgeAlpha(i - state.currentScroll, layout.visibleRows);
             if (itemAlpha * state.popupProgress <= 0.05f) continue;
 
@@ -126,6 +153,7 @@ public class Overlay {
         }
 
         if (renderPrompt) {
+            // 切换为宽松裁剪区域，防止按键提示(Prompt)等略微越界的元素被切掉
             layout.applyLooseScissor();
             renderer.renderKeyPrompt(gui, Constants.LIST_X, layout.startY, layout.itemHeightTotal,
                     core.getSelectedIndex(), state.currentScroll, layout.visibleRows, selectedBgAlpha);
@@ -133,6 +161,7 @@ public class Overlay {
 
         RenderSystem.disableScissor();
 
+        // 如果物品总数超过可见行数，则渲染滚动条
         if (nearbyItems.size() > layout.visibleRows) {
             int totalVisualH = (int) (layout.visibleRows * layout.itemHeightTotal);
             renderer.renderScrollBar(gui, nearbyItems.size(), layout.visibleRows,
@@ -141,6 +170,9 @@ public class Overlay {
         }
     }
 
+    /**
+     * 为当前选中的物品渲染原版物品信息提示框 (Tooltip)。
+     */
     private void renderSelectedTooltip(GuiGraphics gui, Minecraft mc, Core core, List<VisualItemEntry> nearbyItems, OverlayLayout layout) {
         int sel = core.getSelectedIndex();
         if (sel >= 0 && sel < nearbyItems.size()) {
@@ -152,6 +184,9 @@ public class Overlay {
         }
     }
 
+    /**
+     * 判断当前玩家的状态是否满足触发悬浮窗的条件（基于配置文件）。
+     */
     private boolean checkActivationCondition(Minecraft mc) {
         var cfg = BetterLootingConfig.get();
         if (mc.player == null) return false;
@@ -161,6 +196,7 @@ public class Overlay {
             case STAND_STILL -> {
                 double dx = mc.player.getX() - mc.player.xo;
                 double dz = mc.player.getZ() - mc.player.zo;
+                // 利用位移平方差判断玩家是否几乎处于静止状态
                 yield (dx * dx + dz * dz) < 0.0001;
             }
             case KEY_HOLD -> !KeyInit.SHOW_OVERLAY.isUnbound() && KeyInit.SHOW_OVERLAY.isDown();
@@ -169,6 +205,9 @@ public class Overlay {
         };
     }
 
+    /**
+     * 绘制悬浮窗的头部，包括标题文字和下划线分隔符。
+     */
     private void drawHeader(GuiGraphics gui, OverlayLayout layout) {
         int headerY = layout.startY - 14;
         int titleAlpha = (int)(state.popupProgress * layout.globalAlpha * 255);
@@ -186,6 +225,13 @@ public class Overlay {
         renderer.renderFilterTabs(gui, Constants.LIST_X + layout.panelWidth - 20, headerY + 10);
     }
 
+    /**
+     * 计算列表顶部和底部元素的透明度，使其实现平滑淡入淡出的视觉效果。
+     *
+     * @param relativeIndex 元素相对于当前滚动位置的索引 (例如 < 0 表示在视口上方)
+     * @param visibleRows   配置中定义的最大可见行数
+     * @return 0.0f 到 1.0f 之间的透明度乘数
+     */
     private float calculateListEdgeAlpha(float relativeIndex, float visibleRows) {
         if (relativeIndex < 0) return Mth.clamp(1.0f + (relativeIndex * 1.5f), 0f, 1f);
         if (relativeIndex > visibleRows - 1.0f) {

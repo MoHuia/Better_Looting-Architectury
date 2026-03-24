@@ -17,6 +17,10 @@ import net.minecraft.world.item.Items;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 主配置界面（所见即所得）。
+ * 允许玩家通过拖拽、缩放实时预览拾取面板的效果，并提供透明度调节和跳转到条件设置的入口。
+ */
 public class ConfigScreen extends Screen {
 
     private final ConfigViewModel viewModel;
@@ -24,6 +28,7 @@ public class ConfigScreen extends Screen {
     private OverlayRenderer renderer;
     private final List<VisualItemEntry> previewItems = new ArrayList<>();
 
+    // 预览框的边界坐标，用于处理鼠标拖拽和裁剪
     private float boxLeft, boxTop, boxRight, boxBottom;
 
     public ConfigScreen() {
@@ -35,6 +40,7 @@ public class ConfigScreen extends Screen {
         this.viewModel = existingModel;
         this.dragController = new DragController();
 
+        // 填充虚拟的预览物品数据，供渲染使用
         previewItems.add(new VisualItemEntry(new ItemStack(Items.DIAMOND, 1)));
         previewItems.add(new VisualItemEntry(new ItemStack(Items.GOLDEN_APPLE, 1)));
         previewItems.add(new VisualItemEntry(new ItemStack(Items.IRON_SWORD, 1)));
@@ -49,6 +55,7 @@ public class ConfigScreen extends Screen {
         int cx = this.width / 2;
         int bottomBase = this.height - 30;
 
+        // 右上角：跳转到详细条件设置的齿轮按钮
         this.addRenderableWidget(Button.builder(Component.literal("⚙"), b -> {
                     if (this.minecraft != null) {
                         this.minecraft.setScreen(new ConditionsScreen(this, this.viewModel));
@@ -58,19 +65,22 @@ public class ConfigScreen extends Screen {
                 .tooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.settings")))
                 .build());
 
+        // 底部：全局透明度调节滑块
         this.addRenderableWidget(new CommonSlider(
                 cx - 100, bottomBase - 25, 200, 20,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.opacity"),
                 0.1, 1.0, (double) viewModel.globalAlpha,
-                val -> viewModel.globalAlpha = val.floatValue() // 使用 .floatValue()
+                val -> viewModel.globalAlpha = val.floatValue()
         ));
 
+        // 底部：重置按钮
         this.addRenderableWidget(Button.builder(Component.translatable("gui." + BetterLooting.MODID + ".config.reset"), b -> {
             viewModel.resetToDefault();
             this.clearWidgets();
             this.init();
         }).bounds(cx - 105, bottomBase, 100, 20).build());
 
+        // 底部：保存按钮
         this.addRenderableWidget(Button.builder(Component.translatable("gui." + BetterLooting.MODID + ".config.save"), b -> {
             viewModel.saveToConfig();
             this.onClose();
@@ -86,6 +96,9 @@ public class ConfigScreen extends Screen {
         super.render(gui, mouseX, mouseY, partialTick);
     }
 
+    /**
+     * 渲染左上角的调试/信息面板，实时显示当前位置、尺寸、缩放比和触发条件。
+     */
     private void renderInfoOverlay(GuiGraphics gui) {
         gui.fill(5, 5, 130, 80, 0x80000000);
         int startX = 10, startY = 10;
@@ -99,6 +112,10 @@ public class ConfigScreen extends Screen {
         gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.header_condition").copy().append(": ").append(modeName), startX, startY + 45, 0xFFDDDDDD, false);
     }
 
+    /**
+     * 渲染模拟的掉落物面板。
+     * 使用 PoseStack 处理偏移与缩放，并结合 Scissor 处理可视行数截断。
+     */
     private void renderPreview(GuiGraphics gui, int mouseX, int mouseY) {
         var bounds = viewModel.calculatePreviewBounds(this.width, this.height);
         this.boxLeft = bounds.left();
@@ -120,6 +137,7 @@ public class ConfigScreen extends Screen {
         int headerColor = (0x00FFAA00 & 0x00FFFFFF) | (renderAlpha << 24);
         int lineColor = (0x00AAAAAA & 0x00FFFFFF) | ((int)(renderAlpha * 0.5f) << 24);
 
+        // 渲染列表标题
         float localMinY = -(Constants.ITEM_HEIGHT / 2.0f) - 14;
         pose.pushPose();
         pose.translate(Constants.LIST_X, localMinY, 0);
@@ -127,8 +145,10 @@ public class ConfigScreen extends Screen {
         gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.preview_title"), 0, 0, headerColor, true);
         pose.popPose();
 
+        // 渲染标题下方的分割线
         gui.fill(Constants.LIST_X, (int)localMinY + 10, Constants.LIST_X + viewModel.panelWidth, (int)localMinY + 11, lineColor);
 
+        // 开启剪裁区域以模拟 visibleRows 设定下的溢出隐藏效果
         gui.enableScissor((int)boxLeft, (int)boxTop, (int)boxRight, (int)boxBottom);
 
         int startY = -(Constants.ITEM_HEIGHT / 2);
@@ -140,9 +160,14 @@ public class ConfigScreen extends Screen {
         gui.disableScissor();
         pose.popPose();
 
+        // 绘制拖拽调整大小的控制柄
         drawControlHandles(gui, mouseX, mouseY);
     }
 
+    /**
+     * 绘制调整面板尺寸和位置的控制热区边框。
+     * 根据鼠标悬停状态高亮相应的拖拽区域（右侧拉伸、底部拉伸、右下角整体拉伸）。
+     */
     private void drawControlHandles(GuiGraphics gui, int mouseX, int mouseY) {
         DragController.DragMode mode = dragController.getCurrentDragMode();
         int borderCol = (mode == DragController.DragMode.MOVE) ? 0xFFFFFFFF : 0x60FFFFFF;
@@ -158,13 +183,18 @@ public class ConfigScreen extends Screen {
         gui.fill((int)boxRight-2, (int)boxBottom-2, (int)boxRight+6, (int)boxBottom+6, cC);
     }
 
+    /**
+     * 绘制背景参考网格，辅助玩家对齐 UI 元素。
+     */
     private void renderGrid(GuiGraphics gui) {
         int color = 0x20FFFFFF;
         for (int x = 0; x < this.width; x += 20) gui.fill(x, 0, x + 1, this.height, color);
         for (int y = 0; y < this.height; y += 20) gui.fill(0, y, this.width, y + 1, color);
-        gui.fill(this.width / 2, 0, this.width / 2 + 1, this.height, 0x40FF0000);
-        gui.fill(0, this.height / 2, this.width, this.height / 2 + 1, 0x40FF0000);
+        gui.fill(this.width / 2, 0, this.width / 2 + 1, this.height, 0x40FF0000); // 中心垂直红线
+        gui.fill(0, this.height / 2, this.width, this.height / 2 + 1, 0x40FF0000); // 中心水平红线
     }
+
+    // --- 鼠标事件转发给 DragController ---
 
     @Override
     public boolean mouseClicked(double x, double y, int btn) {

@@ -22,14 +22,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
 
+/**
+ * ItemEntity 的 Mixin，用于实现“掉落物超大堆叠”功能。
+ * 通过实现 ISuperStack 接口（鸭子类型），为原版掉落物附加一个“额外数量”属性。
+ * 这可以有效减少地上掉落物实体的数量，从而大幅优化游戏性能。
+ */
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityMixin extends Entity implements ISuperStack {
 
     @Shadow public abstract ItemStack getItem();
     @Shadow public abstract void setItem(ItemStack stack);
 
+    // 注册实体同步数据，用于在服务端和客户端之间同步“额外物品数量”
     @Unique
     private static final EntityDataAccessor<Integer> EXTRA_ITEM_COUNT = SynchedEntityData.defineId(ItemEntity.class, EntityDataSerializers.INT);
+
+    // NBT 标签键名，用于将额外数量保存到硬盘
     @Unique
     private static final String EXTRA_COUNT_NBT_KEY = "BetterLootingExtraCount";
 
@@ -52,11 +60,17 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         this.betterlooting$setExtraCount(this.betterlooting$getExtraCount() + count);
     }
 
+    /**
+     * 定义同步数据初始值
+     */
     @Inject(method = "defineSynchedData", at = @At("RETURN"))
     private void betterlooting$defineSynchedData(CallbackInfo ci) {
         this.entityData.define(EXTRA_ITEM_COUNT, 0);
     }
 
+    /**
+     * 写入 NBT 保存数据
+     */
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     private void betterlooting$saveExtraCount(CompoundTag tag, CallbackInfo ci) {
         int extraCount = this.betterlooting$getExtraCount();
@@ -65,6 +79,9 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         }
     }
 
+    /**
+     * 读取 NBT 恢复数据
+     */
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     private void betterlooting$readExtraCount(CompoundTag tag, CallbackInfo ci) {
         if (tag.contains(EXTRA_COUNT_NBT_KEY)) {
@@ -72,6 +89,10 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         }
     }
 
+    /**
+     * 扩大掉落物的合并搜索范围
+     * 修改 mergeWithNeighbours 中调用 getEntitiesOfClass 的搜索框参数
+     */
     @ModifyArg(
             method = "mergeWithNeighbours",
             at = @At(
@@ -81,22 +102,31 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             index = 1
     )
     private AABB betterlooting$expandMergeArea(AABB originalBox) {
-        double radius = 5.0;
+        double radius = 5.0; // 将合并半径扩大到 5.0 格
         return this.getBoundingBox().inflate(radius, radius, radius);
     }
 
+    /**
+     * 强制允许合并
+     * 只要物品本身是可堆叠的（如泥土），无论数量是否已满 64，都允许尝试合并
+     */
     @Inject(method = "isMergable", at = @At("HEAD"), cancellable = true)
     private void betterlooting$forceMergable(CallbackInfoReturnable<Boolean> cir) {
         if (!this.getItem().isStackable()) return;
         cir.setReturnValue(true);
     }
 
+    /**
+     * 接管并重写实体合并逻辑（核心方法）
+     * 将两个相同的掉落物实体数量相加，并存入存活下来的那个实体的“额外数量”中
+     */
     @Inject(method = "tryToMerge", at = @At("HEAD"), cancellable = true)
     private void betterlooting$superMerge(ItemEntity other, CallbackInfo ci) {
         ItemEntity self = (ItemEntity) (Object) this;
         ItemStack stackSelf = self.getItem();
         ItemStack stackOther = other.getItem();
 
+        // 检查物品种类和 NBT 是否完全一致
         if (!Objects.equals(stackSelf.getItem(), stackOther.getItem()) ||
                 !ItemStack.isSameItemSameTags(stackSelf, stackOther)) {
             return;
@@ -105,9 +135,11 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         ISuperStack selfDuck = (ISuperStack) self;
         ISuperStack otherDuck = (ISuperStack) other;
 
+        // 计算双方的总数量（原版数量 + 我们的额外数量）
         int selfTotal = stackSelf.getCount() + selfDuck.betterlooting$getExtraCount();
         int otherTotal = stackOther.getCount() + otherDuck.betterlooting$getExtraCount();
 
+        // 谁的数量多谁就存活，把另一个实体的数量吸收过来，然后销毁较小的那个实体
         if (selfTotal >= otherTotal) {
             selfDuck.betterlooting$addExtraCount(otherTotal);
             self.setPickUpDelay(15);
@@ -118,12 +150,18 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             self.discard();
         }
 
+        // 取消原版的合并逻辑
         ci.cancel();
     }
 
+    /**
+     * 每 Tick 检查并自动补充物品数量
+     * 当掉落物的原版栈被拾取一部分（比如从 64 变成了 30），
+     * 从“额外数量”池中提取物品来把原版栈补满，直到“额外数量”耗尽。
+     */
     @Inject(method = "tick", at = @At("TAIL"))
     private void betterlooting$refillStack(CallbackInfo ci) {
-        if (this.level().isClientSide) return;
+        if (this.level().isClientSide) return; // 仅在服务端处理逻辑
 
         int extraCount = this.betterlooting$getExtraCount();
         if (extraCount <= 0) return;
