@@ -28,6 +28,14 @@ public class BetterLootingConfig {
     public float visibleRows = 4.5f;
     public float globalAlpha = 0.9f;
     public boolean showHotbarIndicator = true;
+    public String customOverlayTitle = "Loot Detected";
+
+    // ==========================================
+    // 快捷栏指示器悬浮窗设置 (Indicator Settings)
+    // ==========================================
+    public float indicatorX = -1.0f; // -1 代表使用默认贴合快捷栏的位置
+    public float indicatorY = -1.0f;
+    public int indicatorRotation = 0; // 支持 0, 90, 180, 270
 
     // ==========================================
     // 交互模式设置 (Interaction Modes)
@@ -68,6 +76,10 @@ public class BetterLootingConfig {
         this.lookDownAngle = Mth.clamp(this.lookDownAngle, 0.0f, 90.0f);
         this.scanRangeXZ = Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f);
         this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
+        this.customOverlayTitle = BetterLootingConfig.get().customOverlayTitle;
+        this.indicatorRotation = (this.indicatorRotation / 90 * 90) % 360;
+
+        if (this.indicatorRotation < 0) this.indicatorRotation += 360;
 
         if (this.activationMode == null) this.activationMode = ActivationMode.ALWAYS;
         if (this.scrollMode == null) this.scrollMode = ScrollMode.ALWAYS;

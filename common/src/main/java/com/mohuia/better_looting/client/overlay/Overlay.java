@@ -212,14 +212,22 @@ public class Overlay {
         int headerY = layout.startY - 14;
         int titleAlpha = (int)(state.popupProgress * layout.globalAlpha * 255);
 
-        gui.pose().pushPose();
-        gui.pose().translate(Constants.LIST_X, headerY, 0);
-        gui.pose().scale(0.75f, 0.75f, 1.0f);
+        // 1. 获取用户自定义配置的字符串
+        String customTitle = BetterLootingConfig.get().customOverlayTitle;
 
-        Component title = Component.translatable("gui.better_looting.loot_detected");
-        gui.drawString(Minecraft.getInstance().font, title, 0, 0, Utils.colorWithAlpha(0xFFFFD700, titleAlpha), true);
-        gui.pose().popPose();
+        // 2. 判空：只有当字符串存在且不为空时，才渲染文字
+        if (customTitle != null && !customTitle.isEmpty()) {
+            gui.pose().pushPose();
+            gui.pose().translate(Constants.LIST_X, headerY, 0);
+            gui.pose().scale(0.75f, 0.75f, 1.0f);
 
+            // 使用 Component.literal 直接渲染配置中的纯文本
+            Component title = Component.literal(customTitle);
+            gui.drawString(Minecraft.getInstance().font, title, 0, 0, Utils.colorWithAlpha(0xFFFFD700, titleAlpha), true);
+            gui.pose().popPose();
+        }
+
+        // 3. 渲染下划线和右侧 Tabs（不受标题是否留空影响）
         int lineColor = Utils.colorWithAlpha(0xFFAAAAAA, (int)(titleAlpha * 0.5));
         gui.fill(Constants.LIST_X, headerY + 10, Constants.LIST_X + layout.panelWidth, headerY + 11, lineColor);
         renderer.renderFilterTabs(gui, Constants.LIST_X + layout.panelWidth - 20, headerY + 10);

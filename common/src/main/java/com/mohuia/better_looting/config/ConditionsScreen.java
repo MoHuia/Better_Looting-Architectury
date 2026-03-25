@@ -7,6 +7,7 @@ import com.mohuia.better_looting.config.BetterLootingConfig.ActivationMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.ScrollMode;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox; // 【新增】引入原版文本输入框组件
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -82,6 +83,19 @@ public class ConditionsScreen extends Screen {
         }).bounds(rightBtnX, listStartY, dynamicColWidth, BTN_HEIGHT).build();
         this.addRenderableWidget(indicatorBtn);
 
+        // 【新增】自定义悬浮窗标题文本框
+        int titleLabelY = listStartY + BTN_HEIGHT + BTN_GAP * 2; // 留出一点空隙用来在 render 里画标签文字
+        int titleBoxY = titleLabelY + 12; // 文本框在标签文字下方
+
+        EditBox titleInputBox = new EditBox(this.font, rightBtnX, titleBoxY, dynamicColWidth, BTN_HEIGHT, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"));
+        titleInputBox.setMaxLength(32); // 限制标题最大长度，防止界面越界
+        // 设置初始值为 ViewModel 中的值，注意防空指针
+        titleInputBox.setValue(viewModel.customOverlayTitle != null ? viewModel.customOverlayTitle : "");
+        // 监听文本改变，实时同步到 ViewModel
+        titleInputBox.setResponder(text -> viewModel.customOverlayTitle = text);
+        titleInputBox.setTooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.custom_title")));
+        this.addRenderableWidget(titleInputBox);
+
         // 4. 返回按钮：居中置底
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> this.minecraft.setScreen(parent))
                 .bounds(this.width / 2 - 100, this.height - 28, 200, 20).build());
@@ -142,6 +156,11 @@ public class ConditionsScreen extends Screen {
 
         renderKeyInfo(gui, leftColX, bottomY, viewModel.activationMode);
         renderKeyInfo(gui, centerColX, bottomY, viewModel.scrollMode);
+
+        // 【新增】绘制文本框上方的说明文字标签
+        int rightBtnX = rightColX - (dynamicColWidth / 2);
+        int titleLabelY = 65 + BTN_HEIGHT + BTN_GAP * 2; // 与 init() 中的高度计算保持一致
+        gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"), rightBtnX + 2, titleLabelY, 0xDDDDDD);
 
         super.render(gui, mouseX, mouseY, partialTick);
     }
