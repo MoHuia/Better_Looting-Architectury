@@ -19,6 +19,9 @@ public class HotbarIndicator {
      * 需要被挂载到 Architectury 的 HudRenderEvent 渲染事件中。
      */
     public void render(GuiGraphics gui, float partialTick) {
+        // 意图 0：检查玩家是否在配置中关闭了指示器
+        if (!com.mohuia.better_looting.config.BetterLootingConfig.get().showHotbarIndicator) return;
+
         Minecraft mc = Minecraft.getInstance();
 
         // 意图 1：如果玩家按下了 F1 隐藏了 GUI，或者当前打开了任何界面（如物品栏、暂停菜单），则不渲染指示器。

@@ -17,6 +17,7 @@ public class ConfigViewModel {
     public int panelWidth;
     public float visibleRows;
     public float globalAlpha;
+    public boolean showHotbarIndicator;
 
     public BetterLootingConfig.ActivationMode activationMode;
     public BetterLootingConfig.ScrollMode scrollMode;
@@ -47,6 +48,7 @@ public class ConfigViewModel {
         this.activationMode = cfg.activationMode;
         this.scrollMode = cfg.scrollMode;
         this.lookDownAngle = cfg.lookDownAngle;
+        this.showHotbarIndicator = cfg.showHotbarIndicator;
     }
 
     /**
@@ -63,6 +65,7 @@ public class ConfigViewModel {
         cfg.activationMode = this.activationMode;
         cfg.scrollMode = this.scrollMode;
         cfg.lookDownAngle = this.lookDownAngle;
+        cfg.showHotbarIndicator = this.showHotbarIndicator;
 
         cfg.validate(); // 保存前最后校验一次，确保数据绝对安全
         BetterLootingConfig.save();
@@ -82,6 +85,7 @@ public class ConfigViewModel {
         this.activationMode = defaults.activationMode;
         this.scrollMode = defaults.scrollMode;
         this.lookDownAngle = defaults.lookDownAngle;
+        this.showHotbarIndicator = defaults.showHotbarIndicator;
     }
 
     /**

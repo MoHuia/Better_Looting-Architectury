@@ -18,17 +18,20 @@ import java.util.function.Function;
 
 /**
  * 触发与滚动条件配置界面。
- * 允许玩家自定义面板显示和列表滚动的限制条件（如：一直开启、低头时开启、按键开启等）。
+ * 允许玩家自定义面板显示和列表滚动的限制条件，并控制其他杂项设置。
  */
 public class ConditionsScreen extends Screen {
 
     private final Screen parent;
     private final ConfigViewModel viewModel;
 
-    private static final int COLUMN_WIDTH = 160;
     private static final int BTN_HEIGHT = 20;
     private static final int BTN_GAP = 5;
-    private static final int PADDING = 15;
+    private static final int PADDING = 6;
+
+    // --- 动态布局变量 ---
+    private int dynamicColWidth;
+    private int leftColX, centerColX, rightColX;
 
     public ConditionsScreen(Screen parent, ConfigViewModel viewModel) {
         super(Component.translatable("gui." + BetterLooting.MODID + ".conditions_title"));
@@ -36,39 +39,60 @@ public class ConditionsScreen extends Screen {
         this.viewModel = viewModel;
     }
 
+    private void calculateLayout() {
+        int maxBgWidth = 140;
+        int gap = 12;
+
+        int bgWidth = Math.min(maxBgWidth, (this.width - (gap * 2) - 20) / 3);
+
+        this.dynamicColWidth = bgWidth - (PADDING * 2);
+
+        this.centerColX = this.width / 2;
+        this.leftColX = this.centerColX - bgWidth - gap;
+        this.rightColX = this.centerColX + bgWidth + gap;
+    }
+
     @Override
     protected void init() {
-        int quarterWidth = this.width / 4;
-        int threeQuarterWidth = (this.width / 4) * 3;
-        int listStartY = 60;
+        calculateLayout();
 
-        // 构建“激活条件”列
-        buildEnumColumn(quarterWidth, listStartY,
+        // 【修改】将按钮起始高度从 45 下调到 65，避开顶部标题
+        int listStartY = 65;
+
+        // 1. 构建“激活条件”列 (左列)
+        buildEnumColumn(leftColX, listStartY, dynamicColWidth,
                 ActivationMode.values(), viewModel.activationMode,
                 (mode) -> viewModel.activationMode = mode,
                 this::getModeName, this::getModeTooltip);
 
-        // 构建“滚动条件”列
-        buildEnumColumn(threeQuarterWidth, listStartY,
+        // 2. 构建“滚动条件”列 (中列)
+        buildEnumColumn(centerColX, listStartY, dynamicColWidth,
                 ScrollMode.values(), viewModel.scrollMode,
                 (mode) -> viewModel.scrollMode = mode,
                 this::getScrollModeName, this::getScrollModeTooltip);
 
-        // 返回按钮
+        // 3. 构建“其他设置”列 (右列)
+        int rightBtnX = rightColX - (dynamicColWidth / 2);
+        Component indicatorText = Component.translatable("gui." + BetterLooting.MODID + ".config.hotbar_indicator");
+
+        Button indicatorBtn = Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {
+            viewModel.showHotbarIndicator = !viewModel.showHotbarIndicator;
+            this.clearWidgets();
+            this.init();
+        }).bounds(rightBtnX, listStartY, dynamicColWidth, BTN_HEIGHT).build();
+        this.addRenderableWidget(indicatorBtn);
+
+        // 4. 返回按钮：居中置底
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> this.minecraft.setScreen(parent))
-                .bounds(this.width / 2 - 100, this.height - 30, 200, 20).build());
+                .bounds(this.width / 2 - 100, this.height - 28, 200, 20).build());
     }
 
-    /**
-     * 动态生成枚举选项列。
-     * 遍历传入的枚举数组，为每个枚举值生成一个切换按钮。如果是特定模式（如低头模式），还会额外生成相关参数调整的滑块。
-     */
-    private <T extends Enum<T>> void buildEnumColumn(int centerX, int startY, T[] values, T current,
+    private <T extends Enum<T>> void buildEnumColumn(int centerX, int startY, int colWidth, T[] values, T current,
                                                      Consumer<T> setter,
                                                      Function<T, Component> nameProvider,
                                                      Function<T, Tooltip> tooltipProvider) {
         int currentY = startY;
-        int x = centerX - (COLUMN_WIDTH / 2);
+        int x = centerX - (colWidth / 2);
 
         for (T mode : values) {
             boolean isSelected = (mode == current);
@@ -76,18 +100,17 @@ public class ConditionsScreen extends Screen {
             Button btn = Button.builder(formatOptionText(nameProvider.apply(mode), isSelected), b -> {
                         setter.accept(mode);
                         this.clearWidgets();
-                        this.init(); // 刷新界面以更新按钮选中状态和可能出现的子选项
+                        this.init();
                     })
-                    .bounds(x, currentY, COLUMN_WIDTH, BTN_HEIGHT)
+                    .bounds(x, currentY, colWidth, BTN_HEIGHT)
                     .tooltip(tooltipProvider.apply(mode))
                     .build();
             this.addRenderableWidget(btn);
             currentY += BTN_HEIGHT + BTN_GAP;
 
-            // 特殊处理：如果选中了低头模式，展示角度调节滑块
             if (mode == ActivationMode.LOOK_DOWN && isSelected) {
                 this.addRenderableWidget(new CommonSlider(
-                        x + 10, currentY, COLUMN_WIDTH - 10, BTN_HEIGHT,
+                        x + 2, currentY, colWidth - 4, BTN_HEIGHT,
                         Component.translatable("gui." + BetterLooting.MODID + ".angle"),
                         0.0, 90.0, (double) viewModel.lookDownAngle,
                         val -> viewModel.lookDownAngle = val.floatValue()
@@ -97,9 +120,6 @@ public class ConditionsScreen extends Screen {
         }
     }
 
-    /**
-     * 为选中的选项添加绿色勾选标记，未选中的置灰。
-     */
     private Component formatOptionText(Component text, boolean selected) {
         return selected
                 ? Component.literal("[✔] ").withStyle(ChatFormatting.GREEN).append(text.copy().withStyle(ChatFormatting.GREEN))
@@ -111,25 +131,21 @@ public class ConditionsScreen extends Screen {
         this.renderBackground(gui);
         gui.drawCenteredString(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
 
-        int quarterWidth = this.width / 4;
-        int threeQuarterWidth = (this.width / 4) * 3;
+        // 【修改】将半透明背景底板起始高度从 32 下调到 50
+        // 这样栏目的标题就会被渲染在 50 - 12 = 38 的高度，完美避开高度为 15 的主标题
         int topY = 50;
         int bottomY = this.height - 40;
 
-        // 绘制两列的半透明背景底板
-        renderColumnBackground(gui, quarterWidth, topY, bottomY, Component.translatable("gui." + BetterLooting.MODID + ".header_condition"));
-        renderColumnBackground(gui, threeQuarterWidth, topY, bottomY, Component.translatable("gui." + BetterLooting.MODID + ".scroll_mode"));
+        renderColumnBackground(gui, leftColX, topY, bottomY, dynamicColWidth, Component.translatable("gui." + BetterLooting.MODID + ".header_condition"));
+        renderColumnBackground(gui, centerColX, topY, bottomY, dynamicColWidth, Component.translatable("gui." + BetterLooting.MODID + ".scroll_mode"));
+        renderColumnBackground(gui, rightColX, topY, bottomY, dynamicColWidth, Component.translatable("gui." + BetterLooting.MODID + ".other_settings"));
 
-        // 渲染按键绑定提示
-        renderKeyInfo(gui, quarterWidth, bottomY, viewModel.activationMode);
-        renderKeyInfo(gui, threeQuarterWidth, bottomY, viewModel.scrollMode);
+        renderKeyInfo(gui, leftColX, bottomY, viewModel.activationMode);
+        renderKeyInfo(gui, centerColX, bottomY, viewModel.scrollMode);
 
         super.render(gui, mouseX, mouseY, partialTick);
     }
 
-    /**
-     * 根据当前选择的模式，在列表底部显示对应的按键绑定信息。
-     */
     private void renderKeyInfo(GuiGraphics gui, int centerX, int bottomY, Enum<?> mode) {
         if (mode instanceof ActivationMode m && (m == ActivationMode.KEY_HOLD || m == ActivationMode.KEY_TOGGLE)) {
             drawKeyString(gui, centerX, bottomY, KeyInit.SHOW_OVERLAY, "config.key_info");
@@ -138,21 +154,18 @@ public class ConditionsScreen extends Screen {
         }
     }
 
-    /**
-     * 绘制按键绑定状态文字。若按键未绑定（Unbound），文字将标红警示。
-     */
     private void drawKeyString(GuiGraphics gui, int x, int y, net.minecraft.client.KeyMapping key, String langKey) {
         Component keyName = key.getTranslatedKeyMessage();
         int color = key.isUnbound() ? 0xFFFF5555 : 0xFF55FF55;
-        gui.drawCenteredString(this.font, Component.translatable("gui." + BetterLooting.MODID + "." + langKey, keyName), x, y - 15, color);
+        gui.drawCenteredString(this.font, Component.translatable("gui." + BetterLooting.MODID + "." + langKey, keyName), x, y - 12, color);
     }
 
-    private void renderColumnBackground(GuiGraphics gui, int centerX, int topY, int bottomY, Component header) {
-        int halfW = (COLUMN_WIDTH / 2) + PADDING;
-        gui.fill(centerX - halfW, topY, centerX + halfW, bottomY, 0x60000000); // 黑色半透明底
-        gui.fill(centerX - halfW, topY, centerX + halfW, topY + 1, 0x80FFFFFF); // 顶部白线
-        gui.fill(centerX - halfW, bottomY - 1, centerX + halfW, bottomY, 0x80FFFFFF); // 底部白线
-        gui.drawCenteredString(this.font, header, centerX, topY - 12, 0xFFFFAA00); // 橙色标题
+    private void renderColumnBackground(GuiGraphics gui, int centerX, int topY, int bottomY, int colWidth, Component header) {
+        int halfW = (colWidth / 2) + PADDING;
+        gui.fill(centerX - halfW, topY, centerX + halfW, bottomY, 0x60000000);
+        gui.fill(centerX - halfW, topY, centerX + halfW, topY + 1, 0x80FFFFFF);
+        gui.fill(centerX - halfW, bottomY - 1, centerX + halfW, bottomY, 0x80FFFFFF);
+        gui.drawCenteredString(this.font, header, centerX, topY - 12, 0xFFFFAA00);
     }
 
     // --- 国际化文本获取工具方法 ---

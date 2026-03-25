@@ -27,6 +27,7 @@ public class BetterLootingConfig {
     public int panelWidth = 120;
     public float visibleRows = 4.5f;
     public float globalAlpha = 0.9f;
+    public boolean showHotbarIndicator = true;
 
     // ==========================================
     // 交互模式设置 (Interaction Modes)
@@ -38,8 +39,8 @@ public class BetterLootingConfig {
     // 判定参数设置 (Scanning Parameters)
     // ==========================================
     public float lookDownAngle = 45.0f;
-    public float scanRangeXZ = 3.0f;
-    public float scanRangeY = 1.5f;
+    public float scanRangeXZ = 1.0f;
+    public float scanRangeY = 0.5f;
 
     /**
      * 触发物品拾取 UI 的条件模式

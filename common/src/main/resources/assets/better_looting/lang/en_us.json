@@ -17,6 +17,8 @@
   "gui.better_looting.config.header_condition": "Activation Mode",
   "gui.better_looting.config.btn_conditions": "Conditions...",
   "gui.better_looting.loot_detected": "Loot Detected",
+  "gui.better_looting.other_settings": "Other settings",
+  "gui.better_looting.config.hotbar_indicator": "Hotbar Filter Indicator",
 
   "gui.better_looting.config.opacity": "Opacity",
   "gui.better_looting.angle": "Trigger Angle",
