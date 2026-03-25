@@ -27,6 +27,15 @@ public class BetterLootingConfig {
     public int panelWidth = 120;
     public float visibleRows = 4.5f;
     public float globalAlpha = 0.9f;
+    public boolean showHotbarIndicator = true;
+    public String customOverlayTitle = "Loot Detected";
+
+    // ==========================================
+    // 快捷栏指示器悬浮窗设置 (Indicator Settings)
+    // ==========================================
+    public float indicatorX = -1.0f; // -1 代表使用默认贴合快捷栏的位置
+    public float indicatorY = -1.0f;
+    public int indicatorRotation = 0; // 支持 0, 90, 180, 270
 
     // ==========================================
     // 交互模式设置 (Interaction Modes)
@@ -38,8 +47,8 @@ public class BetterLootingConfig {
     // 判定参数设置 (Scanning Parameters)
     // ==========================================
     public float lookDownAngle = 45.0f;
-    public float scanRangeXZ = 3.0f;
-    public float scanRangeY = 1.5f;
+    public float scanRangeXZ = 1.0f; // 注意：进阶版这里是 1.0f，旧版是 3.0f，我保留了进阶版的值
+    public float scanRangeY = 0.5f;  // 注意：进阶版这里是 0.5f，旧版是 1.5f，同上
 
     /**
      * 触发物品拾取 UI 的条件模式
@@ -67,6 +76,15 @@ public class BetterLootingConfig {
         this.lookDownAngle = Mth.clamp(this.lookDownAngle, 0.0f, 90.0f);
         this.scanRangeXZ = Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f);
         this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
+
+        // [逻辑修复] 防止玩家在 JSON 中误删 title 字段导致渲染时 null.isEmpty() 崩溃
+        if (this.customOverlayTitle == null) {
+            this.customOverlayTitle = "Loot Detected";
+        }
+
+        this.indicatorRotation = (this.indicatorRotation / 90 * 90) % 360;
+
+        if (this.indicatorRotation < 0) this.indicatorRotation += 360;
 
         if (this.activationMode == null) this.activationMode = ActivationMode.ALWAYS;
         if (this.scrollMode == null) this.scrollMode = ScrollMode.ALWAYS;

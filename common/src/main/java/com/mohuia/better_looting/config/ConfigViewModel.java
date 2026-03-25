@@ -17,6 +17,14 @@ public class ConfigViewModel {
     public int panelWidth;
     public float visibleRows;
     public float globalAlpha;
+    public boolean showHotbarIndicator;
+
+    // 悬浮窗标题文本（可自定义，也可留空）
+    public String customOverlayTitle;
+
+    // 悬浮窗编辑状态
+    public float indicatorX, indicatorY;
+    public int indicatorRotation;
 
     public BetterLootingConfig.ActivationMode activationMode;
     public BetterLootingConfig.ScrollMode scrollMode;
@@ -47,6 +55,14 @@ public class ConfigViewModel {
         this.activationMode = cfg.activationMode;
         this.scrollMode = cfg.scrollMode;
         this.lookDownAngle = cfg.lookDownAngle;
+        this.showHotbarIndicator = cfg.showHotbarIndicator;
+
+        // 读取自定义标题；做 null 保护，避免输入框或渲染阶段空指针
+        this.customOverlayTitle = cfg.customOverlayTitle == null ? "" : cfg.customOverlayTitle;
+
+        this.indicatorX = cfg.indicatorX;
+        this.indicatorY = cfg.indicatorY;
+        this.indicatorRotation = cfg.indicatorRotation;
     }
 
     /**
@@ -63,6 +79,14 @@ public class ConfigViewModel {
         cfg.activationMode = this.activationMode;
         cfg.scrollMode = this.scrollMode;
         cfg.lookDownAngle = this.lookDownAngle;
+        cfg.showHotbarIndicator = this.showHotbarIndicator;
+
+        // 保存自定义标题；null 一律转为空字符串，保证配置稳定
+        cfg.customOverlayTitle = this.customOverlayTitle == null ? "" : this.customOverlayTitle;
+
+        cfg.indicatorX = this.indicatorX;
+        cfg.indicatorY = this.indicatorY;
+        cfg.indicatorRotation = this.indicatorRotation;
 
         cfg.validate(); // 保存前最后校验一次，确保数据绝对安全
         BetterLootingConfig.save();
@@ -82,6 +106,14 @@ public class ConfigViewModel {
         this.activationMode = defaults.activationMode;
         this.scrollMode = defaults.scrollMode;
         this.lookDownAngle = defaults.lookDownAngle;
+        this.showHotbarIndicator = defaults.showHotbarIndicator;
+
+        // 恢复默认标题；同样做 null 保护
+        this.customOverlayTitle = defaults.customOverlayTitle == null ? "" : defaults.customOverlayTitle;
+
+        this.indicatorX = defaults.indicatorX;
+        this.indicatorY = defaults.indicatorY;
+        this.indicatorRotation = defaults.indicatorRotation;
     }
 
     /**

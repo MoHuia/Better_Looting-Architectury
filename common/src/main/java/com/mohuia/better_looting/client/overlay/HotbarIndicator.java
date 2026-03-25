@@ -2,7 +2,10 @@ package com.mohuia.better_looting.client.overlay;
 
 import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.client.Utils;
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
+import net.minecraft.client.DeltaTracker; // 1.21.1 引入：用于替代 float partialTick
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -14,11 +17,19 @@ import net.minecraft.client.gui.GuiGraphics;
 public class HotbarIndicator {
     public static final HotbarIndicator INSTANCE = new HotbarIndicator();
 
+    // 指示器的基础尺寸常量，用于旋转时的中心点计算
+    public static final int WIDTH = 6;
+    public static final int HEIGHT = 14;
+
     /**
      * HUD 的核心渲染逻辑。
      * 需要被挂载到 Architectury 的 HudRenderEvent 渲染事件中。
      */
-    public void render(GuiGraphics gui, float partialTick) {
+    public void render(GuiGraphics gui, DeltaTracker deltaTracker) {
+        BetterLootingConfig config = BetterLootingConfig.get();
+        // 意图 0：检查玩家是否在配置中关闭了指示器
+        if (!config.showHotbarIndicator) return;
+
         Minecraft mc = Minecraft.getInstance();
 
         // 意图 1：如果玩家按下了 F1 隐藏了 GUI，或者当前打开了任何界面（如物品栏、暂停菜单），则不渲染指示器。
@@ -27,33 +38,59 @@ public class HotbarIndicator {
         // 意图 2：如果玩家处于旁观者模式 (Spectator)，原版快捷栏会被隐藏或替换，此时我们的指示器也应该隐藏。
         if (mc.gameMode != null && !mc.gameMode.canHurtPlayer() && mc.player != null && mc.player.isSpectator()) return;
 
-        int screenWidth = mc.getWindow().getGuiScaledWidth();
-        int screenHeight = mc.getWindow().getGuiScaledHeight();
+        // 获取用户自定义的坐标，若为 -1 则动态计算原版快捷栏相对位置
+        float x = config.indicatorX;
+        float y = config.indicatorY;
 
-        // 坐标计算：基于屏幕中心点进行相对定位。
-        // 原版快捷栏的总宽度是 182 像素。91 是一半的宽度。
-        // 加上 6 像素的边距，意味着指示器会紧贴在快捷栏最右侧稍微偏外的位置。
-        int x = screenWidth / 2 + 91 + 6;
+        if (x < 0 || y < 0) {
+            int screenWidth = mc.getWindow().getGuiScaledWidth();
+            int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        // 快捷栏加上底部的默认边距通常占用 22 像素的高度。
-        // 减去 22 后加上 4 像素的微调，让指示器与快捷栏的槽位在视觉上垂直居中对齐。
-        int startY = screenHeight - 22 + 4;
+            // 坐标计算：基于屏幕中心点进行相对定位。
+            // 原版快捷栏的总宽度是 182 像素。91 是一半的宽度。
+            // 加上 6 像素的边距，意味着指示器会紧贴在快捷栏最右侧稍微偏外的位置。
+            x = screenWidth / 2f + 91f + 6f;
 
-        // 获取当前的核心过滤器模式（假设定义在 Core 模块中）
-        Core.FilterMode mode = Core.INSTANCE.getFilterMode();
+            // 快捷栏加上底部的默认边距通常占用 22 像素的高度。
+            // 减去 22 后加上 4 像素的微调，让指示器与快捷栏的槽位在视觉上垂直居中对齐。
+            y = screenHeight - 22f + 4f;
+        }
 
+        // 调用支持旋转的核心绘制方法
+        renderInternal(gui, x, y, config.indicatorRotation, Core.INSTANCE.getFilterMode());
+    }
+
+    /**
+     * 供编辑界面调用的内部绘制方法，支持自由坐标和 360 度旋转。
+     */
+    public void renderInternal(GuiGraphics gui, float x, float y, int rotationDegrees, Core.FilterMode mode) {
         // 准备 OpenGL 渲染状态：开启透明度混合，确保带 Alpha 通道的颜色能正确显示。
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        gui.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        gui.pose().pushPose();
+
+        // 将原点平移到指示器的物理中心进行自转
+        float centerX = x + WIDTH / 2.0f;
+        float centerY = y + HEIGHT / 2.0f;
+        gui.pose().translate(centerX, centerY, 0);
+        gui.pose().mulPose(Axis.ZP.rotationDegrees(rotationDegrees));
+        gui.pose().translate(-centerX, -centerY, 0);
+
+        int drawX = (int) x;
+        int drawY = (int) y;
 
         // 绘制两个模式的指示灯。
         // 如果当前是 ALL 模式，上方的白色灯亮起；如果当前是 RARE_ONLY，下方的金色灯亮起。
-        drawIndicator(gui, x, startY, mode == Core.FilterMode.ALL, 0xFFFFFFFF);
-        drawIndicator(gui, x, startY + 8, mode == Core.FilterMode.RARE_ONLY, 0xFFFFD700); // 0xFFFFD700 为标准的金色 (Gold)
+        drawIndicator(gui, drawX, drawY, mode == Core.FilterMode.ALL, 0xFFFFFFFF);
+        drawIndicator(gui, drawX, drawY + 8, mode == Core.FilterMode.RARE_ONLY, 0xFFFFD700); // 0xFFFFD700 为标准的金色 (Gold)
 
-        // 重置渲染状态，防止影响后续原版或其他模组的 UI 渲染
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        gui.pose().popPose();
+
+        // 重置 GuiGraphics 颜色状态，防止影响后续原版或其他模组的 UI 渲染
+        gui.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     /**
