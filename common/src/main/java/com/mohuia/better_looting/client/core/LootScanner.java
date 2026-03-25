@@ -5,6 +5,7 @@ import com.mohuia.better_looting.client.Utils;
 import com.mohuia.better_looting.client.filter.FilterWhitelist;
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -124,11 +125,11 @@ public class LootScanner {
      */
     private static class MergeKey {
         private final Item item;
-        private final CompoundTag tag;
+        private final DataComponentPatch components;
 
         public MergeKey(ItemStack stack) {
             this.item = stack.getItem();
-            this.tag = stack.getTag(); // 1.20.1 中标签可能为 null，下方 hashCode 做了安全处理
+            this.components = stack.getComponentsPatch();
         }
 
         @Override
@@ -136,13 +137,12 @@ public class LootScanner {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             MergeKey mergeKey = (MergeKey) o;
-            return item == mergeKey.item && Objects.equals(tag, mergeKey.tag);
+            return item == mergeKey.item && Objects.equals(components, mergeKey.components);
         }
 
         @Override
         public int hashCode() {
-            if (tag == null) return item.hashCode();
-            return 31 * item.hashCode() + tag.hashCode();
+            return Objects.hash(item, components);
         }
     }
 }

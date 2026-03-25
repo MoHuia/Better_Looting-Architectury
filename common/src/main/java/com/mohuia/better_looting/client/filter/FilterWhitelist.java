@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import dev.architectury.platform.Platform;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -11,6 +12,7 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,7 +60,8 @@ public class FilterWhitelist {
         if (id.getPath().equals("air")) return; // 防御性编程：防止空气方块进入白名单
 
         // 提取 NBT 为字符串进行持久化存储
-        String nbtStr = stack.hasTag() ? stack.getTag().toString() : null;
+        CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        String nbtStr = customData.isEmpty() ? null : customData.getUnsafe().toString();
         WhitelistEntry entry = new WhitelistEntry(id.toString(), nbtStr);
 
         if (entries.add(entry)) {
@@ -71,7 +74,8 @@ public class FilterWhitelist {
         if (stack.isEmpty()) return;
 
         ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
-        String nbtStr = stack.hasTag() ? stack.getTag().toString() : null;
+        CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        String nbtStr = customData.isEmpty() ? null : customData.getUnsafe().toString();
         WhitelistEntry entry = new WhitelistEntry(id.toString(), nbtStr);
 
         if (entries.remove(entry)) {
@@ -178,18 +182,19 @@ public class FilterWhitelist {
          */
         public boolean matches(ItemStack stack) {
             ResourceLocation stackId = BuiltInRegistries.ITEM.getKey(stack.getItem());
-            if (!stackId.toString().equals(this.id)) return false; // ID 不匹配，直接拒绝
+            if (!stackId.toString().equals(this.id)) return false;
 
-            CompoundTag stackTag = stack.getTag();
             CompoundTag entryTag = getTag();
 
-            // 意图：NBT 深度匹配机制。
+            CustomData stackData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+            // 将其转换为旧版的 CompoundTag 以便进行兼容性比较
+            CompoundTag stackTag = stackData.isEmpty() ? null : stackData.getUnsafe();
+
             if (entryTag == null || entryTag.isEmpty()) {
-                // 如果白名单条目没有 NBT，则只匹配同样没有 NBT 的物品
                 return stackTag == null || stackTag.isEmpty();
             } else {
                 if (stackTag == null) return false;
-                // NbtUtils.compareNbt 允许子集匹配。即白名单里的标签只要在物品上都有，就算匹配成功（忽略物品上多出来的耐久度等标签）。
+                // 继续使用原版的子集匹配逻辑，但这现在只对 CustomData 生效
                 return NbtUtils.compareNbt(entryTag, stackTag, true);
             }
         }
@@ -206,8 +211,9 @@ public class FilterWhitelist {
 
             ItemStack stack = new ItemStack(item);
             CompoundTag tag = getTag();
-            if (tag != null) {
-                stack.setTag(tag.copy());
+
+            if (tag != null && !tag.isEmpty()) {
+                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag.copy()));
             }
             return stack;
         }

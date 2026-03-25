@@ -24,7 +24,7 @@ public class JeiPlugin implements IModPlugin {
      */
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation("better_looting", "jei_plugin");
+        return ResourceLocation.fromNamespaceAndPath("better_looting", "jei_plugin");
     }
 
     /**

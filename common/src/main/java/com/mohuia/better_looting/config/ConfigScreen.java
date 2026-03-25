@@ -88,12 +88,22 @@ public class ConfigScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(gui);
+    public void renderBackground(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        // 1. 绘制原版的虚化背景
+        super.renderBackground(gui, mouseX, mouseY, partialTick);
+
+        // 2. 绘制网格和预览面板（让它们处于滑块和按键的下方）
         renderGrid(gui);
         renderPreview(gui, mouseX, mouseY);
-        renderInfoOverlay(gui);
+    }
+
+    @Override
+    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        // 1. 这里会自动触发背景绘制和按键绘制
         super.render(gui, mouseX, mouseY, partialTick);
+
+        // 2. 浮窗信息画在最后，确保它悬浮在最顶层，不会被任何东西遮挡
+        renderInfoOverlay(gui);
     }
 
     /**

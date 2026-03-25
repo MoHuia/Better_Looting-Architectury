@@ -1,5 +1,6 @@
 plugins {
-    id 'dev.architectury.loom' version '1.11-SNAPSHOT' apply false
+    // 推荐降到 1.7-SNAPSHOT，这是目前官方对 1.21.1 NeoForge 最稳定支持的版本
+    id 'dev.architectury.loom' version '1.13-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.gradleup.shadow' version '8.3.6' apply false
 }
@@ -13,7 +14,14 @@ allprojects {
     version = rootProject.mod_version
 
     repositories {
-        maven { url "https://repo.spongepowered.org/repository/maven-public/" } // 添加这一行
+        maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+
+        // --- 添加这一段：NeoForge 官方依赖仓库 ---
+        maven {
+            name = "NeoForged"
+            url = "https://maven.neoforged.net/releases/"
+        }
+        // ----------------------------------------
 
         // JEI 的 Maven
         maven {
@@ -56,12 +64,14 @@ subprojects {
     java {
         withSourcesJar()
 
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        // 升级至 Minecraft 1.21.1 强制要求的 Java 21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = 17
+        // 升级至 Java 21
+        it.options.release = 21
     }
 
     publishing {

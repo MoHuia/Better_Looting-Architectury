@@ -10,13 +10,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -93,10 +96,10 @@ public class OverlayRenderer {
         // 特殊处理附魔书：如果物品是附魔书，优先显示第一个附魔的名称而不是统一的“附魔书”
         Component displayName = stack.getHoverName();
         if (stack.getItem() instanceof EnchantedBookItem) {
-            Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
+            ItemEnchantments enchants = stack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY);
             if (!enchants.isEmpty()) {
-                Map.Entry<Enchantment, Integer> first = enchants.entrySet().iterator().next();
-                displayName = first.getKey().getFullname(first.getValue());
+                var first = enchants.entrySet().iterator().next();
+                displayName = Enchantment.getFullname(first.getKey(), first.getIntValue());
             }
         }
 
@@ -201,8 +204,7 @@ public class OverlayRenderer {
      */
     public void renderTooltip(GuiGraphics gui, ItemStack stack, int screenW, int screenH, OverlayLayout layout, float scroll, int sel) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        var lines = stack.getTooltipLines(mc.player, mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
-        if (lines.isEmpty()) return;
+        var lines = stack.getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);        if (lines.isEmpty()) return;
 
         int maxW = lines.stream().mapToInt(mc.font::width).max().orElse(0);
         int tw = maxW + 20, th = lines.size() * 10 + 12;

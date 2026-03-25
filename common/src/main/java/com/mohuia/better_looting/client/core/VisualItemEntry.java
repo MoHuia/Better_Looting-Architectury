@@ -52,7 +52,7 @@ public class VisualItemEntry {
         }
 
         // 检查物品类型和 NBT 是否完全一致
-        if (ItemStack.isSameItemSameTags(this.representativeStack, otherStack)) {
+        if (ItemStack.isSameItemSameComponents(this.representativeStack, otherStack)) {
             this.sourceEntities.add(entity);
 
             ISuperStack superStack = (ISuperStack) entity;

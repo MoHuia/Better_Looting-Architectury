@@ -43,7 +43,7 @@ public class Utils {
         // 位或运算 0xFF000000 用于将 Alpha 通道强制设为 255 (完全不透明)
         if (textColor != null) return textColor.getValue() | 0xFF000000;
 
-        ChatFormatting formatting = stack.getRarity().color;
+        ChatFormatting formatting = stack.getRarity().color();
         // 2. 其次使用原版稀有度定义的颜色（如罕见为黄色，史诗为紫色）
         if (formatting.getColor() != null) return formatting.getColor() | 0xFF000000;
 

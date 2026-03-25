@@ -1,36 +1,32 @@
 package com.mohuia.better_looting.network;
 
-import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.network.C2S.PacketBatchPickup;
-import dev.architectury.networking.NetworkChannel;
-import net.minecraft.resources.ResourceLocation;
+import dev.architectury.networking.NetworkManager;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /**
- * 基于 Architectury API 的网络数据包注册中心
- * 负责在客户端和服务端之间建立通信频道
+ * 网络数据包注册中心
  */
 public class NetworkHandler {
-    // 创建模组专属的主网络通道
-    public static final NetworkChannel INSTANCE = NetworkChannel.create(
-            new ResourceLocation(BetterLooting.MODID, "main")
-    );
 
     /**
      * 注册所有自定义的网络数据包
      * 必须在模组初始化阶段调用
      */
     public static void register() {
-        // 注册批量拾取数据包
-        INSTANCE.register(PacketBatchPickup.class,
-                PacketBatchPickup::toBytes,      // 序列化
-                PacketBatchPickup::new,         // 反序列化
-                PacketBatchPickup::handle);     // 处理器
+        NetworkManager.registerReceiver(
+                NetworkManager.Side.C2S,     // 方向：Client to Server
+                PacketBatchPickup.TYPE,      // 数据包的全局唯一标识
+                PacketBatchPickup.CODEC,     // 编解码器
+                PacketBatchPickup::handle    // 处理逻辑
+        );
     }
 
     /**
      * 便捷方法：从客户端向服务端发送数据包
      */
-    public static void sendToServer(Object msg) {
-        INSTANCE.sendToServer(msg);
+    public static void sendToServer(CustomPacketPayload msg) {
+        // 【变化】直接调用 NetworkManager 静态方法发送
+        NetworkManager.sendToServer(msg);
     }
 }

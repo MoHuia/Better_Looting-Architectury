@@ -107,7 +107,7 @@ public class MouseHandlerMixin {
             ItemStack jeiStack = JeiCompat.getHoveredItem();
             Slot hoveredSlot = FilterEvents.getHoveredSlot(containerScreen, mouseX, mouseY);
 
-            boolean hasTarget = (hoveredSlot != null && hoveredSlot.hasItem()) || (jeiStack != null && !jeiStack.isEmpty());
+            boolean hasTarget = (hoveredSlot != null && hoveredSlot.hasItem()) || !jeiStack.isEmpty();
 
             if (hasTarget) {
                 ci.cancel(); // 拦截原版的点击拿起物品逻辑

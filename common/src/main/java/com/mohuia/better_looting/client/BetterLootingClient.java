@@ -42,7 +42,8 @@ public class BetterLootingClient {
 
         // 4. 注册 HUD 渲染事件
         // 在原版 HUD 渲染完成后执行，用于将我们的覆盖层（Overlay）绘制在屏幕最上层
-        ClientGuiEvent.RENDER_HUD.register((gui, partialTick) -> {
+        ClientGuiEvent.RENDER_HUD.register((gui, deltaTracker) -> {
+            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
             Overlay.INSTANCE.render(gui, partialTick);
             HotbarIndicator.INSTANCE.render(gui, partialTick);
         });

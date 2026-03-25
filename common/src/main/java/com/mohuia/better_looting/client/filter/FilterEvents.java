@@ -53,9 +53,9 @@ public class FilterEvents {
         });
 
         // 拦截鼠标滚轮事件，用于面板的上下滑动。
-        ClientRawInputEvent.MOUSE_SCROLLED.register((client, scrollAmount) -> {
+        ClientRawInputEvent.MOUSE_SCROLLED.register((client, scrollX, scrollY) -> {
             if (client.screen instanceof AbstractContainerScreen<?>) {
-                if (FilterPanel.isOpen() && FilterPanel.scroll(scrollAmount)) {
+                if (FilterPanel.isOpen() && FilterPanel.scroll(scrollY)) {
                     return EventResult.interruptTrue();
                 }
             }

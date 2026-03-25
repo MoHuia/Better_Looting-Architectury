@@ -63,9 +63,10 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     /**
      * 定义同步数据初始值
      */
+    // 【修改 1】1.21.1 原版方法多了一个 Builder 参数，现在必须通过 Builder 注册
     @Inject(method = "defineSynchedData", at = @At("RETURN"))
-    private void betterlooting$defineSynchedData(CallbackInfo ci) {
-        this.entityData.define(EXTRA_ITEM_COUNT, 0);
+    private void betterlooting$defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
+        builder.define(EXTRA_ITEM_COUNT, 0);
     }
 
     /**
@@ -126,9 +127,10 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         ItemStack stackSelf = self.getItem();
         ItemStack stackOther = other.getItem();
 
-        // 检查物品种类和 NBT 是否完全一致
+        // 检查物品种类和组件（代替旧版的 NBT）是否完全一致
+        // 删除了已被废弃的 isSameItemSameTags，换成 1.21 最新的 isSameItemSameComponents
         if (!Objects.equals(stackSelf.getItem(), stackOther.getItem()) ||
-                !ItemStack.isSameItemSameTags(stackSelf, stackOther)) {
+                !ItemStack.isSameItemSameComponents(stackSelf, stackOther)) {
             return;
         }
 

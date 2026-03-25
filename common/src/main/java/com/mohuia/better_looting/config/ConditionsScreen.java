@@ -107,24 +107,34 @@ public class ConditionsScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(gui);
-        gui.drawCenteredString(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
+    public void renderBackground(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        // 1. 先让原版渲染它的虚化和暗色底层
+        super.renderBackground(gui, mouseX, mouseY, partialTick);
 
+        // 2. 在这里绘制所有需要在按键【底层】的自定义内容（不然会遮挡按键）
         int quarterWidth = this.width / 4;
         int threeQuarterWidth = (this.width / 4) * 3;
         int topY = 50;
         int bottomY = this.height - 40;
 
-        // 绘制两列的半透明背景底板
         renderColumnBackground(gui, quarterWidth, topY, bottomY, Component.translatable("gui." + BetterLooting.MODID + ".header_condition"));
         renderColumnBackground(gui, threeQuarterWidth, topY, bottomY, Component.translatable("gui." + BetterLooting.MODID + ".scroll_mode"));
+    }
 
-        // 渲染按键绑定提示
+    @Override
+    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        // 1. super.render 会自动调用上面的 renderBackground，然后再一层层画出按键！
+        super.render(gui, mouseX, mouseY, partialTick);
+
+        // 2. 绘制需要在按键【顶层】的内容（比如文字提示）
+        gui.drawCenteredString(this.font, this.title, this.width / 2, 15, 0xFFFFFFFF); // 记得用之前提到的 0xFFFFFFFF 哦
+
+        int quarterWidth = this.width / 4;
+        int threeQuarterWidth = (this.width / 4) * 3;
+        int bottomY = this.height - 40;
+
         renderKeyInfo(gui, quarterWidth, bottomY, viewModel.activationMode);
         renderKeyInfo(gui, threeQuarterWidth, bottomY, viewModel.scrollMode);
-
-        super.render(gui, mouseX, mouseY, partialTick);
     }
 
     /**
