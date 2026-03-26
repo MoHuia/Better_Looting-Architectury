@@ -57,6 +57,7 @@ public class ConditionsScreen extends Screen {
     protected void init() {
         calculateLayout();
 
+        // 将按钮起始高度从 45 下调到 65，避开顶部标题
         int listStartY = 65;
 
         // 1. 构建“激活条件”列 (左列)
@@ -82,16 +83,48 @@ public class ConditionsScreen extends Screen {
         }).bounds(rightBtnX, listStartY, dynamicColWidth, BTN_HEIGHT).build();
         this.addRenderableWidget(indicatorBtn);
 
-        // 文本框
-        int titleLabelY = listStartY + BTN_HEIGHT + BTN_GAP * 2;
-        int titleBoxY = titleLabelY + 12;
+        // 自定义悬浮窗标题文本框
+        int titleLabelY = listStartY + BTN_HEIGHT + BTN_GAP * 2; // 留出一点空隙用来在 render 里画标签文字
+        int titleBoxY = titleLabelY + 12; // 文本框在标签文字下方
 
         EditBox titleInputBox = new EditBox(this.font, rightBtnX, titleBoxY, dynamicColWidth, BTN_HEIGHT, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"));
-        titleInputBox.setMaxLength(32);
+        titleInputBox.setMaxLength(32); // 限制标题最大长度，防止界面越界
+        // 设置初始值为 ViewModel 中的值，注意防空指针
         titleInputBox.setValue(viewModel.customOverlayTitle != null ? viewModel.customOverlayTitle : "");
+        // 监听文本改变，实时同步到 ViewModel
         titleInputBox.setResponder(text -> viewModel.customOverlayTitle = text);
         titleInputBox.setTooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.custom_title")));
         this.addRenderableWidget(titleInputBox);
+
+        // 超大堆叠开关与滑动条
+        int superMergeBtnY = titleBoxY + BTN_HEIGHT + BTN_GAP;
+        Component mergeText = Component.translatable("gui." + BetterLooting.MODID + ".config.super_merge");
+        Button superMergeBtn = Button.builder(formatOptionText(mergeText, viewModel.enableSuperMerge), b -> {
+            viewModel.enableSuperMerge = !viewModel.enableSuperMerge;
+            this.clearWidgets();
+            this.init();
+        }).bounds(rightBtnX, superMergeBtnY, dynamicColWidth, BTN_HEIGHT).build();
+        this.addRenderableWidget(superMergeBtn);
+
+        // 如果开启了超大堆叠，则显示 XY 范围调节滑块
+        if (viewModel.enableSuperMerge) {
+            int currentRightY = superMergeBtnY + BTN_HEIGHT + BTN_GAP;
+
+            this.addRenderableWidget(new CommonSlider(
+                    rightBtnX, currentRightY, dynamicColWidth, BTN_HEIGHT,
+                    Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_xz"),
+                    0.0, 10.0, (double) viewModel.mergeRangeXZ,
+                    val -> viewModel.mergeRangeXZ = val.floatValue()
+            ));
+            currentRightY += BTN_HEIGHT + BTN_GAP;
+
+            this.addRenderableWidget(new CommonSlider(
+                    rightBtnX, currentRightY, dynamicColWidth, BTN_HEIGHT,
+                    Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_y"),
+                    0.0, 10.0, (double) viewModel.mergeRangeY,
+                    val -> viewModel.mergeRangeY = val.floatValue()
+            ));
+        }
 
         // 4. 返回按钮：居中置底
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> this.minecraft.setScreen(parent))
@@ -144,6 +177,8 @@ public class ConditionsScreen extends Screen {
         super.renderBackground(gui, mouseX, mouseY, partialTick);
 
         // 2. 绘制三列的半透明底板，确保它们在按键的【底层】
+        // 将半透明背景底板起始高度从 32 下调到 50
+        // 这样栏目的标题就会被渲染在 50 - 12 = 38 的高度，完美避开高度为 15 的主标题
         int topY = 50;
         int bottomY = this.height - 40;
 
@@ -167,7 +202,7 @@ public class ConditionsScreen extends Screen {
 
         // 绘制文本框上方的说明文字标签
         int rightBtnX = rightColX - (dynamicColWidth / 2);
-        int titleLabelY = 65 + BTN_HEIGHT + BTN_GAP * 2;
+        int titleLabelY = 65 + BTN_HEIGHT + BTN_GAP * 2; // 与 init() 中的高度计算保持一致
         gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"), rightBtnX + 2, titleLabelY, 0xDDDDDD);
     }
 
@@ -194,6 +229,7 @@ public class ConditionsScreen extends Screen {
     }
 
     // --- 国际化文本获取工具方法 ---
+
     private Component getModeName(ActivationMode mode) {
         return Component.translatable("gui." + BetterLooting.MODID + ".config.mode." + mode.name().toLowerCase());
     }

@@ -30,6 +30,11 @@ public class ConfigViewModel {
     public BetterLootingConfig.ScrollMode scrollMode;
     public float lookDownAngle;
 
+    // 超大堆叠合并设置
+    public boolean enableSuperMerge;
+    public float mergeRangeXZ;
+    public float mergeRangeY;
+
     // ==========================================
     // 拖拽快照状态 (Drag Snapshot State)
     // 用于记录鼠标按下瞬间的数值，配合差值计算避免累加误差
@@ -63,6 +68,10 @@ public class ConfigViewModel {
         this.indicatorX = cfg.indicatorX;
         this.indicatorY = cfg.indicatorY;
         this.indicatorRotation = cfg.indicatorRotation;
+
+        this.enableSuperMerge = cfg.enableSuperMerge;
+        this.mergeRangeXZ = cfg.mergeRangeXZ;
+        this.mergeRangeY = cfg.mergeRangeY;
     }
 
     /**
@@ -87,6 +96,10 @@ public class ConfigViewModel {
         cfg.indicatorX = this.indicatorX;
         cfg.indicatorY = this.indicatorY;
         cfg.indicatorRotation = this.indicatorRotation;
+
+        cfg.enableSuperMerge = this.enableSuperMerge;
+        cfg.mergeRangeXZ = this.mergeRangeXZ;
+        cfg.mergeRangeY = this.mergeRangeY;
 
         cfg.validate(); // 保存前最后校验一次，确保数据绝对安全
         BetterLootingConfig.save();
@@ -114,6 +127,10 @@ public class ConfigViewModel {
         this.indicatorX = defaults.indicatorX;
         this.indicatorY = defaults.indicatorY;
         this.indicatorRotation = defaults.indicatorRotation;
+
+        this.enableSuperMerge = defaults.enableSuperMerge;
+        this.mergeRangeXZ = defaults.mergeRangeXZ;
+        this.mergeRangeY = defaults.mergeRangeY;
     }
 
     /**

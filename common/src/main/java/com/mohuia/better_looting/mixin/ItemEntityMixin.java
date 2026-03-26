@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.mixin;
 
 import com.mohuia.better_looting.client.core.ISuperStack;
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -62,8 +63,8 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
 
     /**
      * 定义同步数据初始值
+     * 【适配 1.21.1】必须通过 Builder 注册
      */
-    // 【修改 1】1.21.1 原版方法多了一个 Builder 参数，现在必须通过 Builder 注册
     @Inject(method = "defineSynchedData", at = @At("RETURN"))
     private void betterlooting$defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
         builder.define(EXTRA_ITEM_COUNT, 0);
@@ -103,8 +104,15 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             index = 1
     )
     private AABB betterlooting$expandMergeArea(AABB originalBox) {
-        double radius = 5.0; // 将合并半径扩大到 5.0 格
-        return this.getBoundingBox().inflate(radius, radius, radius);
+        if (!BetterLootingConfig.get().enableSuperMerge) {
+            return originalBox; // 如果玩家关闭了功能，则不扩大搜索框，直接返回原版参数
+        }
+
+        // 分别获取 XZ 和 Y 的自定义合并半径
+        double radiusXZ = BetterLootingConfig.get().mergeRangeXZ;
+        double radiusY = BetterLootingConfig.get().mergeRangeY;
+
+        return this.getBoundingBox().inflate(radiusXZ, radiusY, radiusXZ);
     }
 
     /**
@@ -113,6 +121,8 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
      */
     @Inject(method = "isMergable", at = @At("HEAD"), cancellable = true)
     private void betterlooting$forceMergable(CallbackInfoReturnable<Boolean> cir) {
+        if (!BetterLootingConfig.get().enableSuperMerge) return; // 关闭功能时不干预
+
         if (!this.getItem().isStackable()) return;
         cir.setReturnValue(true);
     }
@@ -123,12 +133,13 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
      */
     @Inject(method = "tryToMerge", at = @At("HEAD"), cancellable = true)
     private void betterlooting$superMerge(ItemEntity other, CallbackInfo ci) {
+        if (!BetterLootingConfig.get().enableSuperMerge) return; // 关闭功能时不接管合并逻辑
+
         ItemEntity self = (ItemEntity) (Object) this;
         ItemStack stackSelf = self.getItem();
         ItemStack stackOther = other.getItem();
 
-        // 检查物品种类和组件（代替旧版的 NBT）是否完全一致
-        // 删除了已被废弃的 isSameItemSameTags，换成 1.21 最新的 isSameItemSameComponents
+        // 检查物品种类和组件是否完全一致 (代替已被废弃的 isSameItemSameTags)
         if (!Objects.equals(stackSelf.getItem(), stackOther.getItem()) ||
                 !ItemStack.isSameItemSameComponents(stackSelf, stackOther)) {
             return;
@@ -165,6 +176,8 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     private void betterlooting$refillStack(CallbackInfo ci) {
         if (this.level().isClientSide) return; // 仅在服务端处理逻辑
 
+        // 注: 此处的补货逻辑故意不加 enableSuperMerge 的判断
+        // 这样可以保证玩家即便中途关掉了功能，地上那些已经被超大堆叠的物品依然能正常吐出货物
         int extraCount = this.betterlooting$getExtraCount();
         if (extraCount <= 0) return;
 
