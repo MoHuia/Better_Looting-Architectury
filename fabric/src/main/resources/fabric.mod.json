@@ -8,11 +8,12 @@
     "MoHuia"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/MoHuia/Better_Looting-Architectury",
+    "sources": "https://github.com/MoHuia/Better_Looting-Architectury",
+    "issues": "https://github.com/MoHuia/Better_Looting-Architectury/issues"
   },
-  "license": "CC0-1.0",
-  "icon": "assets/better_looting/icon.png",
+  "license": "LGPL-3.0-or-later",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -21,7 +22,7 @@
     "client": [
       "com.mohuia.better_looting.fabric.client.BetterLootingFabricClient"
     ],
-    "jei_plugin_fabric": [
+    "jei_mod_plugin": [
       "com.mohuia.better_looting.client.jei.JeiPlugin"
     ]
   },
@@ -34,8 +35,5 @@
     "java": ">=21",
     "architectury": ">=13.0.8",
     "fabric-api": "*"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }

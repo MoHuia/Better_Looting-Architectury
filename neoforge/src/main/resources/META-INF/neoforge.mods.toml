@@ -1,6 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-license = "Insert License Here"
+license = "GNU LGPLv3"
+issueTrackerURL = "https://github.com/MoHuia/Better_Looting-Architectury/issues" # 问题反馈链接
 
 [[mixins]]
 config = "better_looting.mixins.json"
@@ -10,6 +11,8 @@ modId = "better_looting"
 version = "${version}"
 displayName = "Better Looting"
 authors = "MoHuia"
+logoFile = "icon.png"
+displayURL = "https://github.com/MoHuia/Better_Looting-Architectury" # 你的源码主页链接
 description = '''
 Tired of being a walking vacuum? Try RPG-style immersive loot management.
 '''
