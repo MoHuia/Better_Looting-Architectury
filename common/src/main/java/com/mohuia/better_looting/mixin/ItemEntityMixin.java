@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.mixin;
 
 import com.mohuia.better_looting.client.core.ISuperStack;
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -102,8 +103,15 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             index = 1
     )
     private AABB betterlooting$expandMergeArea(AABB originalBox) {
-        double radius = 5.0; // 将合并半径扩大到 5.0 格
-        return this.getBoundingBox().inflate(radius, radius, radius);
+        if (!BetterLootingConfig.get().enableSuperMerge) {
+            return originalBox; // 如果玩家关闭了功能，则不扩大搜索框，直接返回原版参数
+        }
+
+        // 分别获取 XZ 和 Y 的自定义合并半径
+        double radiusXZ = BetterLootingConfig.get().mergeRangeXZ;
+        double radiusY = BetterLootingConfig.get().mergeRangeY;
+
+        return this.getBoundingBox().inflate(radiusXZ, radiusY, radiusXZ);
     }
 
     /**
@@ -112,6 +120,8 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
      */
     @Inject(method = "isMergable", at = @At("HEAD"), cancellable = true)
     private void betterlooting$forceMergable(CallbackInfoReturnable<Boolean> cir) {
+        if (!BetterLootingConfig.get().enableSuperMerge) return; // 关闭功能时不干预
+
         if (!this.getItem().isStackable()) return;
         cir.setReturnValue(true);
     }
@@ -122,6 +132,8 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
      */
     @Inject(method = "tryToMerge", at = @At("HEAD"), cancellable = true)
     private void betterlooting$superMerge(ItemEntity other, CallbackInfo ci) {
+        if (!BetterLootingConfig.get().enableSuperMerge) return; // 关闭功能时不接管合并逻辑
+
         ItemEntity self = (ItemEntity) (Object) this;
         ItemStack stackSelf = self.getItem();
         ItemStack stackOther = other.getItem();
@@ -163,6 +175,8 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     private void betterlooting$refillStack(CallbackInfo ci) {
         if (this.level().isClientSide) return; // 仅在服务端处理逻辑
 
+        // 注: 此处的补货逻辑故意不加 enableSuperMerge 的判断
+        // 这样可以保证玩家即便中途关掉了功能，地上那些已经被超大堆叠的物品依然能正常吐出货物
         int extraCount = this.betterlooting$getExtraCount();
         if (extraCount <= 0) return;
 

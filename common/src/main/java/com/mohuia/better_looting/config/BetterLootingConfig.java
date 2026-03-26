@@ -50,6 +50,13 @@ public class BetterLootingConfig {
     public float scanRangeXZ = 1.0f;
     public float scanRangeY = 0.5f;
 
+    // ==========================================
+    // 核心功能设置 (Core Feature Settings)
+    // ==========================================
+    public boolean enableSuperMerge = true; // 是否开启掉落物超大堆叠合并
+    public float mergeRangeXZ = 5.0f;       // 水平合并范围 (最大 10)
+    public float mergeRangeY = 5.0f;        // 垂直合并范围 (最大 10)
+
     /**
      * 触发物品拾取 UI 的条件模式
      */
@@ -78,6 +85,9 @@ public class BetterLootingConfig {
         this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
         this.customOverlayTitle = BetterLootingConfig.get().customOverlayTitle;
         this.indicatorRotation = (this.indicatorRotation / 90 * 90) % 360;
+
+        this.mergeRangeXZ = Mth.clamp(this.mergeRangeXZ, 0.0f, 10.0f);
+        this.mergeRangeY = Mth.clamp(this.mergeRangeY, 0.0f, 10.0f);
 
         if (this.indicatorRotation < 0) this.indicatorRotation += 360;
 

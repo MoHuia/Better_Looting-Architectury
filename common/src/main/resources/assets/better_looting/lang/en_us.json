@@ -20,7 +20,9 @@
   "gui.better_looting.other_settings": "Other settings",
   "gui.better_looting.config.hotbar_indicator": "Hotbar Filter Indicator",
   "gui.better_looting.config.custom_title_label": "Panel Title (Leave blank to hide):",
-
+  "gui.better_looting.config.super_merge": "Super Merge",
+  "gui.better_looting.config.merge_range_xz": "Horizontal Merge Range",
+  "gui.better_looting.config.merge_range_y": "Vertical Merge Range",
   "gui.better_looting.config.opacity": "Opacity",
   "gui.better_looting.angle": "Trigger Angle",
   "gui.better_looting.config.save": "Save & Exit",

@@ -20,6 +20,11 @@
   "gui.better_looting.other_settings": "其他设置",
   "gui.better_looting.config.hotbar_indicator": "快捷栏过滤器指示器",
   "gui.better_looting.config.custom_title_label": "浮悬窗标题 (留空则隐藏):",
+  "gui.better_looting.config.super_merge": "超大堆叠合并",
+
+  "gui.better_looting.config.merge_range_xz": "水平合并范围",
+
+  "gui.better_looting.config.merge_range_y": "垂直合并范围",
 
   "gui.better_looting.config.opacity": "透明度",
   "gui.better_looting.angle": "触发角度",

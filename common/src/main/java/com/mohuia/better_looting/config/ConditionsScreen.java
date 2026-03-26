@@ -7,7 +7,7 @@ import com.mohuia.better_looting.config.BetterLootingConfig.ActivationMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.ScrollMode;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox; // 【新增】引入原版文本输入框组件
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -95,6 +95,36 @@ public class ConditionsScreen extends Screen {
         titleInputBox.setResponder(text -> viewModel.customOverlayTitle = text);
         titleInputBox.setTooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.custom_title")));
         this.addRenderableWidget(titleInputBox);
+
+        // 超大堆叠开关与滑动条
+        int superMergeBtnY = titleBoxY + BTN_HEIGHT + BTN_GAP;
+        Component mergeText = Component.translatable("gui." + BetterLooting.MODID + ".config.super_merge");
+        Button superMergeBtn = Button.builder(formatOptionText(mergeText, viewModel.enableSuperMerge), b -> {
+            viewModel.enableSuperMerge = !viewModel.enableSuperMerge;
+            this.clearWidgets();
+            this.init();
+        }).bounds(rightBtnX, superMergeBtnY, dynamicColWidth, BTN_HEIGHT).build();
+        this.addRenderableWidget(superMergeBtn);
+
+        // 如果开启了超大堆叠，则显示 XY 范围调节滑块
+        if (viewModel.enableSuperMerge) {
+            int currentRightY = superMergeBtnY + BTN_HEIGHT + BTN_GAP;
+
+            this.addRenderableWidget(new CommonSlider(
+                    rightBtnX, currentRightY, dynamicColWidth, BTN_HEIGHT,
+                    Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_xz"),
+                    0.0, 10.0, (double) viewModel.mergeRangeXZ,
+                    val -> viewModel.mergeRangeXZ = val.floatValue()
+            ));
+            currentRightY += BTN_HEIGHT + BTN_GAP;
+
+            this.addRenderableWidget(new CommonSlider(
+                    rightBtnX, currentRightY, dynamicColWidth, BTN_HEIGHT,
+                    Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_y"),
+                    0.0, 10.0, (double) viewModel.mergeRangeY,
+                    val -> viewModel.mergeRangeY = val.floatValue()
+            ));
+        }
 
         // 4. 返回按钮：居中置底
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> this.minecraft.setScreen(parent))
