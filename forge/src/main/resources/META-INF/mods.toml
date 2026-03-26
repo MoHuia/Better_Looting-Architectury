@@ -1,6 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "[47,)"
-issueTrackerURL = "https://github.com/MoHuia/Better_Looting-Architectury"
+issueTrackerURL = "https://github.com/MoHuia/Better_Looting-Architectury/issues"
 license = "GNU LGPLv3"
 
 [[mods]]
@@ -8,10 +8,12 @@ modId = "better_looting"
 version = "${version}"
 displayName = "Better Looting"
 authors = "MoHuia"
+logoFile = "icon.png"
+displayURL = "https://github.com/MoHuia/Better_Looting-Architectury"
 description = '''
 Tired of being a walking vacuum? Try RPG-style immersive loot management.
 '''
-logoFile = "icon.png"
+
 
 [[dependencies.better_looting]]
 modId = "forge"

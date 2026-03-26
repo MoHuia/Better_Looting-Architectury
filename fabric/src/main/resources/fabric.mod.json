@@ -8,8 +8,9 @@
     "MoHuia"
   ],
   "contact": {
-    "homepage": "https://github.com/MoHuia/Better_Looting-Architectury",
-    "sources": "https://github.com/MoHuia/Better_Looting-Architectury"
+    "homepage": "https://github.com/MoHuia/better_looting",
+    "sources": "https://github.com/MoHuia/better_looting",
+    "issues": "https://github.com/MoHuia/better_looting/issues"
   },
   "license": "GNU LGPLv3",
   "icon": "icon.png",
