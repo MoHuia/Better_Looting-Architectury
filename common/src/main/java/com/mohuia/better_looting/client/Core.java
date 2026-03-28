@@ -126,7 +126,22 @@ public class Core {
     }
 
     public void toggleFilterMode() {
+        // 1. 切换模式
         filterMode = (filterMode == FilterMode.ALL) ? FilterMode.RARE_ONLY : FilterMode.ALL;
+
+        // 2. 发送快捷栏上方提示
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            // 获取当前模式的本地化名称，并设为黄色高亮
+            Component modeName = Component.translatable("gui.better_looting.config.mode." + filterMode.name().toLowerCase())
+                    .withStyle(ChatFormatting.YELLOW);
+
+            // 组合完整的提示信息
+            Component msg = Component.translatable("message.better_looting.filter_switched", modeName);
+
+            // 发送到 Action Bar (第二个参数为 true)
+            mc.player.displayClientMessage(msg, true);
+        }
     }
 
     public void toggleAutoMode() {
