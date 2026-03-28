@@ -76,4 +76,19 @@ subprojects {
 
         }
     }
+
+    // 1. 禁用原始源码包的生成
+    tasks.named("sourcesJar") {
+        enabled = false
+    }
+
+    // 2. 禁用源码包的重映射任务，彻底砍掉 Source jar 的生成链条
+    tasks.named("remapSourcesJar") {
+        enabled = false
+    }
+
+    // 3. 拦截最终的打包任务，使用相对路径输出
+    tasks.named("remapJar") {
+        destinationDirectory = file("${rootProject.projectDir}/output")
+    }
 }
