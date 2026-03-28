@@ -67,12 +67,6 @@ public class ConfigScreen extends Screen {
     protected void init() {
         if (this.renderer == null) this.renderer = new OverlayRenderer(this.minecraft);
 
-        // 初始化指示器默认坐标
-        if (viewModel.indicatorX < 0 || viewModel.indicatorY < 0) {
-            viewModel.indicatorX = this.width / 2f + 91f + 6f;
-            viewModel.indicatorY = this.height - 22f + 4f;
-        }
-
         // ==========================================
         // 右上角紧凑控制区
         // ==========================================
@@ -136,11 +130,52 @@ public class ConfigScreen extends Screen {
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(gui);
         renderGrid(gui);
-        renderControlPanelBackground(gui); // 新增：为右上角按钮绘制一个底层面板
+        renderControlPanelBackground(gui);
         renderInfoOverlay(gui);
         renderPreview(gui, mouseX, mouseY);
         renderIndicator(gui, mouseX, mouseY);
         super.render(gui, mouseX, mouseY, partialTick);
+    }
+
+    /**
+     * 获取指示器的真实 X 坐标，处理未拖拽时的动态默认值。
+     * 动态计算快捷栏宽度与副手槽状态，防止被其他修改了快捷栏UI的整合包遮挡。
+     */
+    private float getActualIndicatorX() {
+        if (viewModel.indicatorX >= 0) return viewModel.indicatorX;
+
+        float halfHotbarWidth = 91f; // 原版快捷栏一半的宽度兜底值
+        boolean isLeftHanded = false;
+        boolean hasOffhandItem = false;
+
+        if (this.minecraft != null && this.minecraft.player != null) {
+            // 动态获取快捷栏槽位数量 (大部分修改快捷栏大小的Mod会改变此数值)
+            int hotbarSlots = net.minecraft.world.entity.player.Inventory.getSelectionSize();
+            // 原版每个槽位宽 20 像素，加上左右各 1 像素的外边框。总宽度 = 槽位数 * 20 + 2
+            halfHotbarWidth = (hotbarSlots * 20.0f + 2.0f) / 2.0f;
+
+            // 判断主手习惯与副手是否有物品
+            isLeftHanded = this.minecraft.options.mainHand().get() == net.minecraft.world.entity.HumanoidArm.LEFT;
+            hasOffhandItem = !this.minecraft.player.getOffhandItem().isEmpty();
+        }
+
+        // 基础留白间距
+        float offset = 6f;
+
+        // 如果玩家是左撇子且副手有物品，原版会在快捷栏右侧额外渲染一个副手槽 (宽约29像素)，这里动态躲避它
+        if (isLeftHanded && hasOffhandItem) {
+            offset += 29f;
+        }
+
+        return this.width / 2f + halfHotbarWidth + offset;
+    }
+
+    /**
+     * 获取指示器的真实 Y 坐标，处理未拖拽时的动态默认值
+     */
+    private float getActualIndicatorY() {
+        if (viewModel.indicatorY >= 0) return viewModel.indicatorY;
+        return this.height - 22f + 4f; // 动态计算 Y，贴近底部快捷栏高度
     }
 
     /**
@@ -159,9 +194,12 @@ public class ConfigScreen extends Screen {
     private void renderIndicator(GuiGraphics gui, int mouseX, int mouseY) {
         if (!viewModel.showHotbarIndicator) return;
 
+        float currentX = getActualIndicatorX();
+        float currentY = getActualIndicatorY();
+
         gui.pose().pushPose();
-        float centerX = viewModel.indicatorX + HotbarIndicator.WIDTH / 2f;
-        float centerY = viewModel.indicatorY + HotbarIndicator.HEIGHT / 2f;
+        float centerX = currentX + HotbarIndicator.WIDTH / 2f;
+        float centerY = currentY + HotbarIndicator.HEIGHT / 2f;
         gui.pose().translate(centerX, centerY, 0);
         gui.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(viewModel.indicatorRotation));
         gui.pose().translate(-centerX, -centerY, 0);
@@ -170,12 +208,12 @@ public class ConfigScreen extends Screen {
         boolean isHovered = isMouseOverIndicator(mouseX, mouseY);
         if (isHovered || isDraggingIndicator) {
             int outlineColor = isDraggingIndicator ? COLOR_ACCENT : 0x8000BFFF;
-            gui.fill((int)viewModel.indicatorX - 3, (int)viewModel.indicatorY - 3, (int)viewModel.indicatorX + HotbarIndicator.WIDTH + 3, (int)viewModel.indicatorY + HotbarIndicator.HEIGHT + 3, 0x3000BFFF);
-            gui.renderOutline((int)viewModel.indicatorX - 3, (int)viewModel.indicatorY - 3, HotbarIndicator.WIDTH + 6, HotbarIndicator.HEIGHT + 6, outlineColor);
+            gui.fill((int)currentX - 3, (int)currentY - 3, (int)currentX + HotbarIndicator.WIDTH + 3, (int)currentY + HotbarIndicator.HEIGHT + 3, 0x3000BFFF);
+            gui.renderOutline((int)currentX - 3, (int)currentY - 3, HotbarIndicator.WIDTH + 6, HotbarIndicator.HEIGHT + 6, outlineColor);
         }
 
         gui.pose().popPose();
-        HotbarIndicator.INSTANCE.renderInternal(gui, viewModel.indicatorX, viewModel.indicatorY, viewModel.indicatorRotation, Core.INSTANCE.getFilterMode());
+        HotbarIndicator.INSTANCE.renderInternal(gui, currentX, currentY, viewModel.indicatorRotation, Core.INSTANCE.getFilterMode());
     }
 
     /**
@@ -362,13 +400,16 @@ public class ConfigScreen extends Screen {
         }
     }
 
-    // --- 鼠标交互及逻辑检测 (保持原样) ---
+    // --- 鼠标交互及逻辑检测 ---
 
     private boolean isMouseOverIndicator(double mouseX, double mouseY) {
         if (!viewModel.showHotbarIndicator) return false;
         float maxDim = Math.max(HotbarIndicator.WIDTH, HotbarIndicator.HEIGHT);
-        float centerX = viewModel.indicatorX + HotbarIndicator.WIDTH / 2f;
-        float centerY = viewModel.indicatorY + HotbarIndicator.HEIGHT / 2f;
+
+        float currentX = getActualIndicatorX();
+        float currentY = getActualIndicatorY();
+        float centerX = currentX + HotbarIndicator.WIDTH / 2f;
+        float centerY = currentY + HotbarIndicator.HEIGHT / 2f;
         return mouseX >= centerX - maxDim && mouseX <= centerX + maxDim
                 && mouseY >= centerY - maxDim && mouseY <= centerY + maxDim;
     }
@@ -378,8 +419,9 @@ public class ConfigScreen extends Screen {
         if (isMouseOverIndicator(x, y)) {
             if (btn == 0) {
                 isDraggingIndicator = true;
-                indicatorDragOffsetX = x - viewModel.indicatorX;
-                indicatorDragOffsetY = y - viewModel.indicatorY;
+
+                indicatorDragOffsetX = x - getActualIndicatorX();
+                indicatorDragOffsetY = y - getActualIndicatorY();
                 return true;
             } else if (btn == 1) { // 右键旋转
                 viewModel.indicatorRotation = (viewModel.indicatorRotation + 90) % 360;
@@ -401,6 +443,7 @@ public class ConfigScreen extends Screen {
     @Override
     public boolean mouseDragged(double x, double y, int btn, double dx, double dy) {
         if (isDraggingIndicator && btn == 0) {
+            // 这里将坐标真正赋值给 viewModel，只有被拖拽过后，才会打破动态自适应(-1)状态
             viewModel.indicatorX = (float) (x - indicatorDragOffsetX);
             viewModel.indicatorY = (float) (y - indicatorDragOffsetY);
             return true;
