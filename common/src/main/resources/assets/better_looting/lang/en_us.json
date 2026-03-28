@@ -29,6 +29,9 @@
   "gui.better_looting.config.save": "Save & Exit",
   "gui.better_looting.config.reset": "Reset Default",
   "gui.better_looting.config.preview_title": "LOOT PREVIEW",
+  "message.better_looting.filter_switched": "Filter Mode: %s",
+  "gui.better_looting.config.mode.all": "All Items",
+  "gui.better_looting.config.mode.rare_only": "Rare Only",
 
   "gui.better_looting.config.mode.always": "Mode: Always",
   "gui.better_looting.config.mode.look_down": "Mode: Look Down",

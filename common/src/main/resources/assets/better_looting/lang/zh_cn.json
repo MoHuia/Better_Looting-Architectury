@@ -29,6 +29,9 @@
   "gui.better_looting.config.save": "保存并退出",
   "gui.better_looting.config.reset": "恢复默认",
   "gui.better_looting.config.preview_title": "掉落物预览",
+  "message.better_looting.filter_switched": "当前过滤模式: %s",
+  "gui.better_looting.config.mode.all": "全部物品",
+  "gui.better_looting.config.mode.rare_only": "仅稀有",
 
   "gui.better_looting.config.mode.always": "总是显示",
   "gui.better_looting.config.mode.look_down": "低头触发",
