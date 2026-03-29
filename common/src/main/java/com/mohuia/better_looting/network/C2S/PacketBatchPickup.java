@@ -24,15 +24,14 @@ import java.util.List;
  * 客户端到服务端 (C2S) 的批量拾取数据包
  * 用于通知服务端玩家尝试拾取了一批掉落物，并处理“超大堆叠”掉落物的背包塞入逻辑。
  */
-// 【修改】改为 record 并实现 CustomPacketPayload 接口
+// 改为 record 并实现 CustomPacketPayload 接口
 public record PacketBatchPickup(List<Integer> entityIds, boolean isAuto, boolean limitToMaxStack) implements CustomPacketPayload {
 
-    // 【新增】1.21 的 Payload Type 标识
     public static final Type<PacketBatchPickup> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID, "batch_pickup")
     );
 
-    // 【新增】重构后的 StreamCodec，完美保留了你原来的读写逻辑
+    // 重构后的 StreamCodec，完美保留了你原来的读写逻辑
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketBatchPickup> CODEC = StreamCodec.of(
             (buf, packet) -> {
                 // 将数据包序列化为字节流（客户端发送时调用）
@@ -60,11 +59,11 @@ public record PacketBatchPickup(List<Integer> entityIds, boolean isAuto, boolean
     /**
      * 服务端处理逻辑的核心方法
      */
-    // 【修改】去掉了 Supplier，直接传入 NetworkManager.PacketContext
+    // 去掉了 Supplier，直接传入 NetworkManager.PacketContext
     public void handle(NetworkManager.PacketContext ctx) {
         // 确保逻辑在服务端主线程上安全执行
-        ctx.queue(() -> { // 【修改】去掉了 .get()
-            ServerPlayer player = (ServerPlayer) ctx.getPlayer(); // 【修改】去掉了 .get()
+        ctx.queue(() -> {
+            ServerPlayer player = (ServerPlayer) ctx.getPlayer();
             if (player == null || !player.isAlive()) return;
 
             // 根据是否限制拾取数量来设定初始配额 (record 中需通过方法调用获取)
@@ -126,9 +125,22 @@ public record PacketBatchPickup(List<Integer> entityIds, boolean isAuto, boolean
                     // 如果成功捡起了一部分或全部物品
                     if (actuallyTaken > 0) {
                         remainingQuota -= actuallyTaken;
-                        player.take(item, actuallyTaken); // 触发原版捡拾动画和统计数据更新
 
                         int remainingAfterTake = totalAvailable - actuallyTaken;
+
+                        // 伪造动画数量，防止客户端误删实体
+                        // 如果还没捡完（remainingAfterTake > 0），我们发给客户端的拾取数量必须严格小于客户端看到的堆叠数
+                        // 否则原版客户端一看 actuallyTaken >= 64，就会直接在本地把实体删掉（导致视觉上被吞）
+                        int animAmount = actuallyTaken;
+                        if (remainingAfterTake > 0) {
+                            animAmount = Math.min(actuallyTaken, Math.max(1, stack.getCount() - 1));
+                        }
+                        // 触发原版捡拾动画
+                        player.take(item, animAmount);
+
+                        // 手动触发统计数据更新
+                        // player.take() 只播动画，真正的捡拾统计数据必须手动发放
+                        player.awardStat(net.minecraft.stats.Stats.ITEM_PICKED_UP.get(stack.getItem()), actuallyTaken);
 
                         // 根据剩余数量更新地上的掉落物状态
                         if (remainingAfterTake <= 0) {
@@ -139,7 +151,9 @@ public record PacketBatchPickup(List<Integer> entityIds, boolean isAuto, boolean
                             int newExtraCount = remainingAfterTake - newBaseCount;
 
                             stack.setCount(newBaseCount);
-                            item.setItem(stack);
+                            // 【修复 3】必须传入 copy() 才能触发实体数据同步
+                            // 生成一个新的对象引用，强制 SynchedEntityData 认识到数据变脏了，从而将新数据发给客户端
+                            item.setItem(stack.copy());
                             superStack.betterlooting$setExtraCount(newExtraCount);
                         }
                     }

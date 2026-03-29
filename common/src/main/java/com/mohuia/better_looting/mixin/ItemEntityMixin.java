@@ -2,6 +2,8 @@ package com.mohuia.better_looting.mixin;
 
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.config.BetterLootingConfig;
+// 【新增】导入 Accessor 以便读取和修改私有属性 age
+import com.mohuia.better_looting.mixin.ItemEntityAccessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -152,14 +154,21 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         int selfTotal = stackSelf.getCount() + selfDuck.betterlooting$getExtraCount();
         int otherTotal = stackOther.getCount() + otherDuck.betterlooting$getExtraCount();
 
+        // 获取两者的寿命(age)，计算出最年轻的寿命，防止超大堆叠继承老物品寿命而突然消失
+        int selfAge = ((ItemEntityAccessor) self).getAge();
+        int otherAge = ((ItemEntityAccessor) other).getAge();
+        int youngestAge = Math.min(selfAge, otherAge);
+
         // 谁的数量多谁就存活，把另一个实体的数量吸收过来，然后销毁较小的那个实体
         if (selfTotal >= otherTotal) {
             selfDuck.betterlooting$addExtraCount(otherTotal);
             self.setPickUpDelay(15);
+            ((ItemEntityAccessor) self).setAge(youngestAge); // 更新寿命为最年轻的
             other.discard();
         } else {
             otherDuck.betterlooting$addExtraCount(selfTotal);
             other.setPickUpDelay(15);
+            ((ItemEntityAccessor) other).setAge(youngestAge); // 更新寿命为最年轻的
             self.discard();
         }
 
