@@ -16,4 +16,12 @@ public interface ItemEntityAccessor {
      */
     @Accessor("pickupDelay")
     int getPickupDelay();
+
+    // 用于读取实体的存活时间（寿命）
+    @Accessor("age")
+    int getAge();
+
+    // 用于修改实体的存活时间（寿命）
+    @Accessor("age")
+    void setAge(int age);
 }

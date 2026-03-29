@@ -121,9 +121,22 @@ public class PacketBatchPickup {
                     // 如果成功捡起了一部分或全部物品
                     if (actuallyTaken > 0) {
                         remainingQuota -= actuallyTaken;
-                        player.take(item, actuallyTaken); // 触发原版捡拾动画和统计数据更新
 
                         int remainingAfterTake = totalAvailable - actuallyTaken;
+
+                        // 伪造动画数量，防止客户端误删实体
+                        // 如果还没捡完（remainingAfterTake > 0），我们发给客户端的拾取数量必须严格小于客户端看到的堆叠数
+                        // 否则原版客户端一看 actuallyTaken >= 64，就会直接在本地把实体删掉（导致视觉上被吞）
+                        int animAmount = actuallyTaken;
+                        if (remainingAfterTake > 0) {
+                            animAmount = Math.min(actuallyTaken, Math.max(1, stack.getCount() - 1));
+                        }
+                        // 触发原版捡拾动画
+                        player.take(item, animAmount);
+
+                        // 手动触发统计数据更新
+                        // player.take() 只播动画，真正的捡拾统计数据必须手动发放
+                        player.awardStat(net.minecraft.stats.Stats.ITEM_PICKED_UP.get(stack.getItem()), actuallyTaken);
 
                         // 根据剩余数量更新地上的掉落物状态
                         if (remainingAfterTake <= 0) {
@@ -134,7 +147,9 @@ public class PacketBatchPickup {
                             int newExtraCount = remainingAfterTake - newBaseCount;
 
                             stack.setCount(newBaseCount);
-                            item.setItem(stack);
+                            // 必须传入 copy() 才能触发实体数据同步
+                            // 生成一个新的对象引用，强制 SynchedEntityData 认识到数据变脏了，从而将新数据发给客户端
+                            item.setItem(stack.copy());
                             superStack.betterlooting$setExtraCount(newExtraCount);
                         }
                     }

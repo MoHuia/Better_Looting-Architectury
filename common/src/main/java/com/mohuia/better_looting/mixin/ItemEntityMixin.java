@@ -147,6 +147,9 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         ISuperStack selfDuck = (ISuperStack) self;
         ISuperStack otherDuck = (ISuperStack) other;
 
+        // 获取双方中最年轻的存活时间（寿命）
+        int youngestAge = Math.min(((ItemEntityAccessor) self).getAge(), ((ItemEntityAccessor) other).getAge());
+
         // 计算双方的总数量（原版数量 + 我们的额外数量）
         int selfTotal = stackSelf.getCount() + selfDuck.betterlooting$getExtraCount();
         int otherTotal = stackOther.getCount() + otherDuck.betterlooting$getExtraCount();
@@ -155,10 +158,12 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         if (selfTotal >= otherTotal) {
             selfDuck.betterlooting$addExtraCount(otherTotal);
             self.setPickUpDelay(15);
+            ((ItemEntityAccessor) self).setAge(youngestAge); // 更新寿命为最年轻的
             other.discard();
         } else {
             otherDuck.betterlooting$addExtraCount(selfTotal);
             other.setPickUpDelay(15);
+            ((ItemEntityAccessor) other).setAge(youngestAge); // 更新寿命为最年轻的
             self.discard();
         }
 
