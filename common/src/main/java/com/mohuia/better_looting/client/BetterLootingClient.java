@@ -26,6 +26,7 @@ public class BetterLootingClient {
         KeyMappingRegistry.register(KeyInit.SCROLL_UP);
         KeyMappingRegistry.register(KeyInit.SCROLL_DOWN);
         KeyMappingRegistry.register(KeyInit.SCROLL_MODIFIER);
+        KeyMappingRegistry.register(KeyInit.OPEN_FILTER_PANEL);
 
         // 2. 初始化核心逻辑与过滤器事件监听
         Core.INSTANCE.init();

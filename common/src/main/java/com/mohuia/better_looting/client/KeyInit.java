@@ -19,6 +19,13 @@ public class KeyInit {
             GLFW.GLFW_KEY_LEFT_ALT,
             CATEGORY
     );
+    // 打开白名单过滤面板 (默认: 左Alt)
+    public static final KeyMapping OPEN_FILTER_PANEL = new KeyMapping(
+            "key.better_looting.open_filter_panel",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT_ALT,
+            CATEGORY
+    );
 
     // 拾取选中物品 (默认: F)
     public static final KeyMapping PICKUP = new KeyMapping(

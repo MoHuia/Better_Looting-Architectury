@@ -34,6 +34,7 @@
   "message.better_looting.filter_switched": "当前过滤模式： %s",
   "gui.better_looting.config.mode.all": "全部物品",
   "gui.better_looting.config.mode.rare_only": "仅稀有",
+  "key.better_looting.open_filter_panel": "打开白名单过滤面板",
 
   "gui.better_looting.config.mode.always": "总是显示",
   "gui.better_looting.config.mode.look_down": "低头触发",

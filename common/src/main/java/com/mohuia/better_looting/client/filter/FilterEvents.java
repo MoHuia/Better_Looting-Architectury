@@ -1,5 +1,6 @@
 package com.mohuia.better_looting.client.filter;
 
+import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.mixin.ACSAccessor;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
@@ -43,9 +44,8 @@ public class FilterEvents {
                 }
 
                 // 默认使用左 Alt 键切换面板开关。
-                if (keyCode == GLFW.GLFW_KEY_LEFT_ALT) {
+                if (KeyInit.OPEN_FILTER_PANEL.matches(keyCode, scanCode)) {
                     FilterPanel.toggle();
-                    // 阻断事件向下传递，防止原版或其他模组处理此按键。
                     return EventResult.interruptTrue();
                 }
             }
