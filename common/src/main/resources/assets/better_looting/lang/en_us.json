@@ -32,6 +32,7 @@
   "message.better_looting.filter_switched": "Filter Mode: %s",
   "gui.better_looting.config.mode.all": "All Items",
   "gui.better_looting.config.mode.rare_only": "Rare Only",
+  "key.better_looting.open_filter_panel": "Open Whitelist Filter Panel",
 
   "gui.better_looting.config.mode.always": "Mode: Always",
   "gui.better_looting.config.mode.look_down": "Mode: Look Down",
