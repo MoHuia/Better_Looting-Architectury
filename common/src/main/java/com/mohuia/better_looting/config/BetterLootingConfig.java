@@ -47,8 +47,8 @@ public class BetterLootingConfig {
     // 判定参数设置 (Scanning Parameters)
     // ==========================================
     public float lookDownAngle = 45.0f;
-    public float scanRangeXZ = 1.0f;
-    public float scanRangeY = 0.5f;
+    public float scanRangeXZ = 1.0f; // 注意：进阶版这里是 1.0f，旧版是 3.0f，我保留了进阶版的值
+    public float scanRangeY = 0.5f;  // 注意：进阶版这里是 0.5f，旧版是 1.5f，同上
 
     // ==========================================
     // 核心功能设置 (Core Feature Settings)
@@ -65,7 +65,7 @@ public class BetterLootingConfig {
     /**
      * 允许在物品列表中滚动选择的条件模式
      */
-    public enum ScrollMode { ALWAYS, KEY_BIND, STAND_STILL }
+    public enum ScrollMode { ALWAYS, KEY_BIND, INVERT_KEY, STAND_STILL }
 
     private static BetterLootingConfig INSTANCE = new BetterLootingConfig();
     public static BetterLootingConfig get() { return INSTANCE; }
@@ -83,11 +83,16 @@ public class BetterLootingConfig {
         this.lookDownAngle = Mth.clamp(this.lookDownAngle, 0.0f, 90.0f);
         this.scanRangeXZ = Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f);
         this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
-        this.customOverlayTitle = BetterLootingConfig.get().customOverlayTitle;
-        this.indicatorRotation = (this.indicatorRotation / 90 * 90) % 360;
+
+        // 防止玩家在 JSON 中误删 title 字段导致渲染时 null.isEmpty() 崩溃
+        if (this.customOverlayTitle == null) {
+            this.customOverlayTitle = "Loot Detected";
+        }
 
         this.mergeRangeXZ = Mth.clamp(this.mergeRangeXZ, 0.0f, 10.0f);
         this.mergeRangeY = Mth.clamp(this.mergeRangeY, 0.0f, 10.0f);
+
+        this.indicatorRotation = (this.indicatorRotation / 90 * 90) % 360;
 
         if (this.indicatorRotation < 0) this.indicatorRotation += 360;
 

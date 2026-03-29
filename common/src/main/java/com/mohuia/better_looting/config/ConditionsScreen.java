@@ -198,7 +198,9 @@ public class ConditionsScreen extends Screen {
     private void renderKeyInfo(GuiGraphics gui, int centerX, int bottomY, Enum<?> mode) {
         if (mode instanceof ActivationMode m && (m == ActivationMode.KEY_HOLD || m == ActivationMode.KEY_TOGGLE)) {
             drawKeyString(gui, centerX, bottomY, KeyInit.SHOW_OVERLAY, "config.key_info");
-        } else if (mode instanceof ScrollMode m && m == ScrollMode.KEY_BIND) {
+        }
+        // 在这里加上对 INVERT_KEY 的判断
+        else if (mode instanceof ScrollMode m && (m == ScrollMode.KEY_BIND || m == ScrollMode.INVERT_KEY)) {
             drawKeyString(gui, centerX, bottomY, KeyInit.SCROLL_MODIFIER, "config.scroll_key_info");
         }
     }
