@@ -1,5 +1,6 @@
 package com.mohuia.better_looting.mixin;
 
+import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.client.filter.FilterEvents;
 import com.mohuia.better_looting.client.filter.FilterPanel;
 import com.mohuia.better_looting.client.filter.FilterWhitelist;
@@ -57,12 +58,12 @@ public class MouseHandlerMixin {
         boolean isShiftDown = this.minecraft.options.keyShift.isDown();
 
         // 2. 处理模组 Core 逻辑层面的滚动需求
-        // 如果玩家没有按下 Shift 键，且 Core 认为不应该忽略滚动，则模组接管滚轮
-        if (!isShiftDown && !com.mohuia.better_looting.client.Core.INSTANCE.shouldIgnoreScroll()) {
-            com.mohuia.better_looting.client.Core.INSTANCE.performScroll(yOffset);
+        if (!Core.INSTANCE.shouldIgnoreScroll()) {
+            Core.INSTANCE.performScroll(yOffset);
             ci.cancel();
             return;
         }
+
 
         // 仅在打开容器界面时处理过滤面板的滚动
         if (!(this.minecraft.screen instanceof AbstractContainerScreen<?> screen)) return;

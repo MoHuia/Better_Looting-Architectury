@@ -65,7 +65,7 @@ public class BetterLootingConfig {
     /**
      * 允许在物品列表中滚动选择的条件模式
      */
-    public enum ScrollMode { ALWAYS, KEY_BIND, STAND_STILL }
+    public enum ScrollMode { ALWAYS, KEY_BIND, INVERT_KEY, STAND_STILL }
 
     private static BetterLootingConfig INSTANCE = new BetterLootingConfig();
     public static BetterLootingConfig get() { return INSTANCE; }
@@ -84,7 +84,7 @@ public class BetterLootingConfig {
         this.scanRangeXZ = Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f);
         this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
 
-        // [逻辑修复] 防止玩家在 JSON 中误删 title 字段导致渲染时 null.isEmpty() 崩溃
+        // 防止玩家在 JSON 中误删 title 字段导致渲染时 null.isEmpty() 崩溃
         if (this.customOverlayTitle == null) {
             this.customOverlayTitle = "Loot Detected";
         }

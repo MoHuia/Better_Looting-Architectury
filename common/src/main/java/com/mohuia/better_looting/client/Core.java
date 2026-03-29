@@ -64,17 +64,18 @@ public class Core {
      */
     public boolean shouldIgnoreScroll() {
         Minecraft mc = Minecraft.getInstance();
-        // 如果打开了除了本模组配置界面以外的 GUI，忽略滚动
+        // 1. 基础条件拦截：打开了其他界面、HUD未激活、或物品不足以滚动时，直接交还给原版
         if (mc.screen != null && !(mc.screen instanceof ConfigScreen)) return true;
-        // HUD 没激活，或者只有一个物品（不需要滚动），忽略滚动
         if (!isHudActive()) return true;
         if (selectionManager.getNearbyItems().size() <= 1) return true;
 
+        // 2. 根据玩家配置的模式，决定是否将滚轮控制权交还给原版快捷栏
         BetterLootingConfig cfg = BetterLootingConfig.get();
         return switch (cfg.scrollMode) {
-            case ALWAYS -> false;
-            case KEY_BIND -> !KeyInit.SCROLL_MODIFIER.isDown(); // 只有按下修饰键时才拦截滚动
-            case STAND_STILL -> mc.player.getDeltaMovement().horizontalDistanceSqr() > 0.001; // 移动时忽略，静止时拦截
+            case ALWAYS -> false; // 绝对占用：模组始终接管滚轮
+            case INVERT_KEY -> KeyInit.SCROLL_MODIFIER.isDown(); // 新增(按键反转)：按下快捷键时交还给原版，松开时模组接管
+            case KEY_BIND -> !KeyInit.SCROLL_MODIFIER.isDown(); // 原有(按键绑定)：没按快捷键时交还给原版，按下时模组接管
+            case STAND_STILL -> mc.player.getDeltaMovement().horizontalDistanceSqr() > 0.001; // 移动时交还给原版
         };
     }
 
