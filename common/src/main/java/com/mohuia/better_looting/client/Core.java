@@ -35,6 +35,13 @@ public class Core {
 
     public void init() {
         FilterWhitelist.INSTANCE.init();
+
+        // --- 新增：初始化时从配置读取持久化的状态 ---
+        BetterLootingConfig cfg = BetterLootingConfig.get();
+        this.filterMode = cfg.lastFilterMode;
+        this.isAutoMode = cfg.lastAutoMode;
+        // ------------------------------------------
+
         // 注册客户端 Tick 事件，确保在游戏非暂停状态下处理逻辑
         ClientTickEvent.CLIENT_POST.register(this::onClientTick);
     }
@@ -130,6 +137,11 @@ public class Core {
         // 1. 切换模式
         filterMode = (filterMode == FilterMode.ALL) ? FilterMode.RARE_ONLY : FilterMode.ALL;
 
+        // 同步状态到配置并持久化保存
+        BetterLootingConfig cfg = BetterLootingConfig.get();
+        cfg.lastFilterMode = this.filterMode;
+        BetterLootingConfig.save();
+
         // 2. 发送快捷栏上方提示
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
@@ -147,6 +159,12 @@ public class Core {
 
     public void toggleAutoMode() {
         isAutoMode = !isAutoMode;
+
+        // 同步状态到配置并持久化保存
+        BetterLootingConfig cfg = BetterLootingConfig.get();
+        cfg.lastAutoMode = this.isAutoMode;
+        BetterLootingConfig.save();
+
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
             // 在玩家屏幕上显示自动拾取模式的开关提示（带颜色格式化）

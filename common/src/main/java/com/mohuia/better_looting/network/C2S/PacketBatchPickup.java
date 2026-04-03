@@ -18,14 +18,23 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * 客户端到服务端 (C2S) 的批量拾取数据包
- * 用于通知服务端玩家尝试拾取了一批掉落物，并处理“超大堆叠”掉落物的背包塞入逻辑。
+ * 客户端到服务端 (C2S) 的批量拾取数据包。
+ * 作用：由客户端发送，通知服务端玩家尝试拾取了一批掉落物。
+ * 核心功能是处理“超大堆叠（SuperStack）”掉落物安全塞入玩家背包的逻辑，
+ * 并在背包满或达到拾取上限时停止拾取。
  */
 public class PacketBatchPickup {
-    private final List<Integer> entityIds; // 要拾取的掉落物实体 ID 列表
-    private final boolean isAuto;          // 是否为自动拾取触发（用于控制提示信息的显示）
-    private final boolean limitToMaxStack; // 是否限制一次最多只捡一组（64个）
+    /** 客户端请求拾取的掉落物实体 ID 列表 */
+    private final List<Integer> entityIds;
+    /** 是否为自动拾取（例如：范围自动吸附）。如果是，则需要严格校验物品的拾取冷却时间 */
+    private final boolean isAuto;
+    /** 是否限制单次拾取最大数量（通常限制为一组，即 64 个），防止一次性吸入过多导致卡顿或超模 */
+    private final boolean limitToMaxStack;
 
+    /**
+     * 构造函数 (客户端使用)
+     * 用于在客户端收集完需要拾取的实体后，封装成数据包准备发送给服务端。
+     */
     public PacketBatchPickup(List<Integer> entityIds, boolean isAuto, boolean limitToMaxStack) {
         this.entityIds = entityIds;
         this.isAuto = isAuto;
@@ -33,18 +42,22 @@ public class PacketBatchPickup {
     }
 
     /**
-     * 从字节流中反序列化数据包（服务端接收时调用）
+     * 解码构造函数 (服务端使用)
+     * 当服务端收到网络包时，从字节流 (FriendlyByteBuf) 中还原出数据。
      */
     public PacketBatchPickup(FriendlyByteBuf buf) {
         this.isAuto = buf.readBoolean();
         this.limitToMaxStack = buf.readBoolean();
         int count = buf.readVarInt();
         this.entityIds = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) this.entityIds.add(buf.readInt());
+        for (int i = 0; i < count; i++) {
+            this.entityIds.add(buf.readInt());
+        }
     }
 
     /**
-     * 将数据包序列化为字节流（客户端发送时调用）
+     * 编码方法 (客户端使用)
+     * 将当前对象的数据写入字节流，以便通过网络发送。
      */
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeBoolean(isAuto);
@@ -54,113 +67,98 @@ public class PacketBatchPickup {
     }
 
     /**
-     * 服务端处理逻辑的核心方法
+     * 核心处理逻辑 (服务端执行)
+     * 处理玩家的拾取请求，验证合法性，并将物品塞入玩家背包。
      */
     public void handle(Supplier<NetworkManager.PacketContext> ctx) {
-        // 确保逻辑在服务端主线程上安全执行
+        // 将逻辑放入主线程队列执行，确保线程安全（操作实体和背包必须在主线程）
         ctx.get().queue(() -> {
             ServerPlayer player = (ServerPlayer) ctx.get().getPlayer();
+            // 基础校验：玩家必须在线且存活
             if (player == null || !player.isAlive()) return;
 
-            // 根据是否限制拾取数量来设定初始配额
+            // 如果启用了限制，则本次网络包最多只能拾取 64 个物品，否则无限制
             int remainingQuota = limitToMaxStack ? 64 : Integer.MAX_VALUE;
-            boolean anySuccess = false;     // 标记是否成功捡起了至少一个物品
-            boolean inventoryFull = false;  // 标记玩家背包是否已满
+            boolean anySuccess = false;   // 标记本次请求是否成功拾取了至少一个物品（用于触发音效）
+            boolean inventoryFull = false; // 标记玩家背包是否已满
 
+            // 遍历客户端发来的实体 ID 列表
             for (int id : entityIds) {
-                if (remainingQuota <= 0) break; // 额度耗尽，停止拾取
+                // 如果额度用尽或背包已满，直接终止后续处理，节省性能
+                if (remainingQuota <= 0 || inventoryFull) break;
+
                 Entity target = player.level().getEntity(id);
 
-                // 安全检查：目标必须是掉落物，存活，且距离玩家的平方小于 100（约 10 格内）防作弊
-                if (target instanceof ItemEntity item && item.isAlive() && player.distanceToSqr(target) < 100.0) {
-                    // 如果物品还在拾取冷却中，则跳过
-                    if (this.isAuto && ((ItemEntityAccessor)item).getPickupDelay() > 0) continue;
+                // --- 1. 安全与防作弊校验 ---
+                // 必须是物品实体、必须存活、且距离玩家不能超过 10 格 (100.0 = 10^2)
+                if (!(target instanceof ItemEntity item) || !item.isAlive() || player.distanceToSqr(target) >= 100.0) continue;
+                // 如果是自动拾取，原版机制中的“拾取冷却延迟 (PickupDelay)”必须已经归零
+                if (this.isAuto && ((ItemEntityAccessor) item).getPickupDelay() > 0) continue;
 
-                    ItemStack stack = item.getItem();
-                    ISuperStack superStack = (ISuperStack) item;
+                ItemStack stack = item.getItem();
+                ISuperStack superStack = (ISuperStack) item; // 强转为我们的混合接口，获取超大堆叠数据
 
-                    // 计算该掉落物实体包含的实际总物品数（原版数量 + 额外堆叠数量）
-                    int baseCount = stack.getCount();
-                    int extraCount = superStack.betterlooting$getExtraCount();
-                    int totalAvailable = baseCount + extraCount;
+                // --- 2. 数量计算 ---
+                // 总可用数量 = 原版物品栈数量 + 我们存储在 NBT/Mixin 里的额外数量
+                int totalAvailable = stack.getCount() + superStack.betterlooting$getExtraCount();
+                // 决定本次实际尝试拿取的数量（不能超过剩余拾取额度）
+                int toTake = Math.min(totalAvailable, remainingQuota);
+                if (toTake <= 0) continue;
 
-                    // 确定本次实际要捡起多少个
-                    int toTake = Math.min(totalAvailable, remainingQuota);
-                    if (toTake <= 0) continue;
+                // --- 3. 模拟与插入背包 ---
+                // 复制一份 ItemStack 用来尝试插入背包，避免直接修改世界中的实体导致数据异常
+                ItemStack insertStack = stack.copy();
+                insertStack.setCount(toTake);
 
-                    int actuallyTaken = 0;
-                    int amountLeftToInsert = toTake;
-                    int maxStackSize = stack.getMaxStackSize();
+                // 原版的 add 方法会自动处理背包格子分配。
+                // 如果装不下，insertStack 的 count 会变成【剩余无法装下的数量】
+                player.getInventory().add(insertStack);
 
-                    // 【核心分块逻辑】：原版 inventory.add() 不支持处理超过最大堆叠数 (如 64) 的 ItemStack。
-                    // 因此必须将我们需要拾取的超大数量，切分成最大堆叠大小的块，逐个尝试塞进背包。
-                    while (amountLeftToInsert > 0) {
-                        int insertChunk = Math.min(amountLeftToInsert, maxStackSize);
-                        ItemStack chunkStack = stack.copy();
-                        chunkStack.setCount(insertChunk);
+                int remainderCount = insertStack.getCount();    // 塞完后剩下的数量（没装进去的）
+                int actuallyTaken = toTake - remainderCount;    // 实际成功塞入背包的数量
 
-                        // 尝试塞入玩家背包
-                        if (player.getInventory().add(chunkStack)) {
-                            anySuccess = true;
-                            // chunkStack.getCount() 会变成未能塞入的数量（如果背包满了）
-                            int chunkTaken = insertChunk - chunkStack.getCount();
-                            actuallyTaken += chunkTaken;
-                            amountLeftToInsert -= chunkTaken;
+                // 如果有剩余，说明玩家背包在这一个物品判定时已经满了
+                if (remainderCount > 0) {
+                    inventoryFull = true;
+                }
 
-                            // 如果塞入后还有剩余，说明背包满了
-                            if (chunkTaken < insertChunk) {
-                                inventoryFull = true;
-                                break;
-                            }
-                        } else {
-                            inventoryFull = true;
-                            break;
-                        }
-                    }
+                // --- 4. 成功拾取后的状态更新 ---
+                if (actuallyTaken > 0) {
+                    anySuccess = true;
+                    remainingQuota -= actuallyTaken; // 扣除额度
+                    int remainingAfterTake = totalAvailable - actuallyTaken; // 实体在地上应该剩下的总数量
 
-                    // 如果成功捡起了一部分或全部物品
-                    if (actuallyTaken > 0) {
-                        remainingQuota -= actuallyTaken;
+                    // 计算原版的拾取动画数量
+                    // 为了让客户端播放动画时不显得奇怪，我们取 实际拾取量 和 (原版堆叠数-1) 之间的合适值
+                    int animAmount = remainingAfterTake > 0
+                            ? Math.min(actuallyTaken, Math.max(1, stack.getCount() - 1))
+                            : actuallyTaken;
 
-                        int remainingAfterTake = totalAvailable - actuallyTaken;
+                    // 触发原版的拾取动画和统计数据更新
+                    player.take(item, animAmount);
+                    player.awardStat(net.minecraft.stats.Stats.ITEM_PICKED_UP.get(stack.getItem()), actuallyTaken);
 
-                        // 伪造动画数量，防止客户端误删实体
-                        // 如果还没捡完（remainingAfterTake > 0），我们发给客户端的拾取数量必须严格小于客户端看到的堆叠数
-                        // 否则原版客户端一看 actuallyTaken >= 64，就会直接在本地把实体删掉（导致视觉上被吞）
-                        int animAmount = actuallyTaken;
-                        if (remainingAfterTake > 0) {
-                            animAmount = Math.min(actuallyTaken, Math.max(1, stack.getCount() - 1));
-                        }
-                        // 触发原版捡拾动画
-                        player.take(item, animAmount);
-
-                        // 手动触发统计数据更新
-                        // player.take() 只播动画，真正的捡拾统计数据必须手动发放
-                        player.awardStat(net.minecraft.stats.Stats.ITEM_PICKED_UP.get(stack.getItem()), actuallyTaken);
-
-                        // 根据剩余数量更新地上的掉落物状态
-                        if (remainingAfterTake <= 0) {
-                            item.discard(); // 全捡完了，清除实体
-                        } else {
-                            // 没捡完（背包满了或配额耗尽），重新分配掉落物的 原版数量 和 额外数量
-                            int newBaseCount = Math.min(remainingAfterTake, maxStackSize);
-                            int newExtraCount = remainingAfterTake - newBaseCount;
-
-                            stack.setCount(newBaseCount);
-                            // 必须传入 copy() 才能触发实体数据同步
-                            // 生成一个新的对象引用，强制 SynchedEntityData 认识到数据变脏了，从而将新数据发给客户端
-                            item.setItem(stack.copy());
-                            superStack.betterlooting$setExtraCount(newExtraCount);
-                        }
+                    // --- 5. 更新地面上的掉落物实体 ---
+                    if (remainingAfterTake <= 0) {
+                        // 全部捡完了，直接删除地面上的实体
+                        item.discard();
+                    } else {
+                        // 没捡完，重新分配 原版ItemStack数量 和 超大堆叠额外数量
+                        // 优先填满原版的 getMaxStackSize（比如 64），多出来的部分再存入 SuperStack 变量
+                        int newBaseCount = Math.min(remainingAfterTake, stack.getMaxStackSize());
+                        stack.setCount(newBaseCount);
+                        item.setItem(stack.copy()); // 更新实体的基础物品信息
+                        superStack.betterlooting$setExtraCount(remainingAfterTake - newBaseCount); // 更新额外数量
                     }
                 }
             }
 
-            // 如果有捡起物品，播放一次捡拾音效
+            // --- 6. 统一反馈 ---
+            // 如果至少成功拾取了一个物品，播放一次拾取音效（避免循环里播放导致噪音轰炸）
             if (anySuccess) {
                 player.playNotifySound(SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, 2.0F);
             }
-            // 如果背包满了，且不是自动拾取（避免疯狂刷屏），则给玩家发送红字提示
+            // 如果背包满了，且这是玩家主动操作（非自动拾取），在屏幕上方弹出红色提示文字
             if (inventoryFull && !isAuto) {
                 player.displayClientMessage(Component.translatable("message.better_looting.inventory_full").withStyle(ChatFormatting.RED), true);
             }

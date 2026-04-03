@@ -20,7 +20,6 @@ public class CommonSlider extends AbstractSliderButton {
     private final Component prefix;
 
     public CommonSlider(int x, int y, int width, int height, Component prefix, double min, double max, double current, Consumer<Double> setter) {
-        // 核心难点：原版滑动条内部(this.value)只接受 0.0 到 1.0 之间的百分比值。
         // 所以在初始化时，我们必须将传入的当前实际值 (current) 逆向映射到 [0, 1] 的区间内。
         // 公式: (当前值 - 最小值) / (最大值 - 最小值)
         super(x, y, width, height, prefix, (current - min) / (max - min));
