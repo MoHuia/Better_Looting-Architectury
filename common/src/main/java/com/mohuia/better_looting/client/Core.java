@@ -35,6 +35,12 @@ public class Core {
 
     public void init() {
         FilterWhitelist.INSTANCE.init();
+
+        // 从配置读取持久化的状态
+        BetterLootingConfig cfg = BetterLootingConfig.get();
+        this.filterMode = cfg.lastFilterMode;
+        this.isAutoMode = cfg.lastAutoMode;
+
         // 注册客户端 Tick 事件，确保在游戏非暂停状态下处理逻辑
         ClientTickEvent.CLIENT_POST.register(this::onClientTick);
     }
@@ -73,8 +79,8 @@ public class Core {
         BetterLootingConfig cfg = BetterLootingConfig.get();
         return switch (cfg.scrollMode) {
             case ALWAYS -> false; // 绝对占用：模组始终接管滚轮
-            case INVERT_KEY -> KeyInit.SCROLL_MODIFIER.isDown(); // 新增(按键反转)：按下快捷键时交还给原版，松开时模组接管
-            case KEY_BIND -> !KeyInit.SCROLL_MODIFIER.isDown(); // 原有(按键绑定)：没按快捷键时交还给原版，按下时模组接管
+            case INVERT_KEY -> KeyInit.SCROLL_MODIFIER.isDown(); // 按键反转：按下快捷键时交还给原版，松开时模组接管
+            case KEY_BIND -> !KeyInit.SCROLL_MODIFIER.isDown(); // 按键绑定：没按快捷键时交还给原版，按下时模组接管
             case STAND_STILL -> mc.player.getDeltaMovement().horizontalDistanceSqr() > 0.001; // 移动时交还给原版
         };
     }
@@ -130,6 +136,11 @@ public class Core {
         // 1. 切换模式
         filterMode = (filterMode == FilterMode.ALL) ? FilterMode.RARE_ONLY : FilterMode.ALL;
 
+        // 同步状态到配置并持久化保存
+        BetterLootingConfig cfg = BetterLootingConfig.get();
+        cfg.lastFilterMode = this.filterMode;
+        BetterLootingConfig.save();
+
         // 2. 发送快捷栏上方提示
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
@@ -147,6 +158,12 @@ public class Core {
 
     public void toggleAutoMode() {
         isAutoMode = !isAutoMode;
+
+        // 同步状态到配置并持久化保存
+        BetterLootingConfig cfg = BetterLootingConfig.get();
+        cfg.lastAutoMode = this.isAutoMode;
+        BetterLootingConfig.save();
+
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
             // 在玩家屏幕上显示自动拾取模式的开关提示（带颜色格式化）

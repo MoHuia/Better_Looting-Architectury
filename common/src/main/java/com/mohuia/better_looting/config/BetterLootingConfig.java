@@ -2,6 +2,7 @@ package com.mohuia.better_looting.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mohuia.better_looting.client.Core;
 import dev.architectury.platform.Platform;
 import net.minecraft.util.Mth;
 
@@ -47,7 +48,7 @@ public class BetterLootingConfig {
     // 判定参数设置 (Scanning Parameters)
     // ==========================================
     public float lookDownAngle = 45.0f;
-    public float scanRangeXZ = 1.0f; // 注意：进阶版这里是 1.0f，旧版是 3.0f，我保留了进阶版的值
+    public float scanRangeXZ = 1.0f; // 注意：进阶版这里是 1.0f，旧版是 3.0f，保留了进阶版的值
     public float scanRangeY = 0.5f;  // 注意：进阶版这里是 0.5f，旧版是 1.5f，同上
 
     // ==========================================
@@ -56,6 +57,12 @@ public class BetterLootingConfig {
     public boolean enableSuperMerge = true; // 是否开启掉落物超大堆叠合并
     public float mergeRangeXZ = 5.0f;       // 水平合并范围 (最大 10)
     public float mergeRangeY = 5.0f;        // 垂直合并范围 (最大 10)
+
+    // ==========================================
+    // 状态持久化设置 (Persistent State Settings)
+    // ==========================================
+    public Core.FilterMode lastFilterMode = Core.FilterMode.ALL; // 记录上次使用的过滤模式
+    public boolean lastAutoMode = false;                         // 记录上次是否开启了自动拾取
 
     /**
      * 触发物品拾取 UI 的条件模式
@@ -98,6 +105,8 @@ public class BetterLootingConfig {
 
         if (this.activationMode == null) this.activationMode = ActivationMode.ALWAYS;
         if (this.scrollMode == null) this.scrollMode = ScrollMode.ALWAYS;
+
+        if (this.lastFilterMode == null) this.lastFilterMode = Core.FilterMode.ALL;
     }
 
     /**
