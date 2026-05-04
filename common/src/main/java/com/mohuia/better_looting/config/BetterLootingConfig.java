@@ -48,8 +48,8 @@ public class BetterLootingConfig {
     // 判定参数设置 (Scanning Parameters)
     // ==========================================
     public float lookDownAngle = 45.0f;
-    public float scanRangeXZ = 1.0f; // 注意：进阶版这里是 1.0f，旧版是 3.0f，我保留了进阶版的值
-    public float scanRangeY = 0.5f;  // 注意：进阶版这里是 0.5f，旧版是 1.5f，同上
+    public float scanRangeXZ = 1.0f;
+    public float scanRangeY = 1.0f;
 
     // ==========================================
     // 核心功能设置 (Core Feature Settings)
