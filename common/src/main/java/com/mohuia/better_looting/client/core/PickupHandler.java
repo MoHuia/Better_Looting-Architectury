@@ -1,5 +1,6 @@
 package com.mohuia.better_looting.client.core;
 
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import net.minecraft.util.Mth;
 
 /**
@@ -7,7 +8,6 @@ import net.minecraft.util.Mth;
  * 负责区分玩家是“短按”（单次拾取）还是“长按”（批量拾取），并管理自动拾取的冷却。
  */
 public class PickupHandler {
-    private static final int MAX_HOLD_TICKS = 30;      // 长按阈值触发批量拾取
     // 将原本未使用的 PRESS_THRESHOLD_TICKS 替换为更实用的动画防抖盲区
     private static final int DEADZONE_TICKS = 8;       // 动画缓冲期防抖以内不显示进度条
     private static final int AUTO_COOLDOWN_MAX = 2;    // 自动拾取冷却时间 (ticks)
@@ -26,6 +26,8 @@ public class PickupHandler {
      * @return 当前帧应该执行的拾取动作
      */
     public PickupAction tickInput(boolean isKeyDown, boolean hasTargets) {
+        int threshold = BetterLootingConfig.get().maxHoldTicks;
+
         PickupAction action = PickupAction.NONE;
         if (autoPickupCooldown > 0) autoPickupCooldown--;
 
@@ -37,7 +39,7 @@ public class PickupHandler {
             } else if (hasTargets && !batchPickupTriggered) {
                 // 持续按住，增加进度
                 ticksHeld++;
-                if (ticksHeld >= MAX_HOLD_TICKS) {
+                if (ticksHeld >= threshold) {
                     action = PickupAction.BATCH;
                     batchPickupTriggered = true; // 确保一次长按只触发一次批量
                 }
@@ -67,7 +69,8 @@ public class PickupHandler {
 
         // 2. 平滑计算进度：分子分母同时减去 DEADZONE_TICKS
         // 这样即使跨过了 4 ticks 的盲区，进度条也会严格从 0% 开始平滑过渡到 100%
-        return Mth.clamp((float)(ticksHeld - DEADZONE_TICKS) / (MAX_HOLD_TICKS - DEADZONE_TICKS), 0.0f, 1.0f);
+        int threshold = BetterLootingConfig.get().maxHoldTicks;
+        return Mth.clamp((float)(ticksHeld - DEADZONE_TICKS) / (threshold - DEADZONE_TICKS), 0.0f, 1.0f);
     }
 
     public boolean canAutoPickup() { return autoPickupCooldown <= 0; }

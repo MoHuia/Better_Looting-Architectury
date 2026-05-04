@@ -57,7 +57,8 @@ public class BetterLootingConfig {
     public boolean enableSuperMerge = true; // 是否开启掉落物超大堆叠合并
     public float mergeRangeXZ = 5.0f;       // 水平合并范围 (最大 10)
     public float mergeRangeY = 5.0f;        // 垂直合并范围 (最大 10)
-    public float pickupDelaySeconds = 1.0f; // [从 1.20.1 补回] 拾取延迟秒数
+    public float pickupDelaySeconds = 1.0f; // 拾取延迟秒数
+    public int maxHoldTicks = 20; // 默认 20 ticks (1秒)
 
     // ==========================================
     // 状态持久化设置 (Persistent State Settings)
@@ -91,7 +92,8 @@ public class BetterLootingConfig {
         this.lookDownAngle = Mth.clamp(this.lookDownAngle, 0.0f, 90.0f);
         this.scanRangeXZ = Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f);
         this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
-        this.pickupDelaySeconds = Mth.clamp(this.pickupDelaySeconds, 0.0f, 5.0f); // [从 1.20.1 补回]
+        this.pickupDelaySeconds = Mth.clamp(this.pickupDelaySeconds, 0.0f, 5.0f);
+        this.maxHoldTicks = Mth.clamp(this.maxHoldTicks, 10, 100);
 
         // 防止玩家在 JSON 中误删 title 字段导致渲染时 null.isEmpty() 崩溃
         if (this.customOverlayTitle == null) {
