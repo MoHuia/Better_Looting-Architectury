@@ -31,16 +31,18 @@ public class Core {
     private FilterMode filterMode = FilterMode.ALL;
     private boolean isAutoMode = false;
 
+    // 按键拦截的缓冲保护时间
+    private int interceptGraceTicks = 0;
+
     private Core() {}
 
     public void init() {
         FilterWhitelist.INSTANCE.init();
 
-        // --- 新增：初始化时从配置读取持久化的状态 ---
+        // 初始化时从配置读取持久化的状态
         BetterLootingConfig cfg = BetterLootingConfig.get();
         this.filterMode = cfg.lastFilterMode;
         this.isAutoMode = cfg.lastAutoMode;
-        // ------------------------------------------
 
         // 注册客户端 Tick 事件，确保在游戏非暂停状态下处理逻辑
         ClientTickEvent.CLIENT_POST.register(this::onClientTick);
@@ -89,6 +91,11 @@ public class Core {
     public void onClientTick(Minecraft mc) {
         if (mc.player == null || mc.level == null || mc.isPaused()) return;
 
+        // 递减拦截缓冲计时器
+        if (interceptGraceTicks > 0) {
+            interceptGraceTicks--;
+        }
+
         // 更新按键切换状态
         keyTracker.tickOverlayToggle();
         // 扫描周围掉落物并更新 UI 选择管理器
@@ -119,12 +126,16 @@ public class Core {
         var action = pickupHandler.tickInput(isKeyDown, hasTargets);
 
         switch (action) {
-            case SINGLE -> ActionDispatcher.sendSinglePickup(selectionManager);
+            case SINGLE -> {
+                ActionDispatcher.sendSinglePickup(selectionManager);
+                interceptGraceTicks = 20; // 给予 10 Tick (1秒) 的延迟保护
+            }
             case BATCH -> {
                 List<ItemEntity> all = new ArrayList<>();
                 // 收集附近所有可拾取实体的引用
                 selectionManager.getNearbyItems().forEach(e -> all.addAll(e.getSourceEntities()));
                 ActionDispatcher.sendBatchPickup(all, false);
+                interceptGraceTicks = 20; // 给予 10 Tick (1秒) 的延迟保护
             }
         }
     }
@@ -201,6 +212,7 @@ public class Core {
      * 静态辅助方法：判断模组是否应该拦截特定的游戏交互（例如防止在拾取时错误攻击/右键）
      */
     public static boolean shouldIntercept() {
-        return INSTANCE.isHudActive() || INSTANCE.pickupHandler.isInteracting();
+        // interceptGraceTicks > 0 判定
+        return INSTANCE.isHudActive() || INSTANCE.pickupHandler.isInteracting() || INSTANCE.interceptGraceTicks > 0;
     }
 }
