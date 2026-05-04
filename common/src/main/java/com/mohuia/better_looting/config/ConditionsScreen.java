@@ -199,18 +199,11 @@ public class ConditionsScreen extends Screen {
         int currentY = startY;
         int x = mainCenterX - (widgetWidth / 2);
 
-        // 修改点：主区域的组件现在统一使用 addScrollableWidget
-        Component indicatorText = Component.translatable("gui." + BetterLooting.MODID + ".config.hotbar_indicator");
-        this.addScrollableWidget(Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {
-            viewModel.showHotbarIndicator = !viewModel.showHotbarIndicator;
-            this.clearWidgets();
-            this.init();
-        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
-        currentY += BTN_HEIGHT + BTN_GAP + 12;
-
+        // 1. 悬浮窗标题输入框 (移动到首位)
         this.showCustomTitleLabel = true;
         this.customTitleLabelX = x;
-        this.customTitleLabelY = currentY - 10;
+        this.customTitleLabelY = currentY;
+        currentY += 12; // 为文字标签留出空间
 
         EditBox titleInputBox = new EditBox(this.font, x, currentY, widgetWidth, BTN_HEIGHT, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"));
         titleInputBox.setMaxLength(32);
@@ -218,8 +211,18 @@ public class ConditionsScreen extends Screen {
         titleInputBox.setResponder(text -> viewModel.customOverlayTitle = text);
         titleInputBox.setTooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.custom_title")));
         this.addScrollableWidget(titleInputBox);
-        currentY += BTN_HEIGHT + BTN_GAP;
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
 
+        // 2. 快捷栏指示器开关
+        Component indicatorText = Component.translatable("gui." + BetterLooting.MODID + ".config.hotbar_indicator");
+        this.addScrollableWidget(Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {
+            viewModel.showHotbarIndicator = !viewModel.showHotbarIndicator;
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
+
+        // 3. 超级合并开关
         Component mergeText = Component.translatable("gui." + BetterLooting.MODID + ".config.super_merge");
         this.addScrollableWidget(Button.builder(formatOptionText(mergeText, viewModel.enableSuperMerge), b -> {
             viewModel.enableSuperMerge = !viewModel.enableSuperMerge;
@@ -229,28 +232,43 @@ public class ConditionsScreen extends Screen {
         currentY += BTN_HEIGHT + BTN_GAP;
 
         if (viewModel.enableSuperMerge) {
+            // 水平合并范围
             this.addScrollableWidget(new CommonSlider(
                     x, currentY, widgetWidth, BTN_HEIGHT,
                     Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_xz"),
-                    0.0, 10.0, (double) viewModel.mergeRangeXZ,
-                    val -> viewModel.mergeRangeXZ = val.floatValue()
+                    "m", 0.0, 10.0, (double) viewModel.mergeRangeXZ, 1,
+                    val -> viewModel.mergeRangeXZ = (float) (Math.round(val * 10.0) / 10.0)
             ));
             currentY += BTN_HEIGHT + BTN_GAP;
 
+            // 垂直合并范围
             this.addScrollableWidget(new CommonSlider(
                     x, currentY, widgetWidth, BTN_HEIGHT,
                     Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_y"),
-                    0.0, 10.0, (double) viewModel.mergeRangeY,
-                    val -> viewModel.mergeRangeY = val.floatValue()
+                    "m", 0.0, 10.0, (double) viewModel.mergeRangeY, 1,
+                    val -> viewModel.mergeRangeY = (float) (Math.round(val * 10.0) / 10.0)
             ));
             currentY += BTN_HEIGHT + BTN_GAP;
         }
 
+        // 拾取保护延迟
         this.addScrollableWidget(new CommonSlider(
                 x, currentY, widgetWidth, BTN_HEIGHT,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_delay"),
-                0.0, 5.0, (double) viewModel.pickupDelaySeconds,
+                "s", 0.0, 5.0, (double) viewModel.pickupDelaySeconds, 1,
                 val -> viewModel.pickupDelaySeconds = (float) (Math.round(val * 10.0) / 10.0)
+        ));
+        currentY += BTN_HEIGHT + BTN_GAP;
+
+        // 长按触发时间
+        this.addScrollableWidget(new CommonSlider(
+                x, currentY, widgetWidth, BTN_HEIGHT,
+                Component.translatable("gui." + BetterLooting.MODID + ".config.max_hold_seconds"),
+                "s", 0.5, 5.0, (double) viewModel.maxHoldTicks / 20.0, 1,
+                val -> {
+                    float seconds = (float) (Math.round(val * 10.0) / 10.0);
+                    viewModel.maxHoldTicks = (int) (seconds * 20);
+                }
         ));
     }
 

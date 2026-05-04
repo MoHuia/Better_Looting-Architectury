@@ -19,13 +19,20 @@ public class CommonSlider extends AbstractSliderButton {
     // 滑动条上显示的文本前缀（例如："拾取半径" 或 "发光高亮透明度"）
     private final Component prefix;
 
-    public CommonSlider(int x, int y, int width, int height, Component prefix, double min, double max, double current, Consumer<Double> setter) {
+    // 精度和小数点后位数
+    private final int precision;
+    // 数值后缀（例如："s" 或 "m"）
+    private final String suffix;
+
+    public CommonSlider(int x, int y, int width, int height, Component prefix, String suffix, double min, double max, double current, int precision, Consumer<Double> setter) {
         // 所以在初始化时，我们必须将传入的当前实际值 (current) 逆向映射到 [0, 1] 的区间内。
         // 公式: (当前值 - 最小值) / (最大值 - 最小值)
         super(x, y, width, height, prefix, (current - min) / (max - min));
         this.prefix = prefix;
         this.min = min;
         this.max = max;
+        this.precision = precision;
+        this.suffix = suffix;
         this.setter = setter;
 
         // 初始化时必须手动调用一次，确保按钮刚渲染时显示的文字就是正确的初始值
@@ -41,10 +48,20 @@ public class CommonSlider extends AbstractSliderButton {
         // 将内部的 [0, 1] 百分比值 (this.value) 映射回实际的业务逻辑值。
         double val = min + (value * (max - min));
 
+        // 动态格式化输出文字。根据传入的 precision 决定保留几位小数。
+        String formatStr = "%." + precision + "f";
+        String valueText = String.format(formatStr, val) + suffix;
         // 格式化输出文字。这里固定保留了两位小数 (%.2f)。
         // 意图：使用 prefix.copy() 是一个极佳的实践，可以防止意外修改或污染原始的 Component 实例，
         // 确保后续拼接的数值字符串不会被累加到原来的前缀上。
-        setMessage(prefix.copy().append(": " + String.format("%.2f", val)));
+        setMessage(prefix.copy().append(": " + valueText));
+    }
+
+    /**
+     * 兼容旧版构造函数 (默认 2 位小数，无后缀)
+     */
+    public CommonSlider(int x, int y, int width, int height, Component prefix, double min, double max, double current, Consumer<Double> setter) {
+        this(x, y, width, height, prefix, "", min, max, current, 2, setter);
     }
 
     /**

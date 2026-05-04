@@ -67,7 +67,8 @@
   "gui.better_looting.config.super_merge": "Super Merge",
   "gui.better_looting.config.merge_range_xz": "Horizontal Merge Range",
   "gui.better_looting.config.merge_range_y": "Vertical Merge Range",
-  "gui.better_looting.config.pickup_delay": "Pickup Delay (Seconds)",
+  "gui.better_looting.config.pickup_delay": "Pickup Delay",
+  "gui.better_looting.config.max_hold_seconds": "Long Press Duration",
 
   "--- GUI: Layout Editor Help & Info ---": "",
   "gui.better_looting.config.key_info": "Bound Key: %s",

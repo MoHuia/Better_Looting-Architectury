@@ -37,6 +37,7 @@ public class ConfigViewModel {
 
     // 拾取保护时间延迟
     public float pickupDelaySeconds;
+    public int maxHoldTicks;
 
     // ==========================================
     // 拖拽快照状态 (Drag Snapshot State)
@@ -73,6 +74,7 @@ public class ConfigViewModel {
         this.indicatorRotation = cfg.indicatorRotation;
 
         this.pickupDelaySeconds = cfg.pickupDelaySeconds;
+        this.maxHoldTicks = cfg.maxHoldTicks;
 
         this.enableSuperMerge = cfg.enableSuperMerge;
         this.mergeRangeXZ = cfg.mergeRangeXZ;
@@ -103,6 +105,7 @@ public class ConfigViewModel {
         cfg.indicatorRotation = this.indicatorRotation;
 
         cfg.pickupDelaySeconds = this.pickupDelaySeconds;
+        cfg.maxHoldTicks = this.maxHoldTicks;
 
         cfg.enableSuperMerge = this.enableSuperMerge;
         cfg.mergeRangeXZ = this.mergeRangeXZ;
@@ -136,6 +139,7 @@ public class ConfigViewModel {
         this.indicatorRotation = defaults.indicatorRotation;
 
         this.pickupDelaySeconds = defaults.pickupDelaySeconds;
+        this.maxHoldTicks = defaults.maxHoldTicks;
 
         this.enableSuperMerge = defaults.enableSuperMerge;
         this.mergeRangeXZ = defaults.mergeRangeXZ;

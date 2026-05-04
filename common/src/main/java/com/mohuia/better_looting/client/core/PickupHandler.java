@@ -1,5 +1,6 @@
 package com.mohuia.better_looting.client.core;
 
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import net.minecraft.util.Mth;
 
 /**
@@ -26,6 +27,8 @@ public class PickupHandler {
      * @return 当前帧应该执行的拾取动作
      */
     public PickupAction tickInput(boolean isKeyDown, boolean hasTargets) {
+        int threshold = BetterLootingConfig.get().maxHoldTicks;
+
         PickupAction action = PickupAction.NONE;
         if (autoPickupCooldown > 0) autoPickupCooldown--;
 
@@ -37,7 +40,7 @@ public class PickupHandler {
             } else if (hasTargets && !batchPickupTriggered) {
                 // 持续按住，增加进度
                 ticksHeld++;
-                if (ticksHeld >= MAX_HOLD_TICKS) {
+                if (ticksHeld >= threshold) {
                     action = PickupAction.BATCH;
                     batchPickupTriggered = true; // 确保一次长按只触发一次批量
                 }
@@ -67,7 +70,8 @@ public class PickupHandler {
 
         // 2. 平滑计算进度：分子分母同时减去 DEADZONE_TICKS
         // 这样即使跨过了 4 ticks 的盲区，进度条也会严格从 0% 开始平滑过渡到 100%
-        return Mth.clamp((float)(ticksHeld - DEADZONE_TICKS) / (MAX_HOLD_TICKS - DEADZONE_TICKS), 0.0f, 1.0f);
+        int threshold = BetterLootingConfig.get().maxHoldTicks;
+        return Mth.clamp((float)(ticksHeld - DEADZONE_TICKS) / (threshold - DEADZONE_TICKS), 0.0f, 1.0f);
     }
 
     public boolean canAutoPickup() { return autoPickupCooldown <= 0; }
