@@ -6,6 +6,7 @@ import com.mohuia.better_looting.client.gui.CommonSlider;
 import com.mohuia.better_looting.config.BetterLootingConfig.ActivationMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.ScrollMode;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
@@ -14,12 +15,16 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * 触发与滚动条件配置界面。
- * 允许玩家自定义面板显示和列表滚动的限制条件，并控制其他杂项设置。
+ * 采用侧边栏标签页布局，支持主内容区域鼠标滚轮滚动。
  */
 public class ConditionsScreen extends Screen {
 
@@ -27,12 +32,36 @@ public class ConditionsScreen extends Screen {
     private final ConfigViewModel viewModel;
 
     private static final int BTN_HEIGHT = 20;
-    private static final int BTN_GAP = 5;
-    private static final int PADDING = 6;
+    private static final int BTN_GAP = 6;
 
-    // --- 动态布局变量 ---
-    private int dynamicColWidth;
-    private int leftColX, centerColX, rightColX;
+    // --- 侧边栏与主区域布局变量 ---
+    private int sidebarX, sidebarY, sidebarWidth, sidebarHeight;
+    private int mainX, mainY, mainWidth, mainHeight;
+    private int mainCenterX;
+
+    // --- 滚动相关变量 ---
+    private final List<AbstractWidget> scrollableWidgets = new ArrayList<>();
+    private final Map<AbstractWidget, Integer> originalYMap = new HashMap<>();
+    private double scrollAmount = 0;
+    private int maxScroll = 0;
+
+    // 渲染文本框标题所需的坐标
+    private int customTitleLabelX;
+    private int customTitleLabelY;
+    private boolean showCustomTitleLabel = false;
+
+    // 定义当前所处的标签页
+    private enum Category {
+        ACTIVATION("header_condition"),
+        SCROLL("scroll_mode"),
+        OTHER("other_settings");
+
+        final String langKey;
+        Category(String langKey) { this.langKey = langKey; }
+        Component getDisplayName() { return Component.translatable("gui." + BetterLooting.MODID + "." + langKey); }
+    }
+
+    private Category currentCategory = Category.ACTIVATION;
 
     public ConditionsScreen(Screen parent, ConfigViewModel viewModel) {
         super(Component.translatable("gui." + BetterLooting.MODID + ".conditions_title"));
@@ -41,102 +70,196 @@ public class ConditionsScreen extends Screen {
     }
 
     private void calculateLayout() {
-        int maxBgWidth = 140;
-        int gap = 12;
+        this.sidebarWidth = Math.max(100, this.width / 4);
+        this.sidebarX = 15;
+        this.sidebarY = 40;
+        this.sidebarHeight = this.height - 80;
 
-        int bgWidth = Math.min(maxBgWidth, (this.width - (gap * 2) - 20) / 3);
-
-        this.dynamicColWidth = bgWidth - (PADDING * 2);
-
-        this.centerColX = this.width / 2;
-        this.leftColX = this.centerColX - bgWidth - gap;
-        this.rightColX = this.centerColX + bgWidth + gap;
+        this.mainX = sidebarX + sidebarWidth + 10;
+        this.mainY = 40;
+        this.mainWidth = this.width - sidebarX - sidebarWidth - 40;
+        // 稍微减小主区域高度，为底部的快捷键提示文本和返回按钮留出空间
+        this.mainHeight = this.height - 100;
+        this.mainCenterX = mainX + (mainWidth / 2);
     }
 
     @Override
     protected void init() {
+        this.scrollableWidgets.clear();
+        this.originalYMap.clear();
+
         calculateLayout();
+        this.showCustomTitleLabel = false;
 
-        // 将按钮起始高度从 45 下调到 65，避开顶部标题
-        int listStartY = 65;
+        int widgetWidth = Math.min(220, mainWidth - 20);
 
-        // 1. 构建“激活条件”列 (左列)
-        buildEnumColumn(leftColX, listStartY, dynamicColWidth,
-                ActivationMode.values(), viewModel.activationMode,
-                (mode) -> viewModel.activationMode = mode,
+        // 1. 构建左侧侧边栏标签按钮
+        buildSidebar();
+
+        // 2. 根据当前选中的标签页构建右侧内容
+        int startY = mainY + 15;
+
+        switch (currentCategory) {
+            case ACTIVATION -> buildActivationTab(startY, widgetWidth);
+            case SCROLL -> buildScrollTab(startY, widgetWidth);
+            case OTHER -> buildOtherTab(startY, widgetWidth);
+        }
+
+        // 3. 计算最大滚动距离
+        int maxWidgetY = mainY;
+        for (AbstractWidget w : scrollableWidgets) {
+            maxWidgetY = Math.max(maxWidgetY, originalYMap.get(w) + w.getHeight());
+        }
+        // 如果自定义标题标签在最底部，也纳入计算
+        if (showCustomTitleLabel) {
+            maxWidgetY = Math.max(maxWidgetY, customTitleLabelY + 10);
+        }
+        this.maxScroll = Math.max(0, maxWidgetY - mainY - mainHeight + 20); // 20是底部的留白
+
+        // 应用滚动偏移
+        updateWidgetPositions();
+
+        // 4. 返回按钮：全局居中置底 (不加入滚动列表)
+        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> this.minecraft.setScreen(parent))
+                .bounds(this.width / 2 - 100, this.height - 30, 200, 20).build());
+    }
+
+    /**
+     * 将组件添加到滚动区域的专用方法。
+     * 只添加到事件接收器(addWidget)，不添加到默认渲染器，以便我们手动使用 Scissor 裁剪渲染。
+     */
+    private <T extends AbstractWidget> T addScrollableWidget(T widget) {
+        this.addWidget(widget); // 允许接收鼠标和键盘事件
+        this.scrollableWidgets.add(widget);
+        this.originalYMap.put(widget, widget.getY());
+        return widget;
+    }
+
+    // 更新组件的实际 Y 坐标
+    private void updateWidgetPositions() {
+        int paddingY = 6; // 设置上下边距为 6 像素
+
+        for (AbstractWidget widget : scrollableWidgets) {
+            int newY = (int) (originalYMap.get(widget) - scrollAmount);
+            widget.setY(newY);
+            // 只要组件还在裁剪区(可见区)内，就保持渲染和交互状态，防止在边距内被误触
+            widget.visible = (newY + widget.getHeight() > mainY + paddingY) && (newY < mainY + mainHeight - paddingY);
+        }
+    }
+
+    // 监听鼠标滚轮事件
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        // 1.21.1 签名变更为 (mouseX, mouseY, scrollX, scrollY)，scrollY 对应旧版的 delta
+        if (mouseX >= mainX && mouseX <= mainX + mainWidth && mouseY >= mainY && mouseY <= mainY + mainHeight) {
+            if (maxScroll > 0) {
+                this.scrollAmount -= scrollY * 20.0; // 控制每次滚动的像素速度
+                this.scrollAmount = Math.max(0, Math.min(this.scrollAmount, this.maxScroll));
+                updateWidgetPositions();
+                return true;
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private void buildSidebar() {
+        int currentY = sidebarY + 15;
+        int btnWidth = sidebarWidth - 20;
+        int btnX = sidebarX + 10;
+
+        for (Category category : Category.values()) {
+            boolean isSelected = (currentCategory == category);
+
+            Button tabBtn = Button.builder(category.getDisplayName(), b -> {
+                this.currentCategory = category;
+                this.scrollAmount = 0; // 切换标签时重置滚动条
+                this.clearWidgets();
+                this.init();
+            }).bounds(btnX, currentY, btnWidth, BTN_HEIGHT).build();
+
+            tabBtn.active = !isSelected;
+            this.addRenderableWidget(tabBtn);
+            currentY += BTN_HEIGHT + BTN_GAP;
+        }
+    }
+
+    private void buildActivationTab(int startY, int widgetWidth) {
+        buildEnumList(mainCenterX, startY, widgetWidth, ActivationMode.values(), viewModel.activationMode,
+                mode -> viewModel.activationMode = mode,
                 this::getModeName, this::getModeTooltip);
+    }
 
-        // 2. 构建“滚动条件”列 (中列)
-        buildEnumColumn(centerColX, listStartY, dynamicColWidth,
-                ScrollMode.values(), viewModel.scrollMode,
-                (mode) -> viewModel.scrollMode = mode,
+    private void buildScrollTab(int startY, int widgetWidth) {
+        buildEnumList(mainCenterX, startY, widgetWidth, ScrollMode.values(), viewModel.scrollMode,
+                mode -> viewModel.scrollMode = mode,
                 this::getScrollModeName, this::getScrollModeTooltip);
+    }
 
-        // 3. 构建“其他设置”列 (右列)
-        int rightBtnX = rightColX - (dynamicColWidth / 2);
+    private void buildOtherTab(int startY, int widgetWidth) {
+        int currentY = startY;
+        int x = mainCenterX - (widgetWidth / 2);
+
+        // 修改点：主区域的组件现在统一使用 addScrollableWidget
         Component indicatorText = Component.translatable("gui." + BetterLooting.MODID + ".config.hotbar_indicator");
-
-        Button indicatorBtn = Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {
+        this.addScrollableWidget(Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {
             viewModel.showHotbarIndicator = !viewModel.showHotbarIndicator;
             this.clearWidgets();
             this.init();
-        }).bounds(rightBtnX, listStartY, dynamicColWidth, BTN_HEIGHT).build();
-        this.addRenderableWidget(indicatorBtn);
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
+        currentY += BTN_HEIGHT + BTN_GAP + 12;
 
-        // 自定义悬浮窗标题文本框
-        int titleLabelY = listStartY + BTN_HEIGHT + BTN_GAP * 2; // 留出一点空隙用来在 render 里画标签文字
-        int titleBoxY = titleLabelY + 12; // 文本框在标签文字下方
+        this.showCustomTitleLabel = true;
+        this.customTitleLabelX = x;
+        this.customTitleLabelY = currentY - 10;
 
-        EditBox titleInputBox = new EditBox(this.font, rightBtnX, titleBoxY, dynamicColWidth, BTN_HEIGHT, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"));
-        titleInputBox.setMaxLength(32); // 限制标题最大长度，防止界面越界
-        // 设置初始值为 ViewModel 中的值，注意防空指针
+        EditBox titleInputBox = new EditBox(this.font, x, currentY, widgetWidth, BTN_HEIGHT, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"));
+        titleInputBox.setMaxLength(32);
         titleInputBox.setValue(viewModel.customOverlayTitle != null ? viewModel.customOverlayTitle : "");
-        // 监听文本改变，实时同步到 ViewModel
         titleInputBox.setResponder(text -> viewModel.customOverlayTitle = text);
         titleInputBox.setTooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.custom_title")));
-        this.addRenderableWidget(titleInputBox);
+        this.addScrollableWidget(titleInputBox);
+        currentY += BTN_HEIGHT + BTN_GAP;
 
-        // 超大堆叠开关与滑动条
-        int superMergeBtnY = titleBoxY + BTN_HEIGHT + BTN_GAP;
         Component mergeText = Component.translatable("gui." + BetterLooting.MODID + ".config.super_merge");
-        Button superMergeBtn = Button.builder(formatOptionText(mergeText, viewModel.enableSuperMerge), b -> {
+        this.addScrollableWidget(Button.builder(formatOptionText(mergeText, viewModel.enableSuperMerge), b -> {
             viewModel.enableSuperMerge = !viewModel.enableSuperMerge;
             this.clearWidgets();
             this.init();
-        }).bounds(rightBtnX, superMergeBtnY, dynamicColWidth, BTN_HEIGHT).build();
-        this.addRenderableWidget(superMergeBtn);
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
+        currentY += BTN_HEIGHT + BTN_GAP;
 
-        // 如果开启了超大堆叠，则显示 XY 范围调节滑块
         if (viewModel.enableSuperMerge) {
-            int currentRightY = superMergeBtnY + BTN_HEIGHT + BTN_GAP;
-
-            this.addRenderableWidget(new CommonSlider(
-                    rightBtnX, currentRightY, dynamicColWidth, BTN_HEIGHT,
+            this.addScrollableWidget(new CommonSlider(
+                    x, currentY, widgetWidth, BTN_HEIGHT,
                     Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_xz"),
                     0.0, 10.0, (double) viewModel.mergeRangeXZ,
                     val -> viewModel.mergeRangeXZ = val.floatValue()
             ));
-            currentRightY += BTN_HEIGHT + BTN_GAP;
+            currentY += BTN_HEIGHT + BTN_GAP;
 
-            this.addRenderableWidget(new CommonSlider(
-                    rightBtnX, currentRightY, dynamicColWidth, BTN_HEIGHT,
+            this.addScrollableWidget(new CommonSlider(
+                    x, currentY, widgetWidth, BTN_HEIGHT,
                     Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_y"),
                     0.0, 10.0, (double) viewModel.mergeRangeY,
                     val -> viewModel.mergeRangeY = val.floatValue()
             ));
+            currentY += BTN_HEIGHT + BTN_GAP;
         }
 
-        // 4. 返回按钮：居中置底
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> this.minecraft.setScreen(parent))
-                .bounds(this.width / 2 - 100, this.height - 28, 200, 20).build());
+        this.addScrollableWidget(new CommonSlider(
+                x, currentY, widgetWidth, BTN_HEIGHT,
+                Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_delay"),
+                0.0, 5.0, (double) viewModel.pickupDelaySeconds,
+                val -> viewModel.pickupDelaySeconds = (float) (Math.round(val * 10.0) / 10.0)
+        ));
     }
 
-    private <T extends Enum<T>> void buildEnumColumn(int centerX, int startY, int colWidth, T[] values, T current,
-                                                     Consumer<T> setter,
-                                                     Function<T, Component> nameProvider,
-                                                     Function<T, Tooltip> tooltipProvider) {
+    private <T extends Enum<T>> void buildEnumList(int centerX, int startY, int widgetWidth, T[] values, T current,
+                                                   Consumer<T> setter,
+                                                   Function<T, Component> nameProvider,
+                                                   Function<T, Tooltip> tooltipProvider) {
         int currentY = startY;
-        int x = centerX - (colWidth / 2);
+        int x = centerX - (widgetWidth / 2);
 
         for (T mode : values) {
             boolean isSelected = (mode == current);
@@ -146,15 +269,16 @@ public class ConditionsScreen extends Screen {
                         this.clearWidgets();
                         this.init();
                     })
-                    .bounds(x, currentY, colWidth, BTN_HEIGHT)
+                    .bounds(x, currentY, widgetWidth, BTN_HEIGHT)
                     .tooltip(tooltipProvider.apply(mode))
                     .build();
-            this.addRenderableWidget(btn);
+            // 修改点：使用 addScrollableWidget
+            this.addScrollableWidget(btn);
             currentY += BTN_HEIGHT + BTN_GAP;
 
             if (mode == ActivationMode.LOOK_DOWN && isSelected) {
-                this.addRenderableWidget(new CommonSlider(
-                        x + 2, currentY, colWidth - 4, BTN_HEIGHT,
+                this.addScrollableWidget(new CommonSlider(
+                        x + 10, currentY, widgetWidth - 10, BTN_HEIGHT,
                         Component.translatable("gui." + BetterLooting.MODID + ".angle"),
                         0.0, 90.0, (double) viewModel.lookDownAngle,
                         val -> viewModel.lookDownAngle = val.floatValue()
@@ -170,67 +294,92 @@ public class ConditionsScreen extends Screen {
                 : text.copy().withStyle(ChatFormatting.GRAY);
     }
 
-    // 分离背景渲染，防止层级错乱遮挡按键
     @Override
     public void renderBackground(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        // 1. 先让原版渲染它的虚化和暗色底层
+        // 1.21.1 必须使用带参数的签名
         super.renderBackground(gui, mouseX, mouseY, partialTick);
-
-        // 2. 绘制三列的半透明底板，确保它们在按键的【底层】
-        // 将半透明背景底板起始高度从 32 下调到 50
-        // 这样栏目的标题就会被渲染在 50 - 12 = 38 的高度，完美避开高度为 15 的主标题
-        int topY = 50;
-        int bottomY = this.height - 40;
-
-        renderColumnBackground(gui, leftColX, topY, bottomY, dynamicColWidth, Component.translatable("gui." + BetterLooting.MODID + ".header_condition"));
-        renderColumnBackground(gui, centerColX, topY, bottomY, dynamicColWidth, Component.translatable("gui." + BetterLooting.MODID + ".scroll_mode"));
-        renderColumnBackground(gui, rightColX, topY, bottomY, dynamicColWidth, Component.translatable("gui." + BetterLooting.MODID + ".other_settings"));
     }
 
-    // 组件和文字的顶层渲染
     @Override
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        // 1. super.render 会自动调用上面的 renderBackground，然后再画出所有的 Button 和 EditBox
+        // 1. 首先绘制背景（1.21.1 推荐先画背景）
+        this.renderBackground(gui, mouseX, mouseY, partialTick);
+
+        // 2. 调用 super.render。
+        // 这会绘制所有通过 addRenderableWidget 添加的组件（包括你的侧边栏按钮和底部的完成按钮）
+        // 注意：不要把 super.render 放在最后！
         super.render(gui, mouseX, mouseY, partialTick);
 
-        // 2. 绘制需要在按键【顶层】的内容（文字提示等）
+        // 3. 绘制自定义的装饰性面板背景（这些是 fill 操作，不会被模糊覆盖）
+        renderPanelBackground(gui, sidebarX, sidebarY, sidebarWidth, sidebarHeight);
+        renderPanelBackground(gui, mainX, mainY, mainWidth, mainHeight);
+
+        // 4. 绘制标题文字
         gui.drawCenteredString(this.font, this.title, this.width / 2, 15, 0xFFFFFFFF);
+        gui.drawCenteredString(this.font, currentCategory.getDisplayName().copy().withStyle(ChatFormatting.GOLD), mainCenterX, mainY - 12, 0xFFFFFFFF);
 
-        int bottomY = this.height - 40;
-        renderKeyInfo(gui, leftColX, bottomY, viewModel.activationMode);
-        renderKeyInfo(gui, centerColX, bottomY, viewModel.scrollMode);
+        // 5. 开启 Scissor 裁剪并绘制主区域的手动组件
+        int paddingY = 6;
+        gui.enableScissor(mainX, mainY + paddingY, mainX + mainWidth, mainY + mainHeight - paddingY);
 
-        // 绘制文本框上方的说明文字标签
-        int rightBtnX = rightColX - (dynamicColWidth / 2);
-        int titleLabelY = 65 + BTN_HEIGHT + BTN_GAP * 2; // 与 init() 中的高度计算保持一致
-        gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"), rightBtnX + 2, titleLabelY, 0xDDDDDD);
+        if (showCustomTitleLabel) {
+            int labelY = (int) (customTitleLabelY - scrollAmount);
+            if (labelY > mainY + paddingY - 10 && labelY < mainY + mainHeight - paddingY) {
+                gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"), customTitleLabelX + 2, labelY, 0xDDDDDD);
+            }
+        }
+
+        // 手动渲染滚动组件
+        for (AbstractWidget widget : scrollableWidgets) {
+            widget.render(gui, mouseX, mouseY, partialTick);
+        }
+
+        gui.disableScissor();
+
+        // 6. 渲染滚动条和快捷键信息（最后画，确保在最上层）
+        if (maxScroll > 0) {
+            renderScrollBar(gui);
+        }
+        renderContextKeyInfo(gui);
     }
 
-    private void renderKeyInfo(GuiGraphics gui, int centerX, int bottomY, Enum<?> mode) {
-        if (mode instanceof ActivationMode m && (m == ActivationMode.KEY_HOLD || m == ActivationMode.KEY_TOGGLE)) {
-            drawKeyString(gui, centerX, bottomY, KeyInit.SHOW_OVERLAY, "config.key_info");
+    private void renderScrollBar(GuiGraphics gui) {
+        int scrollbarX = mainX + mainWidth - 6;
+        int scrollbarY = mainY + 2;
+        int scrollbarHeight = mainHeight - 4;
+
+        int handleHeight = Math.max(10, (int) ((float) scrollbarHeight * scrollbarHeight / (scrollbarHeight + maxScroll)));
+        int handleY = scrollbarY + (int) ((scrollAmount / maxScroll) * (scrollbarHeight - handleHeight));
+
+        gui.fill(scrollbarX, scrollbarY, scrollbarX + 4, scrollbarY + scrollbarHeight, 0x80000000);
+        gui.fill(scrollbarX, handleY, scrollbarX + 4, handleY + handleHeight, 0xFF888888);
+    }
+
+    private void renderContextKeyInfo(GuiGraphics gui) {
+        int infoY = mainY + mainHeight + 10;
+
+        if (currentCategory == Category.ACTIVATION) {
+            if (viewModel.activationMode == ActivationMode.KEY_HOLD || viewModel.activationMode == ActivationMode.KEY_TOGGLE) {
+                drawKeyString(gui, mainCenterX, infoY, KeyInit.SHOW_OVERLAY, "config.key_info");
+            }
+        } else if (currentCategory == Category.SCROLL) {
+            if (viewModel.scrollMode == ScrollMode.KEY_BIND || viewModel.scrollMode == ScrollMode.INVERT_KEY) {
+                drawKeyString(gui, mainCenterX, infoY, KeyInit.SCROLL_MODIFIER, "config.scroll_key_info");
+            }
         }
-        // 在这里加上对 INVERT_KEY 的判断
-        else if (mode instanceof ScrollMode m && (m == ScrollMode.KEY_BIND || m == ScrollMode.INVERT_KEY)) {
-            drawKeyString(gui, centerX, bottomY, KeyInit.SCROLL_MODIFIER, "config.scroll_key_info");
-        }
+    }
+
+    private void renderPanelBackground(GuiGraphics gui, int x, int y, int w, int h) {
+        gui.fill(x, y, x + w, y + h, 0x60000000);
+        gui.fill(x, y, x + w, y + 1, 0x80FFFFFF);
+        gui.fill(x, y + h - 1, x + w, y + h, 0x80FFFFFF);
     }
 
     private void drawKeyString(GuiGraphics gui, int x, int y, net.minecraft.client.KeyMapping key, String langKey) {
         Component keyName = key.getTranslatedKeyMessage();
         int color = key.isUnbound() ? 0xFFFF5555 : 0xFF55FF55;
-        gui.drawCenteredString(this.font, Component.translatable("gui." + BetterLooting.MODID + "." + langKey, keyName), x, y - 12, color);
+        gui.drawCenteredString(this.font, Component.translatable("gui." + BetterLooting.MODID + "." + langKey, keyName), x, y, color);
     }
-
-    private void renderColumnBackground(GuiGraphics gui, int centerX, int topY, int bottomY, int colWidth, Component header) {
-        int halfW = (colWidth / 2) + PADDING;
-        gui.fill(centerX - halfW, topY, centerX + halfW, bottomY, 0x60000000);
-        gui.fill(centerX - halfW, topY, centerX + halfW, topY + 1, 0x80FFFFFF);
-        gui.fill(centerX - halfW, bottomY - 1, centerX + halfW, bottomY, 0x80FFFFFF);
-        gui.drawCenteredString(this.font, header, centerX, topY - 12, 0xFFFFAA00);
-    }
-
-    // --- 国际化文本获取工具方法 ---
 
     private Component getModeName(ActivationMode mode) {
         return Component.translatable("gui." + BetterLooting.MODID + ".config.mode." + mode.name().toLowerCase());

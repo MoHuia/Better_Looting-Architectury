@@ -31,18 +31,25 @@ public class Core {
     private FilterMode filterMode = FilterMode.ALL;
     private boolean isAutoMode = false;
 
+    // 按键拦截的缓冲保护时间
+    private int interceptGraceTicks = 0;
+
+    // 记录当前是否正处于被拦截的长按状态中（解决长按时物品消失导致的按键穿透）
+    private boolean isHoldingInterceptedKey = false;
+
     private Core() {}
 
     public void init() {
         FilterWhitelist.INSTANCE.init();
 
-        // 从配置读取持久化的状态
+        // 初始化时从配置读取持久化的状态
         BetterLootingConfig cfg = BetterLootingConfig.get();
         this.filterMode = cfg.lastFilterMode;
         this.isAutoMode = cfg.lastAutoMode;
 
         // 注册客户端 Tick 事件，确保在游戏非暂停状态下处理逻辑
-        ClientTickEvent.CLIENT_POST.register(this::onClientTick);
+        // 已修改为 CLIENT_PRE，以便在原版按键处理前抢先执行
+        ClientTickEvent.CLIENT_PRE.register(this::onClientTick);
     }
 
     /**
@@ -79,8 +86,8 @@ public class Core {
         BetterLootingConfig cfg = BetterLootingConfig.get();
         return switch (cfg.scrollMode) {
             case ALWAYS -> false; // 绝对占用：模组始终接管滚轮
-            case INVERT_KEY -> KeyInit.SCROLL_MODIFIER.isDown(); // 按键反转：按下快捷键时交还给原版，松开时模组接管
-            case KEY_BIND -> !KeyInit.SCROLL_MODIFIER.isDown(); // 按键绑定：没按快捷键时交还给原版，按下时模组接管
+            case INVERT_KEY -> KeyInit.SCROLL_MODIFIER.isDown(); // 新增(按键反转)：按下快捷键时交还给原版，松开时模组接管
+            case KEY_BIND -> !KeyInit.SCROLL_MODIFIER.isDown(); // 原有(按键绑定)：没按快捷键时交还给原版，按下时模组接管
             case STAND_STILL -> mc.player.getDeltaMovement().horizontalDistanceSqr() > 0.001; // 移动时交还给原版
         };
     }
@@ -88,10 +95,36 @@ public class Core {
     public void onClientTick(Minecraft mc) {
         if (mc.player == null || mc.level == null || mc.isPaused()) return;
 
+        // 必须先扫描掉落物！确保后续 isHudActive() 判定时，拿到的是当前帧最准确的环境状态
+        selectionManager.updateItems(LootScanner.scan(mc, this.filterMode));
+
+        // 获取当前物理按键的状态
+        boolean isPhysicalDown = keyTracker.isPhysicalKeyDown(KeyInit.PICKUP);
+
+        // 一旦玩家松开按键，立刻解除长按锁定
+        if (!isPhysicalDown) {
+            isHoldingInterceptedKey = false;
+        }
+
+        // 只要当前满足拦截条件，或者正处于已被锁定的长按状态中
+        if (shouldIntercept() || isHoldingInterceptedKey) {
+            // 无条件持续排空原版冲突按键！不再受 isPhysicalDown 限制。
+            // （防止玩家疯狂连按时，物理按键已松开，但底层 clickCount 仍有残留引发穿透）
+            suppressVanillaOverlappingKeys(mc);
+
+            // 仅在此处做长按锁定
+            if (isPhysicalDown) {
+                isHoldingInterceptedKey = true; // 直到松手才解除
+            }
+        }
+
+        // 递减拦截缓冲计时器
+        if (interceptGraceTicks > 0) {
+            interceptGraceTicks--;
+        }
+
         // 更新按键切换状态
         keyTracker.tickOverlayToggle();
-        // 扫描周围掉落物并更新 UI 选择管理器
-        selectionManager.updateItems(LootScanner.scan(mc, this.filterMode));
 
         // 处理自动拾取逻辑
         if (isAutoMode && isHudActive()) {
@@ -116,14 +149,19 @@ public class Core {
 
         // 获取当前输入对应的动作类型
         var action = pickupHandler.tickInput(isKeyDown, hasTargets);
+        int delayTicks = (int) (BetterLootingConfig.get().pickupDelaySeconds * 20);
 
         switch (action) {
-            case SINGLE -> ActionDispatcher.sendSinglePickup(selectionManager);
+            case SINGLE -> {
+                ActionDispatcher.sendSinglePickup(selectionManager);
+                interceptGraceTicks = delayTicks; // 给予 10 Tick (1秒) 的延迟保护
+            }
             case BATCH -> {
                 List<ItemEntity> all = new ArrayList<>();
                 // 收集附近所有可拾取实体的引用
                 selectionManager.getNearbyItems().forEach(e -> all.addAll(e.getSourceEntities()));
                 ActionDispatcher.sendBatchPickup(all, false);
+                interceptGraceTicks = delayTicks; // 给予 10 Tick (1秒) 的延迟保护
             }
         }
     }
@@ -200,6 +238,23 @@ public class Core {
      * 静态辅助方法：判断模组是否应该拦截特定的游戏交互（例如防止在拾取时错误攻击/右键）
      */
     public static boolean shouldIntercept() {
-        return INSTANCE.isHudActive() || INSTANCE.pickupHandler.isInteracting();
+        // interceptGraceTicks > 0 判定
+        return INSTANCE.isHudActive() || INSTANCE.pickupHandler.isInteracting() || INSTANCE.interceptGraceTicks > 0;
+    }
+
+    /**
+     * 动态检测并消耗掉与拾取键重合的原版按键事件，防止“按键穿透”
+     */
+    private void suppressVanillaOverlappingKeys(Minecraft mc) {
+        // 如果拾取键和副手交换键（默认 F）绑定了同一个物理按键
+        if (KeyInit.PICKUP.same(mc.options.keySwapOffhand)) {
+            // 循环消耗掉原版的点击次数，这样原版的 handleKeybinds 就不会触发副手交换了
+            while (mc.options.keySwapOffhand.consumeClick()) {}
+        }
+
+        // 防患于未然：如果玩家把拾取键绑定成了丢弃键（默认 Q）
+        if (KeyInit.PICKUP.same(mc.options.keyDrop)) {
+            while (mc.options.keyDrop.consumeClick()) {}
+        }
     }
 }
