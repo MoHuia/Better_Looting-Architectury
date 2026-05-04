@@ -67,6 +67,7 @@
   "gui.better_looting.config.super_merge": "超大堆叠合并",
   "gui.better_looting.config.merge_range_xz": "水平合并范围",
   "gui.better_looting.config.merge_range_y": "垂直合并范围",
+  "gui.better_looting.config.pickup_delay": "拾取延迟保护 (秒)",
 
   "--- GUI：布局编辑器帮助与信息 ---": "",
   "gui.better_looting.config.key_info": "绑定按键: %s",

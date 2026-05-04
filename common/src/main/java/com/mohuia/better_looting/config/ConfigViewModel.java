@@ -35,6 +35,9 @@ public class ConfigViewModel {
     public float mergeRangeXZ;
     public float mergeRangeY;
 
+    // 拾取保护时间延迟
+    public float pickupDelaySeconds;
+
     // ==========================================
     // 拖拽快照状态 (Drag Snapshot State)
     // 用于记录鼠标按下瞬间的数值，配合差值计算避免累加误差
@@ -69,6 +72,8 @@ public class ConfigViewModel {
         this.indicatorY = cfg.indicatorY;
         this.indicatorRotation = cfg.indicatorRotation;
 
+        this.pickupDelaySeconds = cfg.pickupDelaySeconds;
+
         this.enableSuperMerge = cfg.enableSuperMerge;
         this.mergeRangeXZ = cfg.mergeRangeXZ;
         this.mergeRangeY = cfg.mergeRangeY;
@@ -96,6 +101,8 @@ public class ConfigViewModel {
         cfg.indicatorX = this.indicatorX;
         cfg.indicatorY = this.indicatorY;
         cfg.indicatorRotation = this.indicatorRotation;
+
+        cfg.pickupDelaySeconds = this.pickupDelaySeconds;
 
         cfg.enableSuperMerge = this.enableSuperMerge;
         cfg.mergeRangeXZ = this.mergeRangeXZ;
@@ -127,6 +134,8 @@ public class ConfigViewModel {
         this.indicatorX = defaults.indicatorX;
         this.indicatorY = defaults.indicatorY;
         this.indicatorRotation = defaults.indicatorRotation;
+
+        this.pickupDelaySeconds = defaults.pickupDelaySeconds;
 
         this.enableSuperMerge = defaults.enableSuperMerge;
         this.mergeRangeXZ = defaults.mergeRangeXZ;

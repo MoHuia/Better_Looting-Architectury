@@ -2,6 +2,7 @@ package com.mohuia.better_looting.network.C2S;
 
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.mixin.ItemEntityAccessor;
+import com.mohuia.better_looting.platform.PlatformHooks;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
@@ -9,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -90,10 +92,10 @@ public class PacketBatchPickup {
                 Entity target = player.level().getEntity(id);
 
                 // --- 1. 安全与防作弊校验 ---
-                // 必须是物品实体、必须存活、且距离玩家不能超过 10 格 (100.0 = 10^2)
-                if (!(target instanceof ItemEntity item) || !item.isAlive() || player.distanceToSqr(target) >= 100.0) continue;
+                // 必须是物品实体、必须存活、距离玩家不能超过 10 格 (100.0 = 10^2)
                 // 如果是自动拾取，原版机制中的“拾取冷却延迟 (PickupDelay)”必须已经归零
-                if (this.isAuto && ((ItemEntityAccessor) item).getPickupDelay() > 0) continue;
+                if (!(target instanceof ItemEntity item) || !item.isAlive() || player.distanceToSqr(item) >= 100.0 ||
+                        (isAuto && ((ItemEntityAccessor) item).getPickupDelay() > 0)) continue;
 
                 ItemStack stack = item.getItem();
                 ISuperStack superStack = (ISuperStack) item; // 强转为我们的混合接口，获取超大堆叠数据
@@ -110,17 +112,14 @@ public class PacketBatchPickup {
                 ItemStack insertStack = stack.copy();
                 insertStack.setCount(toTake);
 
-                // 原版的 add 方法会自动处理背包格子分配。
-                // 如果装不下，insertStack 的 count 会变成【剩余无法装下的数量】
+                // 原版的 add 方法会自动处理背包格子分配。如果装不下，insertStack 的 count 会变成【剩余无法装下的数量】
                 player.getInventory().add(insertStack);
 
                 int remainderCount = insertStack.getCount();    // 塞完后剩下的数量（没装进去的）
                 int actuallyTaken = toTake - remainderCount;    // 实际成功塞入背包的数量
 
                 // 如果有剩余，说明玩家背包在这一个物品判定时已经满了
-                if (remainderCount > 0) {
-                    inventoryFull = true;
-                }
+                if (remainderCount > 0) inventoryFull = true;
 
                 // --- 4. 成功拾取后的状态更新 ---
                 if (actuallyTaken > 0) {
@@ -130,13 +129,25 @@ public class PacketBatchPickup {
 
                     // 计算原版的拾取动画数量
                     // 为了让客户端播放动画时不显得奇怪，我们取 实际拾取量 和 (原版堆叠数-1) 之间的合适值
-                    int animAmount = remainingAfterTake > 0
-                            ? Math.min(actuallyTaken, Math.max(1, stack.getCount() - 1))
-                            : actuallyTaken;
+                    int animAmount = remainingAfterTake > 0 ? Math.min(actuallyTaken, Math.max(1, stack.getCount() - 1)) : actuallyTaken;
 
                     // 触发原版的拾取动画和统计数据更新
                     player.take(item, animAmount);
-                    player.awardStat(net.minecraft.stats.Stats.ITEM_PICKED_UP.get(stack.getItem()), actuallyTaken);
+                    player.awardStat(Stats.ITEM_PICKED_UP.get(stack.getItem()), actuallyTaken);
+
+                    /* 构造一个代表“本次实际拾取”的 ItemStack 并通知平台 */
+                    try {
+                        ItemStack pickedUp = stack.copy();
+                        pickedUp.setCount(actuallyTaken);
+                        PlatformHooks.fireItemPickupEvent(player, item, pickedUp);
+                    } catch (Throwable t) {
+                        // 在游戏内聊天框输出简要的报错信息
+                        player.sendSystemMessage(Component.literal("§c[BetterLooting 调试] 平台Hook失败: " + t));
+                        // 输出堆栈的第一行，精准定位是哪一行代码崩了
+                        if (t.getStackTrace().length > 0) {
+                            player.sendSystemMessage(Component.literal("§c↳ 崩溃位置: " + t.getStackTrace()[0]));
+                        }
+                    }
 
                     // --- 5. 更新地面上的掉落物实体 ---
                     if (remainingAfterTake <= 0) {
@@ -155,9 +166,8 @@ public class PacketBatchPickup {
 
             // --- 6. 统一反馈 ---
             // 如果至少成功拾取了一个物品，播放一次拾取音效（避免循环里播放导致噪音轰炸）
-            if (anySuccess) {
-                player.playNotifySound(SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, 2.0F);
-            }
+            if (anySuccess) player.playNotifySound(SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, 2.0F);
+
             // 如果背包满了，且这是玩家主动操作（非自动拾取），在屏幕上方弹出红色提示文字
             if (inventoryFull && !isAuto) {
                 player.displayClientMessage(Component.translatable("message.better_looting.inventory_full").withStyle(ChatFormatting.RED), true);

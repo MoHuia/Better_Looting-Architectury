@@ -7,9 +7,10 @@ import net.minecraft.util.Mth;
  * 负责区分玩家是“短按”（单次拾取）还是“长按”（批量拾取），并管理自动拾取的冷却。
  */
 public class PickupHandler {
-    private static final int MAX_HOLD_TICKS = 12;      // 长按阈值：12 ticks (约 0.6 秒) 触发批量拾取
-    private static final int PRESS_THRESHOLD_TICKS = 1; // 按下即视为开始交互
-    private static final int AUTO_COOLDOWN_MAX = 2;     // 自动拾取冷却时间 (ticks)
+    private static final int MAX_HOLD_TICKS = 30;      // 长按阈值触发批量拾取
+    // 将原本未使用的 PRESS_THRESHOLD_TICKS 替换为更实用的动画防抖盲区
+    private static final int DEADZONE_TICKS = 8;       // 动画缓冲期防抖以内不显示进度条
+    private static final int AUTO_COOLDOWN_MAX = 2;    // 自动拾取冷却时间 (ticks)
 
     private int ticksHeld = 0;
     private int autoPickupCooldown = 0;
@@ -59,13 +60,20 @@ public class PickupHandler {
      * @return 获取当前长按的进度 (0.0 到 1.0)，可用于渲染 UI 进度条（如圆环）
      */
     public float getProgress() {
-        if (ticksHeld < 2) return 0.0f; // 轻微防抖，避免刚点按就闪烁进度条
+        // 1. 如果还在防抖缓冲期内，直接返回 0，彻底消除单次点击的动画闪烁
+        if (ticksHeld <= DEADZONE_TICKS) return 0.0f;
+
         if (batchPickupTriggered) return 1.0f;
-        return Mth.clamp((float)ticksHeld / MAX_HOLD_TICKS, 0.0f, 1.0f);
+
+        // 2. 平滑计算进度：分子分母同时减去 DEADZONE_TICKS
+        // 这样即使跨过了 4 ticks 的盲区，进度条也会严格从 0% 开始平滑过渡到 100%
+        return Mth.clamp((float)(ticksHeld - DEADZONE_TICKS) / (MAX_HOLD_TICKS - DEADZONE_TICKS), 0.0f, 1.0f);
     }
 
     public boolean canAutoPickup() { return autoPickupCooldown <= 0; }
     public void resetAutoCooldown() { this.autoPickupCooldown = 0; }
     public void onAutoPickupTriggered() { this.autoPickupCooldown = AUTO_COOLDOWN_MAX; }
+
+    // isInteracting 依然以 ticksHeld > 0 判断，保证底层交互逻辑(比如阻止原版按键穿透)足够灵敏
     public boolean isInteracting() { return ticksHeld > 0; }
 }
