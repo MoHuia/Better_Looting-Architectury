@@ -60,8 +60,10 @@ public class LootScanner {
         if (mc.player == null || mc.level == null) return new ArrayList<>();
 
         BetterLootingConfig cfg = BetterLootingConfig.get();
-        double expandXZ = cfg.scanRangeXZ;
-        double expandY = cfg.scanRangeY;
+
+        // 【修改点】：使用 getActualScanRange 获取实际生效的范围（支持服务端强制覆盖）
+        double expandXZ = cfg.getActualScanRangeXZ();
+        double expandY = cfg.getActualScanRangeY();
 
         // 以玩家的碰撞箱为中心向外扩散扫描范围
         AABB area = mc.player.getBoundingBox().inflate(expandXZ, expandY, expandXZ);
