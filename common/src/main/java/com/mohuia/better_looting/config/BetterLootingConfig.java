@@ -15,6 +15,9 @@ public class BetterLootingConfig {
     // 将后缀名改为 .toml
     private static final File CONFIG_FILE = Platform.getConfigFolder().resolve("better_looting.toml").toFile();
 
+    // 新增：指向旧版本的 JSON 配置文件，用于更新时自动清理
+    private static final File OLD_CONFIG_FILE = Platform.getConfigFolder().resolve("better_looting.json").toFile();
+
     // ==========================================
     // 视觉与 UI 设置 (Visual & UI Settings)
     // ==========================================
@@ -48,6 +51,12 @@ public class BetterLootingConfig {
     public float scanRangeY = 1.0f;
 
     // ==========================================
+    // 服务端强制覆盖参数 (联机同步专用，不保存到本地文件)
+    // ==========================================
+    public transient float serverScanRangeXZ = -1.0f;
+    public transient float serverScanRangeY = -1.0f;
+
+    // ==========================================
     // 核心功能设置 (Core Feature Settings)
     // ==========================================
     public boolean enableSuperMerge = true;
@@ -62,12 +71,38 @@ public class BetterLootingConfig {
     public Core.FilterMode lastFilterMode = Core.FilterMode.ALL;
     public boolean lastAutoMode = false;
 
+    /**
+     * 获取实际生效的水平拾取范围。
+     * 如果在联机模式且服务端下发了强制参数，则使用服务端的；否则使用本地配置。
+     */
+    public float getActualScanRangeXZ() {
+        return serverScanRangeXZ > 0 ? serverScanRangeXZ : scanRangeXZ;
+    }
+
+    /**
+     * 获取实际生效的垂直拾取范围。
+     * 如果在联机模式且服务端下发了强制参数，则使用服务端的；否则使用本地配置。
+     */
+    public float getActualScanRangeY() {
+        return serverScanRangeY > 0 ? serverScanRangeY : scanRangeY;
+    }
+
+    /**
+     * 触发物品拾取 UI 的条件模式
+     */
     public enum ActivationMode { ALWAYS, LOOK_DOWN, STAND_STILL, KEY_HOLD, KEY_TOGGLE }
+
+    /**
+     * 允许在物品列表中滚动选择的条件模式
+     */
     public enum ScrollMode { ALWAYS, KEY_BIND, INVERT_KEY, STAND_STILL }
 
     private static BetterLootingConfig INSTANCE = new BetterLootingConfig();
     public static BetterLootingConfig get() { return INSTANCE; }
 
+    /**
+     * 校验并限制配置值的范围，防止用户手动修改配置文件导致 UI 越界或崩溃。
+     */
     public void validate() {
         this.xOffset = Mth.clamp(this.xOffset, -2000.0f, 2000.0f);
         this.yOffset = Mth.clamp(this.yOffset, -2000.0f, 2000.0f);
@@ -135,9 +170,9 @@ public class BetterLootingConfig {
             config.setComment("Scanning", "判定参数设置 (Scanning Parameters)");
             config.setComment("Scanning.lookDownAngle", "HUD触发角度");
             config.set("Scanning.lookDownAngle", INSTANCE.lookDownAngle);
-            config.setComment("Scanning.scanRangeXZ", "水平拾取检测范围(只能游戏外调整)");
+            config.setComment("Scanning.scanRangeXZ", "水平拾取检测范围(联机时受服主强制同步覆盖)");
             config.set("Scanning.scanRangeXZ", INSTANCE.scanRangeXZ);
-            config.setComment("Scanning.scanRangeY", "垂直拾取检测范围(只能游戏外调整)");
+            config.setComment("Scanning.scanRangeY", "垂直拾取检测范围(联机时受服主强制同步覆盖)");
             config.set("Scanning.scanRangeY", INSTANCE.scanRangeY);
 
             // --- 核心功能 ---
@@ -216,6 +251,18 @@ public class BetterLootingConfig {
     }
 
     public static void init() {
+        // 清理旧版本的 JSON 配置文件
+        if (OLD_CONFIG_FILE.exists()) {
+            try {
+                if (OLD_CONFIG_FILE.delete()) {
+                    System.out.println("[BetterLooting] Successfully deleted old JSON config file.");
+                }
+            } catch (Exception e) {
+                System.err.println("[BetterLooting] Failed to delete old JSON config.");
+                e.printStackTrace();
+            }
+        }
+
         load();
     }
 }
