@@ -16,7 +16,8 @@ dependencies {
     // Architectury 允许在 Common 中使用 Fabric 的包，它会在 NeoForge 端自动进行重映射 (Remap)
     modApi "me.shedaniel.cloth:cloth-config-fabric:${cloth_config_version}"
 
-    implementation 'com.electronwill.night-config:toml:3.6.6'
+    implementation "com.electronwill.night-config:core:3.6.7"
+    implementation "com.electronwill.night-config:toml:3.6.7"
 }
 
 repositories {
