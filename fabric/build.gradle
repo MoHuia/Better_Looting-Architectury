@@ -45,6 +45,9 @@ dependencies {
     // --- JEI 导入  ---
     modCompileOnly "mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}"
     modLocalRuntime "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"
+
+    implementation "com.electronwill.night-config:toml:3.6.7"
+    include "com.electronwill.night-config:toml:3.6.7"
 }
 
 processResources {
