@@ -16,7 +16,6 @@ import org.lwjgl.glfw.GLFW;
  */
 public class FilterEvents {
     private static long lastClickTime = 0;
-    private static final long CLICK_COOLDOWN_MS = 150;
 
     public static void init() {
         // 初始化白名单数据（尝试从本地 JSON 加载）

@@ -4,7 +4,7 @@ import com.mohuia.better_looting.client.Constants;
 import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.Utils;
-import com.mohuia.better_looting.client.core.VisualItemEntry;
+import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.DeltaTracker; // 1.21.1 引入：用于替代 float partialTick

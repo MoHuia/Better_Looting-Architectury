@@ -1,4 +1,4 @@
-package com.mohuia.better_looting.client.core;
+package com.mohuia.better_looting.client.core.pipeline;
 
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import java.util.ArrayList;
