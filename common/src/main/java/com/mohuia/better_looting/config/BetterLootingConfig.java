@@ -1,7 +1,7 @@
 package com.mohuia.better_looting.config;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.mohuia.better_looting.client.Core;
+import com.mohuia.better_looting.config.FilterMode;
 import dev.architectury.platform.Platform;
 import net.minecraft.util.Mth;
 
@@ -68,7 +68,7 @@ public class BetterLootingConfig {
     // ==========================================
     // 状态持久化设置 (Persistent State Settings)
     // ==========================================
-    public Core.FilterMode lastFilterMode = Core.FilterMode.ALL;
+    public FilterMode lastFilterMode = FilterMode.ALL;
     public boolean lastAutoMode = false;
 
     /**
@@ -128,7 +128,7 @@ public class BetterLootingConfig {
 
         if (this.activationMode == null) this.activationMode = ActivationMode.ALWAYS;
         if (this.scrollMode == null) this.scrollMode = ScrollMode.ALWAYS;
-        if (this.lastFilterMode == null) this.lastFilterMode = Core.FilterMode.ALL;
+        if (this.lastFilterMode == null) this.lastFilterMode = FilterMode.ALL;
     }
 
     /**
@@ -239,7 +239,7 @@ public class BetterLootingConfig {
             INSTANCE.pickupDelaySeconds = config.<Number>getOrElse("Core.pickupDelaySeconds", 1.0f).floatValue();
             INSTANCE.maxHoldTicks = config.getOrElse("Core.maxHoldTicks", 20);
 
-            try { INSTANCE.lastFilterMode = Core.FilterMode.valueOf(config.getOrElse("State.lastFilterMode", "ALL")); } catch (Exception ignored) {}
+            try { INSTANCE.lastFilterMode = FilterMode.valueOf(config.getOrElse("State.lastFilterMode", "ALL")); } catch (Exception ignored) {}
             INSTANCE.lastAutoMode = config.getOrElse("State.lastAutoMode", false);
 
             INSTANCE.validate();

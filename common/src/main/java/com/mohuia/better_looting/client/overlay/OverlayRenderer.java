@@ -2,9 +2,10 @@ package com.mohuia.better_looting.client.overlay;
 
 import com.mohuia.better_looting.client.Constants;
 import com.mohuia.better_looting.client.Core;
+import com.mohuia.better_looting.config.FilterMode;
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.Utils;
-import com.mohuia.better_looting.client.core.VisualItemEntry;
+import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
@@ -40,8 +41,8 @@ public class OverlayRenderer {
     public void renderFilterTabs(GuiGraphics gui, int x, int y) {
         RenderSystem.enableBlend();
         var mode = Core.INSTANCE.getFilterMode();
-        drawTab(gui, x, y, mode == Core.FilterMode.ALL, 0xFFFFFFFF);
-        drawTab(gui, x + 9, y, mode == Core.FilterMode.RARE_ONLY, 0xFFFFD700);
+        drawTab(gui, x, y, mode == FilterMode.ALL, 0xFFFFFFFF);
+        drawTab(gui, x + 9, y, mode == FilterMode.RARE_ONLY, 0xFFFFD700);
     }
 
     /**

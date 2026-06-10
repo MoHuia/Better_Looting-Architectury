@@ -3,7 +3,7 @@ package com.mohuia.better_looting.config;
 import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.Constants;
 import com.mohuia.better_looting.client.Core;
-import com.mohuia.better_looting.client.core.VisualItemEntry;
+import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import com.mohuia.better_looting.client.gui.CommonSlider;
 import com.mohuia.better_looting.client.overlay.HotbarIndicator;
 import com.mohuia.better_looting.client.overlay.OverlayRenderer;
@@ -30,7 +30,6 @@ public class ConfigScreen extends Screen {
     private final DragController dragController;
     private OverlayRenderer renderer;
     private final List<VisualItemEntry> previewItems = new ArrayList<>();
-    public String customOverlayTitle;
 
     // 预览框的边界坐标，用于处理鼠标拖拽和裁剪
     private float boxLeft, boxTop, boxRight, boxBottom;

@@ -88,8 +88,8 @@ public class Utils {
     public static float easeOutBack(float x) {
         float c1 = 1.70158f;
         float c3 = c1 + 1;
-        // 数学公式: 1 + c3 * (x - 1)^3 + c1 * (x - 1)^2
-        return 1 + c3 * (float) Math.pow(x - 1, 3) + c1 * (float) Math.pow(x - 1, 2);
+        float t = x - 1;
+        return 1 + c3 * t * t * t + c1 * t * t;
     }
 
     /**
@@ -101,7 +101,7 @@ public class Utils {
      * @return 经过缓动曲线映射后的进度值
      */
     public static float easeOutCubic(float x) {
-        // 数学公式: 1 - (1 - x)^3
-        return 1 - (float) Math.pow(1 - x, 3);
+        float t = 1 - x;
+        return 1 - t * t * t;
     }
 }

@@ -91,8 +91,11 @@ public class FilterPanel {
 
                         // 渲染 Tooltip 前必须暂时关闭剪裁，否则 Tooltip 如果过长会被切断
                         RenderSystem.disableScissor();
-                        gui.renderTooltip(Minecraft.getInstance().font, stack, mouseX, mouseY);
-                        RenderSystem.enableScissor((int)(startX * guiScale), scY, (int)(PANEL_WIDTH * guiScale), scH);
+                        try {
+                            gui.renderTooltip(Minecraft.getInstance().font, stack, mouseX, mouseY);
+                        } finally {
+                            RenderSystem.enableScissor((int)(startX * guiScale), scY, (int)(PANEL_WIDTH * guiScale), scH);
+                        }
                     }
                 } else if (index == items.size()) {
                     // 渲染列表末尾的 "+" 号，提示玩家可以放入物品

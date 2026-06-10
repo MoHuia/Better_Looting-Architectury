@@ -38,6 +38,7 @@ public class MouseHandlerMixin {
      */
     @Unique
     private double better_looting$getScaledMouseX() {
+        if (this.minecraft.getWindow() == null) return this.minecraft.mouseHandler.xpos();
         return this.minecraft.mouseHandler.xpos() * (double) this.minecraft.getWindow().getGuiScaledWidth() / (double) this.minecraft.getWindow().getScreenWidth();
     }
 
@@ -46,6 +47,7 @@ public class MouseHandlerMixin {
      */
     @Unique
     private double better_looting$getScaledMouseY() {
+        if (this.minecraft.getWindow() == null) return this.minecraft.mouseHandler.ypos();
         return this.minecraft.mouseHandler.ypos() * (double) this.minecraft.getWindow().getGuiScaledHeight() / (double) this.minecraft.getWindow().getScreenHeight();
     }
 

@@ -26,9 +26,4 @@ public class Constants {
     public static final int ITEM_WIDTH = 110;                   // 列表单项宽度
     public static final int LIST_X = 30;                        // 列表渲染起始 X 坐标偏移
 
-    // ==========================================
-    // 动画常量
-    // ==========================================
-    public static final float SCROLL_SMOOTHING = 0.2f;          // 滚动平滑系数，越小越平滑
-    public static final float POPUP_SMOOTHING = 0.15f;          // 弹出动画平滑系数
 }

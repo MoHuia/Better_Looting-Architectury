@@ -1,6 +1,6 @@
-package com.mohuia.better_looting.client.core;
+package com.mohuia.better_looting.client.core.pipeline;
 
-import com.mohuia.better_looting.client.Core;
+import com.mohuia.better_looting.config.FilterMode;
 import com.mohuia.better_looting.client.Utils;
 import com.mohuia.better_looting.client.filter.FilterWhitelist;
 import com.mohuia.better_looting.config.BetterLootingConfig;
@@ -56,7 +56,7 @@ public class LootScanner {
      * @param filterMode 过滤器模式（全部扫描 / 仅稀有）
      * @return 经过处理并排序后的可视化列表项
      */
-    public static List<VisualItemEntry> scan(Minecraft mc, Core.FilterMode filterMode) {
+    public static List<VisualItemEntry> scan(Minecraft mc, FilterMode filterMode) {
         if (mc.player == null || mc.level == null) return new ArrayList<>();
 
         BetterLootingConfig cfg = BetterLootingConfig.get();
@@ -80,7 +80,7 @@ public class LootScanner {
         for (ItemEntity entity : rawEntities) {
             ItemStack stack = entity.getItem();
 
-            if (filterMode == Core.FilterMode.RARE_ONLY && shouldHide(stack)) {
+            if (filterMode == FilterMode.RARE_ONLY && shouldHide(stack)) {
                 continue;
             }
 

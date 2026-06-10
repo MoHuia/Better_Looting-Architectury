@@ -1,4 +1,4 @@
-package com.mohuia.better_looting.client.core;
+package com.mohuia.better_looting.client.core.pipeline;
 
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.config.ConfigScreen;

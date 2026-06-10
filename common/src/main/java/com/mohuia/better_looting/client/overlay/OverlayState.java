@@ -1,6 +1,6 @@
 package com.mohuia.better_looting.client.overlay;
 
-import com.mohuia.better_looting.client.core.VisualItemEntry;
+import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
 import net.minecraft.util.Mth;

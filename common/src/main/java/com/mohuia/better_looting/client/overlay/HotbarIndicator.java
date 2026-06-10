@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.client.overlay;
 
 import com.mohuia.better_looting.client.Core;
+import com.mohuia.better_looting.config.FilterMode;
 import com.mohuia.better_looting.client.Utils;
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -34,7 +35,7 @@ public class HotbarIndicator {
         // 意图 1：如果玩家按下了 F1 隐藏了 GUI，或者当前打开了任何界面（如物品栏、暂停菜单），则不渲染指示器。
         if (mc.options.hideGui || mc.screen != null) return;
 
-        // 意图 2：如果玩家处于旁观者模式 (Spectator)，原版快捷栏会被隐藏或替换，此时我们的指示器也应该隐藏。
+        // 意图 2：如果玩家处于创造或旁观者模式，原版快捷栏会被隐藏或替换，此时我们的指示器也应该隐藏。
         if (mc.gameMode != null && !mc.gameMode.canHurtPlayer() && mc.player != null && mc.player.isSpectator()) return;
 
         // 获取用户自定义的坐标，若为 -1 则动态计算原版快捷栏相对位置
@@ -62,7 +63,7 @@ public class HotbarIndicator {
     /**
      * 供编辑界面调用的内部绘制方法，支持自由坐标和 360 度旋转。
      */
-    public void renderInternal(GuiGraphics gui, float x, float y, int rotationDegrees, Core.FilterMode mode) {
+    public void renderInternal(GuiGraphics gui, float x, float y, int rotationDegrees, FilterMode mode) {
         // 准备 OpenGL 渲染状态：开启透明度混合，确保带 Alpha 通道的颜色能正确显示。
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -82,8 +83,8 @@ public class HotbarIndicator {
 
         // 绘制两个模式的指示灯。
         // 如果当前是 ALL 模式，上方的白色灯亮起；如果当前是 RARE_ONLY，下方的金色灯亮起。
-        drawIndicator(gui, drawX, drawY, mode == Core.FilterMode.ALL, 0xFFFFFFFF);
-        drawIndicator(gui, drawX, drawY + 8, mode == Core.FilterMode.RARE_ONLY, 0xFFFFD700); // 0xFFFFD700 为标准的金色 (Gold)
+        drawIndicator(gui, drawX, drawY, mode == FilterMode.ALL, 0xFFFFFFFF);
+        drawIndicator(gui, drawX, drawY + 8, mode == FilterMode.RARE_ONLY, 0xFFFFD700); // 0xFFFFD700 为标准的金色 (Gold)
 
         gui.pose().popPose();
 

@@ -51,9 +51,7 @@ public class CommonSlider extends AbstractSliderButton {
         // 动态格式化输出文字。根据传入的 precision 决定保留几位小数。
         String formatStr = "%." + precision + "f";
         String valueText = String.format(formatStr, val) + suffix;
-        // 格式化输出文字。这里固定保留了两位小数 (%.2f)。
-        // 意图：使用 prefix.copy() 是一个极佳的实践，可以防止意外修改或污染原始的 Component 实例，
-        // 确保后续拼接的数值字符串不会被累加到原来的前缀上。
+        // 使用 prefix.copy() 防止污染原始 Component 实例
         setMessage(prefix.copy().append(": " + valueText));
     }
 

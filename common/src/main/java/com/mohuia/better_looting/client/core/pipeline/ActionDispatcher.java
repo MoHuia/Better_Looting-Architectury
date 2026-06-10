@@ -1,4 +1,4 @@
-package com.mohuia.better_looting.client.core;
+package com.mohuia.better_looting.client.core.pipeline;
 
 import com.mohuia.better_looting.network.NetworkHandler;
 import com.mohuia.better_looting.network.C2S.PacketBatchPickup;
