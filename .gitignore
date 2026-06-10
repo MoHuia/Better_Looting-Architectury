@@ -1,12 +1,32 @@
-# 项目排除路径
+# Gradle
 /.gradle/
 /build/
 /common/.gradle/
 /common/build/
-/common/build/classes/java/main/
 /fabric/.gradle/
 /fabric/build/
-/fabric/build/classes/java/main/
 /forge/.gradle/
 /forge/build/
-/forge/build/classes/java/main/
+/neoforge/.gradle/
+/neoforge/build/
+
+# IDE
+.idea/
+
+# Runtime (game saves, logs, configs, screenshots, crash reports)
+fabric/run/
+forge/run/
+neoforge/run/
+
+# Build output
+output/
+
+# Graphify
+graphify-out/
+
+# Architectury transformer cache
+.architectury-transformer/
+
+# OS files
+.DS_Store
+Thumbs.db
