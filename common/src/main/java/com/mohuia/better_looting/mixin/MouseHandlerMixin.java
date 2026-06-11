@@ -4,10 +4,12 @@ import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.client.filter.FilterEvents;
 import com.mohuia.better_looting.client.filter.FilterPanel;
 import com.mohuia.better_looting.client.filter.FilterWhitelist;
+import com.mohuia.better_looting.client.inventory.InventoryLootList;
 import com.mohuia.better_looting.client.jei.JeiCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.Slot;
@@ -22,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * 鼠标处理器的全局 Mixin（高优先级）
- * 用于接管游戏内的鼠标滚动和点击事件，实现快捷过滤操作及自定义面板的交互。
+ * 用于接管游戏内的鼠标滚动、点击和移动事件，实现快捷过滤操作及自定义面板的交互。
  */
 @Mixin(value = MouseHandler.class, priority = 500)
 public class MouseHandlerMixin {
@@ -66,7 +68,7 @@ public class MouseHandlerMixin {
             return;
         }
 
-        // 仅在打开容器界面时处理过滤面板的滚动
+        // 仅在打开容器界面时处理过滤面板和物品栏列表的滚动
         if (!(this.minecraft.screen instanceof AbstractContainerScreen<?> screen)) return;
 
         double mouseX = better_looting$getScaledMouseX();
@@ -74,8 +76,15 @@ public class MouseHandlerMixin {
 
         // 如果鼠标悬停在过滤面板上，将滚轮事件传递给面板并取消原版响应
         if (FilterPanel.isOpen() && FilterEvents.isMouseOverPanel(mouseX, mouseY, screen)) {
-            // 提示：如果你希望在过滤面板上按 Shift 也能滚动其他东西，也可以把 isShiftDown 加到这里
             if (FilterPanel.scroll(yOffset)) {
+                ci.cancel();
+            }
+        }
+
+        // 物品栏掉落物列表滚动
+        if (screen instanceof InventoryScreen) {
+            if (InventoryLootList.INSTANCE.isMouseOverList(mouseX, mouseY)) {
+                InventoryLootList.INSTANCE.handleScroll(yOffset);
                 ci.cancel();
             }
         }
@@ -86,10 +95,44 @@ public class MouseHandlerMixin {
      */
     @Inject(method = "onPress", at = @At("HEAD"), cancellable = true)
     private void interceptGlobalMousePress(long window, int button, int action, int modifiers, CallbackInfo ci) {
+        // 物品拖拽释放（无论当前屏幕，释放拖拽状态）
+        if (action == 0 && InventoryLootList.INSTANCE.isDraggingItem()) {
+            if (this.minecraft.screen instanceof InventoryScreen invScreen) {
+                InventoryLootList.INSTANCE.onItemRelease(invScreen);
+            }
+            ci.cancel();
+            return;
+        }
+
+        // 滚动条拖拽释放
+        if (action == 0 && InventoryLootList.INSTANCE.isDraggingScrollbar()) {
+            InventoryLootList.INSTANCE.onScrollbarRelease();
+            ci.cancel();
+            return;
+        }
+
         if (!(this.minecraft.screen instanceof AbstractContainerScreen<?> containerScreen)) return;
 
         double mouseX = better_looting$getScaledMouseX();
         double mouseY = better_looting$getScaledMouseY();
+
+        // 物品栏列表：滚动条按下优先
+        if (action == 1 && containerScreen instanceof InventoryScreen) {
+            if (InventoryLootList.INSTANCE.isMouseOverScrollbar(mouseX, mouseY)) {
+                ci.cancel();
+                InventoryLootList.INSTANCE.onScrollbarPress(mouseX, mouseY);
+                return;
+            }
+        }
+
+        // 物品栏列表：物品按下（仅左键，玩家手上没有已拿起的物品时）
+        if (action == 1 && button == 0 && containerScreen instanceof InventoryScreen
+                && containerScreen.getMenu().getCarried().isEmpty()) {
+            if (InventoryLootList.INSTANCE.onItemPress(mouseX, mouseY)) {
+                ci.cancel();
+                return;
+            }
+        }
 
         // 1. 优先处理对过滤面板本身的直接点击
         if (FilterPanel.isOpen() && FilterEvents.isMouseOverPanel(mouseX, mouseY, containerScreen)) {
@@ -134,6 +177,23 @@ public class MouseHandlerMixin {
                     this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, pitch));
                 }
             }
+        }
+    }
+
+    /**
+     * 拦截鼠标移动事件，驱动物品栏掉落物列表的滚动条拖拽。
+     */
+    @Inject(method = "onMove", at = @At("HEAD"))
+    private void onMouseMove(long window, double xpos, double ypos, CallbackInfo ci) {
+        if (this.minecraft.getWindow() == null) return;
+        double mouseX = xpos * (double) this.minecraft.getWindow().getGuiScaledWidth() / (double) this.minecraft.getWindow().getScreenWidth();
+        double mouseY = ypos * (double) this.minecraft.getWindow().getGuiScaledHeight() / (double) this.minecraft.getWindow().getScreenHeight();
+
+        if (InventoryLootList.INSTANCE.isDraggingItem()) {
+            InventoryLootList.INSTANCE.onItemDrag(mouseX, mouseY);
+        }
+        if (InventoryLootList.INSTANCE.isDraggingScrollbar()) {
+            InventoryLootList.INSTANCE.onScrollbarDrag(mouseX, mouseY);
         }
     }
 }

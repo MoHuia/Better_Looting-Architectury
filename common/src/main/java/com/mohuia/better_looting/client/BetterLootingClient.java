@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.client;
 
 import com.mohuia.better_looting.client.filter.FilterEvents;
+import com.mohuia.better_looting.client.inventory.InventoryLootList;
 import com.mohuia.better_looting.client.overlay.HotbarIndicator;
 import com.mohuia.better_looting.client.overlay.Overlay;
 import dev.architectury.event.events.client.ClientGuiEvent;
@@ -31,6 +32,7 @@ public class BetterLootingClient {
         // 2. 初始化核心逻辑与过滤器事件监听
         Core.INSTANCE.init();
         FilterEvents.init();
+        InventoryLootList.INSTANCE.init();
 
         // 3. 注册客户端 Tick 事件
         // 在每一帧逻辑更新后执行，用于处理状态同步、动画进度计算等非渲染逻辑
