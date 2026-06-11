@@ -29,6 +29,7 @@ public class BetterLootingConfig {
     public float globalAlpha = 0.9f;
     public boolean showHotbarIndicator = true;
     public String customOverlayTitle = "Loot Detected";
+    public int inventoryListWidth = 120;
 
     // ==========================================
     // 快捷栏指示器悬浮窗设置 (Indicator Settings)
@@ -108,6 +109,7 @@ public class BetterLootingConfig {
         this.yOffset = Mth.clamp(this.yOffset, -2000.0f, 2000.0f);
         this.uiScale = Mth.clamp(this.uiScale, 0.1f, 4.0f);
         this.panelWidth = Mth.clamp(this.panelWidth, 80, 500);
+        this.inventoryListWidth = Mth.clamp(this.inventoryListWidth, 80, 500);
         this.visibleRows = Mth.clamp(this.visibleRows, 1.0f, 20.0f);
         this.globalAlpha = Mth.clamp(this.globalAlpha, 0.1f, 1.0f);
         this.lookDownAngle = Mth.clamp(this.lookDownAngle, 0.0f, 90.0f);
@@ -152,6 +154,8 @@ public class BetterLootingConfig {
             config.set("Visual.showHotbarIndicator", INSTANCE.showHotbarIndicator);
             config.setComment("Visual.customOverlayTitle", "自定义悬浮窗标题 (留空则隐藏)");
             config.set("Visual.customOverlayTitle", INSTANCE.customOverlayTitle);
+            config.setComment("Visual.inventoryListWidth", "物品栏左侧掉落物列表面板宽度 (默认 120)");
+            config.set("Visual.inventoryListWidth", INSTANCE.inventoryListWidth);
 
             // --- 指示器设置 ---
             config.setComment("Indicator", "快捷栏指示器悬浮窗设置 (Indicator Settings)");
@@ -221,6 +225,7 @@ public class BetterLootingConfig {
             INSTANCE.globalAlpha = config.<Number>getOrElse("Visual.globalAlpha", 0.9f).floatValue();
             INSTANCE.showHotbarIndicator = config.getOrElse("Visual.showHotbarIndicator", true);
             INSTANCE.customOverlayTitle = config.getOrElse("Visual.customOverlayTitle", "Loot Detected");
+            INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 120);
 
             INSTANCE.indicatorX = config.<Number>getOrElse("Indicator.indicatorX", -1.0f).floatValue();
             INSTANCE.indicatorY = config.<Number>getOrElse("Indicator.indicatorY", -1.0f).floatValue();

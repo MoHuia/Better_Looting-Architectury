@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.network;
 
 import com.mohuia.better_looting.network.C2S.PacketBatchPickup;
+import com.mohuia.better_looting.network.C2S.PacketPlaceIntoSlot;
 import com.mohuia.better_looting.network.S2C.PacketSyncConfig;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -22,6 +23,14 @@ public class NetworkHandler {
                 PacketBatchPickup.TYPE,      // 数据包的全局唯一标识
                 PacketBatchPickup.CODEC,     // 编解码器
                 PacketBatchPickup::handle    // 处理逻辑
+        );
+
+        // 注册客户端向服务端发送的：拖拽放入指定槽位数据包 (C2S)
+        NetworkManager.registerReceiver(
+                NetworkManager.Side.C2S,
+                PacketPlaceIntoSlot.TYPE,
+                PacketPlaceIntoSlot.CODEC,
+                PacketPlaceIntoSlot::handle
         );
 
         // 注册服务端向客户端同步的：配置更新数据包 (S2C)
