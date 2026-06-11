@@ -1,32 +1,50 @@
-# Gradle
-/.gradle/
-/build/
-/common/.gradle/
-/common/build/
-/fabric/.gradle/
-/fabric/build/
-/forge/.gradle/
-/forge/build/
-/neoforge/.gradle/
-/neoforge/build/
+# === Gradle ===
+.gradle/
+build/
+*/build/
+*/.gradle/
+!gradle/wrapper/gradle-wrapper.jar
 
-# IDE
+# === IDE ===
 .idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+*~
 
-# Runtime (game saves, logs, configs, screenshots, crash reports)
-fabric/run/
-forge/run/
-neoforge/run/
+# === Runtime (game saves, logs, configs, crash reports) ===
+run/
+*/run/
+*.log
+*.log.gz
+*.zip
+crash-reports/
+saves/
+logs/
+config/
 
-# Build output
+# === Build output ===
 output/
+bin/
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
 
-# Graphify
+# === Architectury transformer ===
+.architectury-transformer/
+*/.architectury-transformer/
+
+# === Graphify ===
 graphify-out/
 
-# Architectury transformer cache
-.architectury-transformer/
-
-# OS files
+# === OS files ===
 .DS_Store
 Thumbs.db
+
+# === Java ===
+hs_err_pid*
+replay_pid*
