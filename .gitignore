@@ -1,50 +1,51 @@
 # === Gradle ===
 .gradle/
 build/
-*/build/
-*/.gradle/
 !gradle/wrapper/gradle-wrapper.jar
 
-# === IDE ===
+# === IDE (IntelliJ / Eclipse / VSCode) ===
 .idea/
-.vscode/
 *.iml
 *.ipr
 *.iws
+.classpath
+.project
+.settings/
+.vscode/
 *.swp
 *.swo
 *~
 
-# === Runtime (game saves, logs, configs, crash reports) ===
+# === Minecraft Runtime ===
 run/
-*/run/
-*.log
-*.log.gz
-*.zip
+logs/
 crash-reports/
 saves/
-logs/
-config/
+*.log
+*.log.gz
 
-# === Build output ===
+# === Java ===
+*.class
+*.jar
+*.war
+hs_err_pid*
+replay_pid*
+
+# === Architectury / Loom ===
+.architectury-transformer/
+*.tiny
+!gradle/**/*.tiny
+
+# === Build Output ===
 output/
 bin/
 out/
-*.class
-*.jar
-!gradle/wrapper/gradle-wrapper.jar
 
-# === Architectury transformer ===
-.architectury-transformer/
-*/.architectury-transformer/
-
-# === Graphify ===
-graphify-out/
-
-# === OS files ===
+# === OS ===
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# === Java ===
-hs_err_pid*
-replay_pid*
+# === Misc ===
+graphify-out/
+*.zip
