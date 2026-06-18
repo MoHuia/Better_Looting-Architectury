@@ -24,7 +24,6 @@ run/
 crash-reports/
 saves/
 logs/
-config/
 
 # === Build output ===
 output/
