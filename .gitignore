@@ -49,3 +49,6 @@ desktop.ini
 # === Misc ===
 graphify-out/
 *.zip
+
+# === Project Config ===
+CLAUDE.md
