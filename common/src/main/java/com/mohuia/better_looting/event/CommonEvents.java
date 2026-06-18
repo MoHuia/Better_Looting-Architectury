@@ -1,5 +1,8 @@
 package com.mohuia.better_looting.event;
 
+import com.mohuia.better_looting.config.BetterLootingConfig;
+import com.mohuia.better_looting.config.BetterLootingConfig.PickupInterceptMode;
+import com.mohuia.better_looting.platform.PlatformHooks;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.PlayerEvent;
 import net.minecraft.world.entity.player.Player;
@@ -14,10 +17,12 @@ public class CommonEvents {
      * 初始化通用事件
      */
     public static void init() {
-        // 拦截玩家拾取物品的预处理事件
-        // 返回 interruptFalse() 会阻止原版的默认拾取行为，从而允许模组接管并使用自定义的拾取逻辑
-        PlayerEvent.PICKUP_ITEM_PRE.register((player, itemEntity, stack) -> {
-            return EventResult.interruptFalse();
-        });
+        BetterLootingConfig cfg = BetterLootingConfig.get();
+
+        if (cfg.pickupInterceptMode == PickupInterceptMode.ALWAYS) {
+            PlayerEvent.PICKUP_ITEM_PRE.register((player, itemEntity, stack) -> EventResult.interruptFalse());
+        } else if (cfg.pickupInterceptMode == PickupInterceptMode.AUTO) {
+            PlatformHooks.setupPickupInterception();
+        }
     }
 }

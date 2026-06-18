@@ -54,7 +54,8 @@ public class Core {
 
         keyTracker.tickOverlayToggle();
 
-        if (ModeManager.INSTANCE.isAutoMode() && isHudActive()) {
+        // 自动拾取用全量未过滤列表判空，确保不被 StabilityFilter 延迟
+        if (ModeManager.INSTANCE.isAutoMode() && !selectionManager.getUnfilteredItems().isEmpty()) {
             if (pickupHandler.canAutoPickup()) {
                 ActionDispatcher.handleAutoPickup(selectionManager, pickupHandler);
             }
@@ -81,7 +82,8 @@ public class Core {
             }
             case BATCH -> {
                 List<ItemEntity> all = new ArrayList<>();
-                selectionManager.getNearbyItems().forEach(e -> all.addAll(e.getSourceEntities()));
+                // 使用未过滤的全量数据，确保长按拾取不被 StabilityFilter 延迟
+                selectionManager.getUnfilteredItems().forEach(e -> all.addAll(e.getSourceEntities()));
                 ActionDispatcher.sendBatchPickup(all, false);
                 InputGuard.INSTANCE.setGraceTicks(delayTicks);
             }

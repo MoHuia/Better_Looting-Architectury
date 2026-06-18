@@ -13,4 +13,12 @@ public class PlatformHooks {
     public static void fireItemPickupEvent(ServerPlayer player, ItemEntity itemEntity, ItemStack stack) {
         throw new AssertionError();
     }
+
+    /**
+     * 注册平台特定的拾取拦截策略（用于 AUTO 模式）。
+     */
+    @ExpectPlatform
+    public static void setupPickupInterception() {
+        throw new AssertionError();
+    }
 }

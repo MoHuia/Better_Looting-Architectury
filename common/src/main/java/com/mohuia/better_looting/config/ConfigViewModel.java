@@ -28,6 +28,7 @@ public class ConfigViewModel {
 
     public BetterLootingConfig.ActivationMode activationMode;
     public BetterLootingConfig.ScrollMode scrollMode;
+    public BetterLootingConfig.PickupInterceptMode pickupInterceptMode;
     public float lookDownAngle;
 
     // 超大堆叠合并设置
@@ -38,6 +39,9 @@ public class ConfigViewModel {
     // 拾取保护时间延迟
     public float pickupDelaySeconds;
     public int maxHoldTicks;
+
+    // HUD 稳定过滤阈值
+    public int stabilityThresholdTicks;
 
     // ==========================================
     // 拖拽快照状态 (Drag Snapshot State)
@@ -63,6 +67,7 @@ public class ConfigViewModel {
         this.globalAlpha = cfg.globalAlpha;
         this.activationMode = cfg.activationMode;
         this.scrollMode = cfg.scrollMode;
+        this.pickupInterceptMode = cfg.pickupInterceptMode;
         this.lookDownAngle = cfg.lookDownAngle;
         this.showHotbarIndicator = cfg.showHotbarIndicator;
 
@@ -75,6 +80,7 @@ public class ConfigViewModel {
 
         this.pickupDelaySeconds = cfg.pickupDelaySeconds;
         this.maxHoldTicks = cfg.maxHoldTicks;
+        this.stabilityThresholdTicks = cfg.stabilityThresholdTicks;
 
         this.enableSuperMerge = cfg.enableSuperMerge;
         this.mergeRangeXZ = cfg.mergeRangeXZ;
@@ -94,6 +100,7 @@ public class ConfigViewModel {
         cfg.globalAlpha = this.globalAlpha;
         cfg.activationMode = this.activationMode;
         cfg.scrollMode = this.scrollMode;
+        cfg.pickupInterceptMode = this.pickupInterceptMode;
         cfg.lookDownAngle = this.lookDownAngle;
         cfg.showHotbarIndicator = this.showHotbarIndicator;
 
@@ -106,6 +113,7 @@ public class ConfigViewModel {
 
         cfg.pickupDelaySeconds = this.pickupDelaySeconds;
         cfg.maxHoldTicks = this.maxHoldTicks;
+        cfg.stabilityThresholdTicks = this.stabilityThresholdTicks;
 
         cfg.enableSuperMerge = this.enableSuperMerge;
         cfg.mergeRangeXZ = this.mergeRangeXZ;
@@ -128,6 +136,7 @@ public class ConfigViewModel {
         this.globalAlpha = defaults.globalAlpha;
         this.activationMode = defaults.activationMode;
         this.scrollMode = defaults.scrollMode;
+        this.pickupInterceptMode = defaults.pickupInterceptMode;
         this.lookDownAngle = defaults.lookDownAngle;
         this.showHotbarIndicator = defaults.showHotbarIndicator;
 
@@ -140,6 +149,7 @@ public class ConfigViewModel {
 
         this.pickupDelaySeconds = defaults.pickupDelaySeconds;
         this.maxHoldTicks = defaults.maxHoldTicks;
+        this.stabilityThresholdTicks = defaults.stabilityThresholdTicks;
 
         this.enableSuperMerge = defaults.enableSuperMerge;
         this.mergeRangeXZ = defaults.mergeRangeXZ;
