@@ -60,6 +60,8 @@ public class BetterLootingConfig {
     // ==========================================
     // 核心功能设置 (Core Feature Settings)
     // ==========================================
+    public PickupInterceptMode pickupInterceptMode = PickupInterceptMode.AUTO;
+    public int stabilityThresholdTicks = 4;
     public boolean enableSuperMerge = true;
     public float mergeRangeXZ = 5.0f;
     public float mergeRangeY = 5.0f;
@@ -98,6 +100,18 @@ public class BetterLootingConfig {
      */
     public enum ScrollMode { ALWAYS, KEY_BIND, INVERT_KEY, STAND_STILL }
 
+    /**
+     * 原版拾取事件拦截策略
+     */
+    public enum PickupInterceptMode {
+        /** 智能模式：仅在其他模组未处理拾取事件时才拦截（推荐，兼容性最好） */
+        AUTO,
+        /** 始终拦截：无条件阻止原版拾取（可能与背包类模组冲突） */
+        ALWAYS,
+        /** 不拦截：完全放行原版拾取，仅保留 F 键自定义拾取 */
+        NEVER
+    }
+
     private static BetterLootingConfig INSTANCE = new BetterLootingConfig();
     public static BetterLootingConfig get() { return INSTANCE; }
 
@@ -122,6 +136,7 @@ public class BetterLootingConfig {
             this.customOverlayTitle = "Loot Detected";
         }
 
+        this.stabilityThresholdTicks = Mth.clamp(this.stabilityThresholdTicks, 0, 20);
         this.mergeRangeXZ = Mth.clamp(this.mergeRangeXZ, 0.0f, 10.0f);
         this.mergeRangeY = Mth.clamp(this.mergeRangeY, 0.0f, 10.0f);
 
@@ -130,6 +145,7 @@ public class BetterLootingConfig {
 
         if (this.activationMode == null) this.activationMode = ActivationMode.ALWAYS;
         if (this.scrollMode == null) this.scrollMode = ScrollMode.ALWAYS;
+        if (this.pickupInterceptMode == null) this.pickupInterceptMode = PickupInterceptMode.AUTO;
         if (this.lastFilterMode == null) this.lastFilterMode = FilterMode.ALL;
     }
 
@@ -181,6 +197,10 @@ public class BetterLootingConfig {
 
             // --- 核心功能 ---
             config.setComment("Core", "核心功能设置 (Core Feature Settings)");
+            config.setComment("Core.pickupInterceptMode", "拾取拦截策略: AUTO(智能,推荐) / ALWAYS(始终拦截) / NEVER(不拦截)");
+            config.set("Core.pickupInterceptMode", INSTANCE.pickupInterceptMode.name());
+            config.setComment("Core.stabilityThresholdTicks", "物品必须连续存在多少 tick 才在悬浮窗显示（默认4=0.2秒，0=关闭）");
+            config.set("Core.stabilityThresholdTicks", INSTANCE.stabilityThresholdTicks);
             config.setComment("Core.enableSuperMerge", "是否开启掉落物超大堆叠合并");
             config.set("Core.enableSuperMerge", INSTANCE.enableSuperMerge);
             config.setComment("Core.mergeRangeXZ", "水平合并范围 (最大 10)");
@@ -238,6 +258,8 @@ public class BetterLootingConfig {
             INSTANCE.scanRangeXZ = config.<Number>getOrElse("Scanning.scanRangeXZ", 1.0f).floatValue();
             INSTANCE.scanRangeY = config.<Number>getOrElse("Scanning.scanRangeY", 1.0f).floatValue();
 
+            try { INSTANCE.pickupInterceptMode = PickupInterceptMode.valueOf(config.getOrElse("Core.pickupInterceptMode", "AUTO")); } catch (Exception ignored) {}
+            INSTANCE.stabilityThresholdTicks = config.getOrElse("Core.stabilityThresholdTicks", 4);
             INSTANCE.enableSuperMerge = config.getOrElse("Core.enableSuperMerge", true);
             INSTANCE.mergeRangeXZ = config.<Number>getOrElse("Core.mergeRangeXZ", 5.0f).floatValue();
             INSTANCE.mergeRangeY = config.<Number>getOrElse("Core.mergeRangeY", 5.0f).floatValue();

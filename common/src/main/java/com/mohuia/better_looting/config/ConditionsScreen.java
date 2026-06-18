@@ -4,6 +4,7 @@ import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.gui.CommonSlider;
 import com.mohuia.better_looting.config.BetterLootingConfig.ActivationMode;
+import com.mohuia.better_looting.config.BetterLootingConfig.PickupInterceptMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.ScrollMode;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -213,7 +214,23 @@ public class ConditionsScreen extends Screen {
         this.addScrollableWidget(titleInputBox);
         currentY += BTN_HEIGHT + BTN_GAP + 6;
 
-        // 2. 快捷栏指示器开关
+        // 2. 拾取拦截模式（兼容其他模组的关键设置）
+        Component interceptText = Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_intercept_mode_title");
+        Component interceptLabel = Component.literal("")
+                .append(interceptText)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(getInterceptModeName(viewModel.pickupInterceptMode).copy().withStyle(ChatFormatting.YELLOW));
+        this.addScrollableWidget(Button.builder(interceptLabel, b -> {
+            // 轮转切换 AUTO -> ALWAYS -> NEVER -> AUTO
+            PickupInterceptMode[] values = PickupInterceptMode.values();
+            int next = (viewModel.pickupInterceptMode.ordinal() + 1) % values.length;
+            viewModel.pickupInterceptMode = values[next];
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).tooltip(getInterceptModeTooltip(viewModel.pickupInterceptMode)).build());
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
+
+        // 3. 快捷栏指示器开关
         Component indicatorText = Component.translatable("gui." + BetterLooting.MODID + ".config.hotbar_indicator");
         this.addScrollableWidget(Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {
             viewModel.showHotbarIndicator = !viewModel.showHotbarIndicator;
@@ -269,6 +286,15 @@ public class ConditionsScreen extends Screen {
                     float seconds = (float) (Math.round(val * 10.0) / 10.0);
                     viewModel.maxHoldTicks = (int) (seconds * 20);
                 }
+        ));
+        currentY += BTN_HEIGHT + BTN_GAP;
+
+        // HUD 稳定显示阈值
+        this.addScrollableWidget(new CommonSlider(
+                x, currentY, widgetWidth, BTN_HEIGHT,
+                Component.translatable("gui." + BetterLooting.MODID + ".config.stability_threshold"),
+                "tick", 0.0, 20.0, (double) viewModel.stabilityThresholdTicks, 1,
+                val -> viewModel.stabilityThresholdTicks = (int) Math.round(val)
         ));
     }
 
@@ -408,5 +434,13 @@ public class ConditionsScreen extends Screen {
 
     private Tooltip getScrollModeTooltip(ScrollMode mode) {
         return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.scroll." + mode.name().toLowerCase()));
+    }
+
+    private Component getInterceptModeName(PickupInterceptMode mode) {
+        return Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_intercept." + mode.name().toLowerCase());
+    }
+
+    private Tooltip getInterceptModeTooltip(PickupInterceptMode mode) {
+        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.pickup_intercept." + mode.name().toLowerCase()));
     }
 }

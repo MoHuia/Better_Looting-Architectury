@@ -53,7 +53,8 @@ public class ActionDispatcher {
      */
     public static void handleAutoPickup(SelectionManager selection, PickupHandler pickupHandler) {
         List<ItemEntity> targets = new ArrayList<>();
-        selection.getNearbyItems().forEach(e ->
+        // 自动拾取使用全量未过滤数据，避免 StabilityFilter 导致拾取延迟
+        selection.getUnfilteredItems().forEach(e ->
                 e.getSourceEntities().forEach(en -> { if(en.isAlive()) targets.add(en); })
         );
 

@@ -1,5 +1,6 @@
 package com.mohuia.better_looting.client.core.pipeline;
 
+import com.mohuia.better_looting.client.core.policy.StabilityFilter;
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,22 +8,27 @@ import java.util.List;
 /**
  * UI 选中状态管理器。
  * 负责管理附近物品的列表索引、处理玩家的滚轮事件，以及计算 HUD 滚动条的可视范围。
+ * 内置 StabilityFilter，确保进入 HUD 渲染的物品已经稳定存在一段时间。
  */
 public class SelectionManager {
-    /** 当前扫描到并整合好的附近物品条目列表 */
+    private final StabilityFilter stabilityFilter = new StabilityFilter();
+    /** 全量扫描结果（未经过滤，用于自动拾取等需要即时响应的逻辑） */
+    private List<VisualItemEntry> unfilteredItems = new ArrayList<>();
+    /** HUD 显示用的稳定过滤结果 */
     private List<VisualItemEntry> nearbyItems = new ArrayList<>();
     /** 当前玩家高亮选中的物品索引位置 */
     private int selectedIndex = 0;
-    /** HUD 渲染时的顶部偏移量（用来实现长列表的“滑动窗口”滚动效果） */
+    /** HUD 渲染时的顶部偏移量（用来实现长列表的”滑动窗口”滚动效果） */
     private int targetScrollOffset = 0;
 
     /**
      * 更新检测到的物品列表，并重新校验选中状态防止越界。
-     * 通常由 LootScanner 扫描完毕后在 ClientTick 中调用。
-     * @param items 最新的可视物品列表
+     * 扫描结果经过 StabilityFilter 过滤后才进入 HUD 渲染管线。
+     * @param items 最新的全量扫描结果
      */
     public void updateItems(List<VisualItemEntry> items) {
-        this.nearbyItems = items;
+        this.unfilteredItems = items;
+        this.nearbyItems = stabilityFilter.tick(items);
         validateSelection();
     }
 
@@ -78,7 +84,10 @@ public class SelectionManager {
     }
 
     // --- Getter 方法，主要供 HUD 渲染层 (GUI) 读取状态 ---
+    /** 返回经 StabilityFilter 过滤后的稳定条目列表（HUD 渲染用） */
     public List<VisualItemEntry> getNearbyItems() { return nearbyItems; }
+    /** 返回全量未过滤条目列表（自动拾取/F键拾取用，确保即时响应） */
+    public List<VisualItemEntry> getUnfilteredItems() { return unfilteredItems; }
     public int getSelectedIndex() { return selectedIndex; }
     public int getTargetScrollOffset() { return targetScrollOffset; }
 }
