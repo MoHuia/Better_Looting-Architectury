@@ -51,3 +51,7 @@ Thumbs.db
 # === Java ===
 hs_err_pid*
 replay_pid*
+
+# === Project Config ===
+CLAUDE.md
+docs/agents/
