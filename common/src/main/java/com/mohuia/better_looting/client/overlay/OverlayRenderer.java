@@ -267,7 +267,7 @@ public class OverlayRenderer {
     }
 
     // ===== 九宫格贴图背景 =====
-    private static final int TEX_SIZE = 22;     // 源图尺寸 22x22
+    private static final int TEX_SIZE = 32;     // 源图尺寸 32x32
     private static final int LEFT_INSET = 6;    // 左段宽度（含左侧高亮条 x=0~3），不横向拉伸
     private static final int RIGHT_INSET = 4;   // 右段宽度，不横向拉伸
     private static final int HUD_CONTENT_INSET = 4;  // HUD 贴图模式行内内容右移量，让出左侧高亮条
