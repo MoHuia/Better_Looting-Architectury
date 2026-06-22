@@ -32,6 +32,7 @@ public class BetterLootingConfig {
     public String newLabelText = "NEW";
     public int inventoryListWidth = 120;
     public boolean showInventoryLootList = true;
+    public boolean enableTooltipPreview = true;
     public String overlaySkin = "vanilla";
 
     /** 所有可用的悬浮窗物品行背景皮肤（对应 texture/overlay/&lt;skin&gt;/ 目录），供游戏内循环切换使用。 */
@@ -191,6 +192,8 @@ public class BetterLootingConfig {
             config.set("Visual.inventoryListWidth", INSTANCE.inventoryListWidth);
             config.setComment("Visual.showInventoryLootList", "是否在物品栏左侧显示掉落物列表");
             config.set("Visual.showInventoryLootList", INSTANCE.showInventoryLootList);
+            config.setComment("Visual.enableTooltipPreview", "是否在悬浮窗选中物品时显示物品信息预览");
+            config.set("Visual.enableTooltipPreview", INSTANCE.enableTooltipPreview);
             config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格)。对应 texture/overlay/<skin>/ 目录, 默认 vanilla");
             config.set("Visual.overlaySkin", INSTANCE.overlaySkin);
 
@@ -271,6 +274,7 @@ public class BetterLootingConfig {
             INSTANCE.newLabelText = config.getOrElse("Visual.newLabelText", "NEW");
             INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 120);
             INSTANCE.showInventoryLootList = config.getOrElse("Visual.showInventoryLootList", true);
+            INSTANCE.enableTooltipPreview = config.getOrElse("Visual.enableTooltipPreview", true);
             INSTANCE.overlaySkin = config.getOrElse("Visual.overlaySkin", "vanilla");
 
             INSTANCE.indicatorX = config.<Number>getOrElse("Indicator.indicatorX", -1.0f).floatValue();
