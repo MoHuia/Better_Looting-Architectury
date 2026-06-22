@@ -237,10 +237,16 @@ public class OverlayRenderer {
      */
     public void renderTooltip(GuiGraphics gui, ItemStack stack, int screenW, int screenH, OverlayLayout layout, float scroll, int sel) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        var lines = stack.getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);        if (lines.isEmpty()) return;
+        var lines = stack.getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+        if (lines.isEmpty()) return;
 
-        int maxW = lines.stream().mapToInt(mc.font::width).max().orElse(0);
-        int tw = maxW + 20, th = lines.size() * 10 + 12;
+        // 获取模组可能注入的自定义 Tooltip 组件（如图标、进度条等）
+        Optional<net.minecraft.world.inventory.tooltip.TooltipComponent> component = stack.getTooltipImage();
+
+        int textW = lines.stream().mapToInt(mc.font::width).max().orElse(0);
+        int tw = textW + 20;
+        // 有自定义组件时预估额外高度，确保不会被截断
+        int th = lines.size() * 10 + 12 + (component.isPresent() ? 20 : 0);
 
         float relY = sel - scroll;
         int listRight = (int) (layout.baseX + layout.slideOffset + (layout.panelWidth + Constants.LIST_X) * layout.finalScale);
@@ -252,7 +258,7 @@ public class OverlayRenderer {
         int gap = 12;
         int x = (listRight + gap + tw < screenW - 8) ? listRight + gap : Math.max(8, listLeft - gap - tw);
 
-        gui.renderTooltip(mc.font, lines, Optional.empty(), x, y + 10);
+        gui.renderTooltip(mc.font, lines, component, x, y + 10);
     }
 
     /**
