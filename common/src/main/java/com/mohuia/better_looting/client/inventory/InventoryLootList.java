@@ -218,6 +218,7 @@ public class InventoryLootList {
         }
     }
 
+
     /**
      * 底部淡出。
      */
