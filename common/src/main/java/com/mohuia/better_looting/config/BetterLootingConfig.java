@@ -30,6 +30,10 @@ public class BetterLootingConfig {
     public boolean showHotbarIndicator = true;
     public String customOverlayTitle = "Loot Detected";
     public int inventoryListWidth = 120;
+    public String overlaySkin = "vanilla";
+
+    /** 所有可用的悬浮窗物品行背景皮肤（对应 texture/overlay/&lt;skin&gt;/ 目录），供游戏内循环切换使用。 */
+    public static final String[] AVAILABLE_OVERLAY_SKINS = { "vanilla", "stardew" };
 
     // ==========================================
     // 快捷栏指示器悬浮窗设置 (Indicator Settings)
@@ -136,6 +140,10 @@ public class BetterLootingConfig {
             this.customOverlayTitle = "Loot Detected";
         }
 
+        if (this.overlaySkin == null || this.overlaySkin.trim().isEmpty()) {
+            this.overlaySkin = "vanilla";
+        }
+
         this.stabilityThresholdTicks = Mth.clamp(this.stabilityThresholdTicks, 0, 20);
         this.mergeRangeXZ = Mth.clamp(this.mergeRangeXZ, 0.0f, 10.0f);
         this.mergeRangeY = Mth.clamp(this.mergeRangeY, 0.0f, 10.0f);
@@ -172,6 +180,8 @@ public class BetterLootingConfig {
             config.set("Visual.customOverlayTitle", INSTANCE.customOverlayTitle);
             config.setComment("Visual.inventoryListWidth", "物品栏左侧掉落物列表面板宽度 (默认 120)");
             config.set("Visual.inventoryListWidth", INSTANCE.inventoryListWidth);
+            config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格)。对应 texture/overlay/<skin>/ 目录, 默认 vanilla");
+            config.set("Visual.overlaySkin", INSTANCE.overlaySkin);
 
             // --- 指示器设置 ---
             config.setComment("Indicator", "快捷栏指示器悬浮窗设置 (Indicator Settings)");
@@ -246,6 +256,7 @@ public class BetterLootingConfig {
             INSTANCE.showHotbarIndicator = config.getOrElse("Visual.showHotbarIndicator", true);
             INSTANCE.customOverlayTitle = config.getOrElse("Visual.customOverlayTitle", "Loot Detected");
             INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 120);
+            INSTANCE.overlaySkin = config.getOrElse("Visual.overlaySkin", "vanilla");
 
             INSTANCE.indicatorX = config.<Number>getOrElse("Indicator.indicatorX", -1.0f).floatValue();
             INSTANCE.indicatorY = config.<Number>getOrElse("Indicator.indicatorY", -1.0f).floatValue();

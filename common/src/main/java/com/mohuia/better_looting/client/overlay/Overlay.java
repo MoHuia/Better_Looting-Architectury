@@ -143,7 +143,7 @@ public class Overlay {
             int y = layout.startY + (int) ((i - state.currentScroll) * layout.itemHeightTotal);
 
             renderer.renderItemRow(gui, Constants.LIST_X, y, layout.panelWidth, entry,
-                    isSelected, finalBgAlpha, finalTextAlpha, !core.isItemInInventory(entry.getItem().getItem()));
+                    isSelected, finalBgAlpha, finalTextAlpha, !core.isItemInInventory(entry.getItem().getItem()), true);
 
             if (isSelected) {
                 renderPrompt = true;

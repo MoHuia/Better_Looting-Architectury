@@ -1,17 +1,20 @@
 package com.mohuia.better_looting.client.overlay;
 
 import com.mohuia.better_looting.client.Constants;
+import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.config.FilterMode;
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.Utils;
 import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
@@ -61,34 +64,60 @@ public class OverlayRenderer {
      * 包括背景色块、物品图标、数量、名称以及 "NEW" 标签。
      */
     public void renderItemRow(GuiGraphics gui, int x, int y, int width, VisualItemEntry entry, boolean selected, float bgAlpha, float textAlpha, boolean isNew) {
+        renderItemRow(gui, x, y, width, entry, selected, bgAlpha, textAlpha, isNew, false);
+    }
+
+    /**
+     * 渲染物品列表中的单行条目。
+     * 包括背景色块、物品图标、数量、名称以及 "NEW" 标签。
+     *
+     * @param useSkin 为 true 时用九宫格贴图背景（HUD 悬浮窗），否则用原版纯色矩形（背包列表 / 配置预览）。
+     */
+    public void renderItemRow(GuiGraphics gui, int x, int y, int width, VisualItemEntry entry, boolean selected, float bgAlpha, float textAlpha, boolean isNew, boolean useSkin) {
         ItemStack stack = entry.getItem();
         int count = entry.getCount();
 
         // 渲染条目背景（选中状态会有不同的颜色高亮）
-        int bgColor = selected ? Constants.COLOR_BG_SELECTED : Constants.COLOR_BG_NORMAL;
-        renderRoundedRect(gui, x, y, width, Constants.ITEM_HEIGHT, Utils.applyAlpha(bgColor, bgAlpha));
+        if (useSkin) {
+            renderRowBackgroundTexture(gui, x, y, width, Constants.ITEM_HEIGHT, selected, bgAlpha);
+        } else {
+            int bgColor = selected ? Constants.COLOR_BG_SELECTED : Constants.COLOR_BG_NORMAL;
+            renderRoundedRect(gui, x, y, width, Constants.ITEM_HEIGHT, Utils.applyAlpha(bgColor, bgAlpha));
+        }
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int alpha255 = (int) (textAlpha * 255);
 
+        // HUD 贴图模式下，行内内容整体右移让出左侧高亮条
+        int ix = x + (useSkin ? HUD_CONTENT_INSET : 0);
+
         // 绘制基于物品稀有度或自定义颜色的左侧指示条
-        gui.fill(x + 20, y + 3, x + 21, y + Constants.ITEM_HEIGHT - 3,
+        // 亮底皮肤下先垫一层深色凹槽，避免白色/亮色稀有度条与奶油底融成一片
+        if (useSkin && skinLightBackground) {
+            gui.fill(ix + 19, y + 2, ix + 22, y + Constants.ITEM_HEIGHT - 2,
+                    Utils.colorWithAlpha(0xFF3A2410, alpha255));
+        }
+        gui.fill(ix + 20, y + 3, ix + 21, y + Constants.ITEM_HEIGHT - 3,
                 Utils.colorWithAlpha(Utils.getItemStackDisplayColor(stack), alpha255));
 
         // 渲染物品模型及数量
-        gui.renderItem(stack, x + 3, y + 3);
+        gui.renderItem(stack, ix + 3, y + 3);
         String countText = (count > 1) ? compactCount(count) : null;
-        gui.renderItemDecorations(mc.font, stack, x + 3, y + 3, countText);
+        gui.renderItemDecorations(mc.font, stack, ix + 3, y + 3, countText);
 
         // 当透明度过低时跳过文本渲染以优化性能
         if (alpha255 <= 10) return;
 
         var pose = gui.pose();
-        int textColor = Utils.colorWithAlpha(selected ? Constants.COLOR_TEXT_WHITE : Constants.COLOR_TEXT_DIM, alpha255);
+        // 贴图模式套用皮肤文字主题（亮底皮肤用深色字）；纯色底模式沿用原版亮色
+        int baseTextColor = useSkin
+                ? (selected ? skinTextSelected : skinTextNormal)
+                : (selected ? Constants.COLOR_TEXT_WHITE : Constants.COLOR_TEXT_DIM);
+        int textColor = Utils.colorWithAlpha(baseTextColor, alpha255);
 
         // 使用 PoseStack 进行缩放，使文本适应 UI 比例
         pose.pushPose();
-        pose.translate(x + 26, y + 8, 0);
+        pose.translate(ix + 26, y + 8, 0);
         pose.scale(0.75f, 0.75f, 1.0f);
 
         // 特殊处理附魔书：如果物品是附魔书，优先显示第一个附魔的名称而不是统一的“附魔书”
@@ -109,7 +138,9 @@ public class OverlayRenderer {
             pose.pushPose();
             pose.translate(x + width - 22, y + 8, 0);
             pose.scale(0.75f, 0.75f, 1.0f);
-            gui.drawString(mc.font, "NEW", 0, 0, Utils.colorWithAlpha(Constants.COLOR_NEW_LABEL, alpha255), true);
+            // 亮底皮肤用深红色，否则用亮橙色，保证在两种底色上都醒目
+            int newColor = (useSkin && skinLightBackground) ? 0xFFB23A00 : Constants.COLOR_NEW_LABEL;
+            gui.drawString(mc.font, "NEW", 0, 0, Utils.colorWithAlpha(newColor, alpha255), true);
             pose.popPose();
         }
     }
@@ -227,5 +258,82 @@ public class OverlayRenderer {
     private void renderRoundedRect(GuiGraphics gui, int x, int y, int w, int h, int color) {
         gui.fill(x + 1, y, x + w - 1, y + h, color);
         gui.fill(x, y + 1, x + w, y + h - 1, color);
+    }
+
+    // ===== 九宫格贴图背景 =====
+    private static final int TEX_SIZE = 22;     // 源图尺寸 22x22
+    private static final int LEFT_INSET = 6;    // 左段宽度（含左侧高亮条 x=0~3），不横向拉伸
+    private static final int RIGHT_INSET = 4;   // 右段宽度，不横向拉伸
+    private static final int HUD_CONTENT_INSET = 4;  // HUD 贴图模式行内内容右移量，让出左侧高亮条
+    private String cachedSkin = null;
+    private ResourceLocation skinNormal;
+    private ResourceLocation skinSelected;
+
+    // 皮肤文字主题：亮底皮肤（如星露谷）需要深色文字与稀有度条衬底，否则会糊在一起看不清
+    private boolean skinLightBackground = false;
+    private int skinTextSelected = Constants.COLOR_TEXT_WHITE;
+    private int skinTextNormal = Constants.COLOR_TEXT_DIM;
+
+    private void ensureSkinTextures() {
+        String skin = BetterLootingConfig.get().overlaySkin;
+        if (!skin.equals(cachedSkin)) {
+            cachedSkin = skin;
+            skinNormal = new ResourceLocation(BetterLooting.MODID,
+                    "texture/overlay/" + skin + "/row.png");
+            skinSelected = new ResourceLocation(BetterLooting.MODID,
+                    "texture/overlay/" + skin + "/row_selected.png");
+            applySkinTheme(skin);
+        }
+    }
+
+    /**
+     * 根据皮肤名设置对应的文字配色。亮底皮肤使用深色文字以保证可读性。
+     */
+    private void applySkinTheme(String skin) {
+        switch (skin) {
+            case "stardew" -> {
+                skinLightBackground = true;
+                skinTextSelected = 0xFF3A2410; // 深棕（选中）
+                skinTextNormal = 0xFF5A3A1E;   // 稍浅棕（普通）
+            }
+            default -> {
+                skinLightBackground = false;
+                skinTextSelected = Constants.COLOR_TEXT_WHITE;
+                skinTextNormal = Constants.COLOR_TEXT_DIM;
+            }
+        }
+    }
+
+    /**
+     * 横向三段式九宫格绘制物品行背景贴图：
+     * 左段（含左侧高亮条）与右段按原图宽度 1:1 渲染、不横向拉伸；中段横向拉伸到剩余宽度。
+     * 垂直方向行高恒等于图高，整图不做纵向拉伸。透明度通过 shaderColor 的 alpha 通道应用。
+     */
+    private void renderRowBackgroundTexture(GuiGraphics gui, int x, int y, int width, int height, boolean selected, float alpha) {
+        ensureSkinTextures();
+        ResourceLocation tex = selected ? skinSelected : skinNormal;
+
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, Mth.clamp(alpha, 0f, 1f));
+
+        int left = LEFT_INSET;
+        int right = RIGHT_INSET;
+        int srcMid = TEX_SIZE - left - right;        // 源图中段宽度
+        int dstMid = Math.max(0, width - left - right);
+
+        // 左段（含高亮条，1:1 不拉伸，整高）
+        blitStretch(gui, tex, x, y, left, height, 0, 0, left, TEX_SIZE);
+        // 中段（横向拉伸，整高）
+        blitStretch(gui, tex, x + left, y, dstMid, height, left, 0, srcMid, TEX_SIZE);
+        // 右段（1:1 不拉伸，整高）
+        blitStretch(gui, tex, x + width - right, y, right, height, TEX_SIZE - right, 0, right, TEX_SIZE);
+
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    /** 将源区域拉伸到目标尺寸。 */
+    private void blitStretch(GuiGraphics gui, ResourceLocation tex, int dx, int dy, int dw, int dh, int u, int v, int sw, int sh) {
+        if (dw <= 0 || dh <= 0) return;
+        gui.blit(tex, dx, dy, dw, dh, (float) u, (float) v, sw, sh, TEX_SIZE, TEX_SIZE);
     }
 }

@@ -214,7 +214,26 @@ public class ConditionsScreen extends Screen {
         this.addScrollableWidget(titleInputBox);
         currentY += BTN_HEIGHT + BTN_GAP + 6;
 
-        // 2. 拾取拦截模式（兼容其他模组的关键设置）
+        // 2. 悬浮窗背景皮肤循环切换
+        Component skinText = Component.translatable("gui." + BetterLooting.MODID + ".config.overlay_skin");
+        Component skinLabel = Component.literal("")
+                .append(skinText)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(getSkinName(viewModel.overlaySkin).copy().withStyle(ChatFormatting.YELLOW));
+        this.addScrollableWidget(Button.builder(skinLabel, b -> {
+            // 在所有可用皮肤之间轮转切换
+            String[] skins = BetterLootingConfig.AVAILABLE_OVERLAY_SKINS;
+            int idx = 0;
+            for (int i = 0; i < skins.length; i++) {
+                if (skins[i].equals(viewModel.overlaySkin)) { idx = i; break; }
+            }
+            viewModel.overlaySkin = skins[(idx + 1) % skins.length];
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).tooltip(getSkinTooltip(viewModel.overlaySkin)).build());
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
+
+        // 3. 拾取拦截模式（兼容其他模组的关键设置）
         Component interceptText = Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_intercept_mode_title");
         Component interceptLabel = Component.literal("")
                 .append(interceptText)
@@ -442,5 +461,13 @@ public class ConditionsScreen extends Screen {
 
     private Tooltip getInterceptModeTooltip(PickupInterceptMode mode) {
         return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.pickup_intercept." + mode.name().toLowerCase()));
+    }
+
+    private Component getSkinName(String skin) {
+        return Component.translatable("gui." + BetterLooting.MODID + ".config.overlay_skin." + skin);
+    }
+
+    private Tooltip getSkinTooltip(String skin) {
+        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.overlay_skin"));
     }
 }
