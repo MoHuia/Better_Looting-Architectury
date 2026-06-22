@@ -87,8 +87,8 @@
   "gui.better_looting.config.stability_threshold": "Item Display Stability Delay",
 
   "--- GUI: Filter Panel ---": "",
-  "gui.better_looting.filter.whitelist_tip": "Whitelist: these items will always appear in the loot list",
-  "gui.better_looting.filter.blacklist_tip": "Blacklist: these items will be hidden from the loot list",
+  "gui.better_looting.filter.whitelist_tip": "Always shown in filter mode",
+  "gui.better_looting.filter.blacklist_tip": "Items blocked in default mode",
 
   "--- GUI: Layout Editor Help & Info ---": "",
   "gui.better_looting.config.key_info": "Bound Key: %s",
