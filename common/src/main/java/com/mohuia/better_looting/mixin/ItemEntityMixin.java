@@ -24,8 +24,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Objects;
 
 /**
- * ItemEntity 的 Mixin，用于实现“掉落物超大堆叠”功能。
- * 通过实现 ISuperStack 接口（鸭子类型），为原版掉落物附加一个“额外数量”属性。
+ * ItemEntity 的 Mixin，用于实现"掉落物超大堆叠"功能。
+ * 通过实现 ISuperStack 接口（鸭子类型），为原版掉落物附加一个"额外数量"属性。
  * 这可以有效减少地上掉落物实体的数量，从而大幅优化游戏性能。
  */
 @Mixin(ItemEntity.class)
@@ -34,7 +34,7 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     @Shadow public abstract ItemStack getItem();
     @Shadow public abstract void setItem(ItemStack stack);
 
-    // 注册实体同步数据，用于在服务端和客户端之间同步“额外物品数量”
+    // 注册实体同步数据，用于在服务端和客户端之间同步"额外物品数量"
     @Unique
     private static final EntityDataAccessor<Integer> EXTRA_ITEM_COUNT = SynchedEntityData.defineId(ItemEntity.class, EntityDataSerializers.INT);
 
@@ -128,7 +128,7 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
 
     /**
      * 接管并重写实体合并逻辑（核心方法）
-     * 将两个相同的掉落物实体数量相加，并存入存活下来的那个实体的“额外数量”中
+     * 将两个相同的掉落物实体数量相加，并存入存活下来的那个实体的"额外数量"中
      */
     @Inject(method = "tryToMerge", at = @At("HEAD"), cancellable = true)
     private void betterlooting$superMerge(ItemEntity other, CallbackInfo ci) {
@@ -174,7 +174,7 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     /**
      * 每 Tick 检查并自动补充物品数量
      * 当掉落物的原版栈被拾取一部分（比如从 64 变成了 30），
-     * 从“额外数量”池中提取物品来把原版栈补满，直到“额外数量”耗尽。
+     * 从"额外数量"池中提取物品来把原版栈补满，直到"额外数量"耗尽。
      */
     @Inject(method = "tick", at = @At("TAIL"))
     private void betterlooting$refillStack(CallbackInfo ci) {
@@ -199,5 +199,39 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             this.setItem(newStack);
             this.betterlooting$setExtraCount(extraCount - amountToRefill);
         }
+    }
+
+    /**
+     * 当外部模组（如机械动力鼓风机）通过 setItem 改变物品类型/NBT 时，
+     * 将 ExtraCount 中存储的旧物品溢出为新的掉落物实体，
+     * 防止物品丢失或被错误地"洗白"为新产品。
+     */
+    @Inject(method = "setItem", at = @At("HEAD"))
+    private void betterlooting$spillExtraOnItemChange(ItemStack newStack, CallbackInfo ci) {
+        if (this.level().isClientSide) return;
+
+        int extraCount = this.betterlooting$getExtraCount();
+        if (extraCount <= 0) return;
+
+        ItemEntity self = (ItemEntity) (Object) this;
+        ItemStack oldStack = self.getItem();
+
+        // 如果物品类型或 NBT 未发生变化，说明是模组自身的操作，不需要溢出
+        if (ItemStack.isSameItemSameTags(oldStack, newStack)) return;
+
+        // 物品被外部模组改成了不同类型（如矿石→锭），溢出 ExtraCount 中的旧物品
+        int maxStack = oldStack.getMaxStackSize();
+        while (extraCount > 0) {
+            int spillAmount = Math.min(extraCount, maxStack);
+            ItemStack spillStack = oldStack.copy();
+            spillStack.setCount(spillAmount);
+            extraCount -= spillAmount;
+
+            ItemEntity spill = new ItemEntity(self.level(), self.getX(), self.getY(), self.getZ(), spillStack);
+            spill.setPickUpDelay(10); // 给予短暂冷却，让外部模组有机会处理
+            spill.setDeltaMovement(self.getDeltaMovement());
+            self.level().addFreshEntity(spill);
+        }
+        this.betterlooting$setExtraCount(0);
     }
 }
