@@ -3,6 +3,7 @@ package com.mohuia.better_looting.client.inventory;
 import com.mohuia.better_looting.client.Constants;
 import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.client.Utils;
+import com.mohuia.better_looting.client.filter.FilterPanel;
 import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import com.mohuia.better_looting.client.overlay.OverlayRenderer;
 import com.mohuia.better_looting.client.overlay.OverlayState;
@@ -94,6 +95,7 @@ public class InventoryLootList {
         // === 布局 ===
         BetterLootingConfig cfg = BetterLootingConfig.get();
         if (!cfg.showInventoryLootList) return;
+        if (FilterPanel.isOpen()) return;
         ACSAccessor acc = (ACSAccessor) screen;
         int leftPos = acc.getLeftPos();
         int topPos = acc.getTopPos();
