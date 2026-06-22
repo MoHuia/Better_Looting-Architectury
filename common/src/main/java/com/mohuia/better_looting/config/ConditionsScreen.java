@@ -51,6 +51,11 @@ public class ConditionsScreen extends Screen {
     private int customTitleLabelY;
     private boolean showCustomTitleLabel = false;
 
+    // 新物品标签文本输入框标签坐标
+    private int newLabelLabelX;
+    private int newLabelLabelY;
+    private boolean showNewLabelLabel = false;
+
     // 定义当前所处的标签页
     private enum Category {
         ACTIVATION("header_condition"),
@@ -91,6 +96,7 @@ public class ConditionsScreen extends Screen {
 
         calculateLayout();
         this.showCustomTitleLabel = false;
+        this.showNewLabelLabel = false;
 
         int widgetWidth = Math.min(220, mainWidth - 20);
 
@@ -114,6 +120,9 @@ public class ConditionsScreen extends Screen {
         // 如果自定义标题标签在最底部，也纳入计算
         if (showCustomTitleLabel) {
             maxWidgetY = Math.max(maxWidgetY, customTitleLabelY + 10);
+        }
+        if (showNewLabelLabel) {
+            maxWidgetY = Math.max(maxWidgetY, newLabelLabelY + 10);
         }
         this.maxScroll = Math.max(0, maxWidgetY - mainY - mainHeight + 20); // 20是底部的留白
 
@@ -212,6 +221,20 @@ public class ConditionsScreen extends Screen {
         titleInputBox.setResponder(text -> viewModel.customOverlayTitle = text);
         titleInputBox.setTooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.custom_title")));
         this.addScrollableWidget(titleInputBox);
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
+
+        // 1.5 新物品标签文本输入框
+        this.showNewLabelLabel = true;
+        this.newLabelLabelX = x;
+        this.newLabelLabelY = currentY;
+        currentY += 12;
+
+        EditBox newLabelInputBox = new EditBox(this.font, x, currentY, widgetWidth, BTN_HEIGHT, Component.translatable("gui." + BetterLooting.MODID + ".config.new_label_text"));
+        newLabelInputBox.setMaxLength(16);
+        newLabelInputBox.setValue(viewModel.newLabelText != null ? viewModel.newLabelText : "NEW");
+        newLabelInputBox.setResponder(text -> viewModel.newLabelText = text);
+        newLabelInputBox.setTooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.new_label_text")));
+        this.addScrollableWidget(newLabelInputBox);
         currentY += BTN_HEIGHT + BTN_GAP + 6;
 
         // 2. 悬浮窗背景皮肤循环切换
@@ -378,6 +401,13 @@ public class ConditionsScreen extends Screen {
             // 同样为自定义标题的文本渲染增加边距判断
             if (labelY > mainY + paddingY - 10 && labelY < mainY + mainHeight - paddingY) {
                 gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"), customTitleLabelX + 2, labelY, 0xDDDDDD);
+            }
+        }
+
+        if (showNewLabelLabel) {
+            int labelY = (int) (newLabelLabelY - scrollAmount);
+            if (labelY > mainY + paddingY - 10 && labelY < mainY + mainHeight - paddingY) {
+                gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.new_label_text"), newLabelLabelX + 2, labelY, 0xDDDDDD);
             }
         }
 
