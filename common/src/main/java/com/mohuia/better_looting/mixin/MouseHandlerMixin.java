@@ -4,7 +4,7 @@ import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.client.filter.FilterEvents;
 import com.mohuia.better_looting.client.filter.FilterPanel;
 import com.mohuia.better_looting.client.filter.FilterWhitelist;
-import com.mohuia.better_looting.client.inventory.InventoryLootList;
+import com.mohuia.better_looting.client.inventory.LootListInteraction;
 import com.mohuia.better_looting.client.jei.JeiCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -84,8 +84,8 @@ public class MouseHandlerMixin {
 
         // 物品栏掉落物列表滚动
         if (screen instanceof InventoryScreen) {
-            if (InventoryLootList.INSTANCE.isMouseOverList(mouseX, mouseY)) {
-                InventoryLootList.INSTANCE.handleScroll(yOffset);
+            if (LootListInteraction.INSTANCE.isMouseOverList(mouseX, mouseY)) {
+                LootListInteraction.INSTANCE.handleScroll(yOffset);
                 ci.cancel();
             }
         }
@@ -97,17 +97,17 @@ public class MouseHandlerMixin {
     @Inject(method = "onPress", at = @At("HEAD"), cancellable = true)
     private void interceptGlobalMousePress(long window, int button, int action, int modifiers, CallbackInfo ci) {
         // 物品拖拽释放（无论当前屏幕，释放拖拽状态）
-        if (action == 0 && InventoryLootList.INSTANCE.isDraggingItem()) {
+        if (action == 0 && LootListInteraction.INSTANCE.isDraggingItem()) {
             if (this.minecraft.screen instanceof InventoryScreen invScreen) {
-                InventoryLootList.INSTANCE.onItemRelease(invScreen);
+                LootListInteraction.INSTANCE.onItemRelease(invScreen);
             }
             ci.cancel();
             return;
         }
 
         // 滚动条拖拽释放
-        if (action == 0 && InventoryLootList.INSTANCE.isDraggingScrollbar()) {
-            InventoryLootList.INSTANCE.onScrollbarRelease();
+        if (action == 0 && LootListInteraction.INSTANCE.isDraggingScrollbar()) {
+            LootListInteraction.INSTANCE.onScrollbarRelease();
             ci.cancel();
             return;
         }
@@ -119,9 +119,9 @@ public class MouseHandlerMixin {
 
         // 物品栏列表：滚动条按下优先
         if (action == 1 && containerScreen instanceof InventoryScreen) {
-            if (InventoryLootList.INSTANCE.isMouseOverScrollbar(mouseX, mouseY)) {
+            if (LootListInteraction.INSTANCE.isMouseOverScrollbar(mouseX, mouseY)) {
                 ci.cancel();
-                InventoryLootList.INSTANCE.onScrollbarPress(mouseX, mouseY);
+                LootListInteraction.INSTANCE.onScrollbarPress(mouseX, mouseY);
                 return;
             }
         }
@@ -129,7 +129,7 @@ public class MouseHandlerMixin {
         // 物品栏列表：物品按下（仅左键，玩家手上没有已拿起的物品时）
         if (action == 1 && button == 0 && containerScreen instanceof InventoryScreen
                 && containerScreen.getMenu().getCarried().isEmpty()) {
-            if (InventoryLootList.INSTANCE.onItemPress(mouseX, mouseY)) {
+            if (LootListInteraction.INSTANCE.onItemPress(mouseX, mouseY)) {
                 ci.cancel();
                 return;
             }
@@ -190,11 +190,11 @@ public class MouseHandlerMixin {
         double mouseX = xpos * (double) this.minecraft.getWindow().getGuiScaledWidth() / (double) this.minecraft.getWindow().getScreenWidth();
         double mouseY = ypos * (double) this.minecraft.getWindow().getGuiScaledHeight() / (double) this.minecraft.getWindow().getScreenHeight();
 
-        if (InventoryLootList.INSTANCE.isDraggingItem()) {
-            InventoryLootList.INSTANCE.onItemDrag(mouseX, mouseY);
+        if (LootListInteraction.INSTANCE.isDraggingItem()) {
+            LootListInteraction.INSTANCE.onItemDrag(mouseX, mouseY);
         }
-        if (InventoryLootList.INSTANCE.isDraggingScrollbar()) {
-            InventoryLootList.INSTANCE.onScrollbarDrag(mouseX, mouseY);
+        if (LootListInteraction.INSTANCE.isDraggingScrollbar()) {
+            LootListInteraction.INSTANCE.onScrollbarDrag(mouseX, mouseY);
         }
     }
 }
