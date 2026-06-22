@@ -18,8 +18,9 @@ public class FilterEvents {
     private static long lastClickTime = 0;
 
     public static void init() {
-        // 初始化白名单数据（尝试从本地 JSON 加载）
+        // 初始化白名单和黑名单数据（尝试从本地 JSON 加载）
         FilterWhitelist.INSTANCE.init();
+        FilterBlacklist.INSTANCE.init();
 
         // 当 GUI 初始化完成后触发。重置状态，防止跨屏幕时的状态残留。
         ClientGuiEvent.INIT_POST.register((screen, access) -> {
