@@ -114,6 +114,9 @@ public class LootScanner {
     private static boolean shouldHide(ItemStack stack) {
         if (FilterWhitelist.INSTANCE.contains(stack)) return false;
 
+        // 如果关闭了稀有物品过滤，则严格仅显示白名单内的物品
+        if (!BetterLootingConfig.get().enableRareItemFilter) return true;
+
         // 隐藏那些稀有度为普通、没有附魔、也没有特殊 Tooltip（比如带词缀/属性修改）的物品
         return stack.getRarity() == Rarity.COMMON
                 && !stack.isEnchanted()
