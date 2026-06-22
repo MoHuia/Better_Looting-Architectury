@@ -22,6 +22,9 @@ public class ConfigViewModel {
     // 悬浮窗标题文本（可自定义，也可留空）
     public String customOverlayTitle;
 
+    // 悬浮窗物品行背景皮肤
+    public String overlaySkin;
+
     // 悬浮窗编辑状态
     public float indicatorX, indicatorY;
     public int indicatorRotation;
@@ -74,6 +77,8 @@ public class ConfigViewModel {
         // 读取自定义标题；做 null 保护，避免输入框或渲染阶段空指针
         this.customOverlayTitle = cfg.customOverlayTitle == null ? "" : cfg.customOverlayTitle;
 
+        this.overlaySkin = cfg.overlaySkin;
+
         this.indicatorX = cfg.indicatorX;
         this.indicatorY = cfg.indicatorY;
         this.indicatorRotation = cfg.indicatorRotation;
@@ -106,6 +111,8 @@ public class ConfigViewModel {
 
         // 保存自定义标题；null 一律转为空字符串，保证配置稳定
         cfg.customOverlayTitle = this.customOverlayTitle == null ? "" : this.customOverlayTitle;
+
+        cfg.overlaySkin = this.overlaySkin;
 
         cfg.indicatorX = this.indicatorX;
         cfg.indicatorY = this.indicatorY;
@@ -142,6 +149,8 @@ public class ConfigViewModel {
 
         // 恢复默认标题；同样做 null 保护
         this.customOverlayTitle = defaults.customOverlayTitle == null ? "" : defaults.customOverlayTitle;
+
+        this.overlaySkin = defaults.overlaySkin;
 
         this.indicatorX = defaults.indicatorX;
         this.indicatorY = defaults.indicatorY;
