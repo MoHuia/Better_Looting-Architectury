@@ -28,6 +28,9 @@ public class ConfigViewModel {
     // 悬浮窗物品行背景皮肤
     public String overlaySkin;
 
+    // 物品栏左侧掉落物列表开关
+    public boolean showInventoryLootList;
+
     // 悬浮窗编辑状态
     public float indicatorX, indicatorY;
     public int indicatorRotation;
@@ -36,6 +39,9 @@ public class ConfigViewModel {
     public BetterLootingConfig.ScrollMode scrollMode;
     public BetterLootingConfig.PickupInterceptMode pickupInterceptMode;
     public float lookDownAngle;
+
+    // 白名单稀有物品过滤开关
+    public boolean enableRareItemFilter;
 
     // 超大堆叠合并设置
     public boolean enableSuperMerge;
@@ -84,6 +90,8 @@ public class ConfigViewModel {
 
         this.overlaySkin = cfg.overlaySkin;
 
+        this.showInventoryLootList = cfg.showInventoryLootList;
+
         this.indicatorX = cfg.indicatorX;
         this.indicatorY = cfg.indicatorY;
         this.indicatorRotation = cfg.indicatorRotation;
@@ -92,6 +100,7 @@ public class ConfigViewModel {
         this.maxHoldTicks = cfg.maxHoldTicks;
         this.stabilityThresholdTicks = cfg.stabilityThresholdTicks;
 
+        this.enableRareItemFilter = cfg.enableRareItemFilter;
         this.enableSuperMerge = cfg.enableSuperMerge;
         this.mergeRangeXZ = cfg.mergeRangeXZ;
         this.mergeRangeY = cfg.mergeRangeY;
@@ -121,6 +130,8 @@ public class ConfigViewModel {
 
         cfg.overlaySkin = this.overlaySkin;
 
+        cfg.showInventoryLootList = this.showInventoryLootList;
+
         cfg.indicatorX = this.indicatorX;
         cfg.indicatorY = this.indicatorY;
         cfg.indicatorRotation = this.indicatorRotation;
@@ -129,6 +140,7 @@ public class ConfigViewModel {
         cfg.maxHoldTicks = this.maxHoldTicks;
         cfg.stabilityThresholdTicks = this.stabilityThresholdTicks;
 
+        cfg.enableRareItemFilter = this.enableRareItemFilter;
         cfg.enableSuperMerge = this.enableSuperMerge;
         cfg.mergeRangeXZ = this.mergeRangeXZ;
         cfg.mergeRangeY = this.mergeRangeY;
@@ -161,6 +173,8 @@ public class ConfigViewModel {
 
         this.overlaySkin = defaults.overlaySkin;
 
+        this.showInventoryLootList = defaults.showInventoryLootList;
+
         this.indicatorX = defaults.indicatorX;
         this.indicatorY = defaults.indicatorY;
         this.indicatorRotation = defaults.indicatorRotation;
@@ -169,6 +183,7 @@ public class ConfigViewModel {
         this.maxHoldTicks = defaults.maxHoldTicks;
         this.stabilityThresholdTicks = defaults.stabilityThresholdTicks;
 
+        this.enableRareItemFilter = defaults.enableRareItemFilter;
         this.enableSuperMerge = defaults.enableSuperMerge;
         this.mergeRangeXZ = defaults.mergeRangeXZ;
         this.mergeRangeY = defaults.mergeRangeY;

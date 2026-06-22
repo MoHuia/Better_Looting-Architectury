@@ -93,6 +93,7 @@ public class InventoryLootList {
 
         // === 布局 ===
         BetterLootingConfig cfg = BetterLootingConfig.get();
+        if (!cfg.showInventoryLootList) return;
         ACSAccessor acc = (ACSAccessor) screen;
         int leftPos = acc.getLeftPos();
         int topPos = acc.getTopPos();

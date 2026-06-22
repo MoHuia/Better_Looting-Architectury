@@ -271,7 +271,16 @@ public class ConditionsScreen extends Screen {
         }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).tooltip(getInterceptModeTooltip(viewModel.pickupInterceptMode)).build());
         currentY += BTN_HEIGHT + BTN_GAP + 6;
 
-        // 3. 快捷栏指示器开关
+        // 3. 物品栏左侧掉落物列表开关
+        Component lootListText = Component.translatable("gui." + BetterLooting.MODID + ".config.inventory_loot_list");
+        this.addScrollableWidget(Button.builder(formatOptionText(lootListText, viewModel.showInventoryLootList), b -> {
+            viewModel.showInventoryLootList = !viewModel.showInventoryLootList;
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
+
+        // 4. 快捷栏指示器开关
         Component indicatorText = Component.translatable("gui." + BetterLooting.MODID + ".config.hotbar_indicator");
         this.addScrollableWidget(Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {
             viewModel.showHotbarIndicator = !viewModel.showHotbarIndicator;
@@ -280,7 +289,16 @@ public class ConditionsScreen extends Screen {
         }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
         currentY += BTN_HEIGHT + BTN_GAP + 6;
 
-        // 3. 超级合并开关
+        // 5. 白名单稀有物品过滤开关
+        Component rareFilterText = Component.translatable("gui." + BetterLooting.MODID + ".config.rare_item_filter");
+        this.addScrollableWidget(Button.builder(formatOptionText(rareFilterText, viewModel.enableRareItemFilter), b -> {
+            viewModel.enableRareItemFilter = !viewModel.enableRareItemFilter;
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
+
+        // 6. 超级合并开关
         Component mergeText = Component.translatable("gui." + BetterLooting.MODID + ".config.super_merge");
         this.addScrollableWidget(Button.builder(formatOptionText(mergeText, viewModel.enableSuperMerge), b -> {
             viewModel.enableSuperMerge = !viewModel.enableSuperMerge;
