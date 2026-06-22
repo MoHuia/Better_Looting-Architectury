@@ -136,14 +136,15 @@ public class OverlayRenderer {
         gui.drawString(mc.font, displayName, 0, 0, textColor, false);
         pose.popPose();
 
-        // 渲染 "NEW" 标签提醒
-        if (isNew) {
+        // 渲染新物品标签提醒（文本可自定义，留空则隐藏）
+        String label = BetterLootingConfig.get().newLabelText;
+        if (isNew && label != null && !label.isEmpty()) {
             pose.pushPose();
             pose.translate(x + width - 22, y + 8, 0);
             pose.scale(0.75f, 0.75f, 1.0f);
-            // 亮底皮肤用深红色，否则用亮橙色，保证在两种底色上都醒目
-            int newColor = (useSkin && skinLightBackground) ? 0xFFB23A00 : Constants.COLOR_NEW_LABEL;
-            gui.drawString(mc.font, "NEW", 0, 0, Utils.colorWithAlpha(newColor, alpha255), true);
+            // 亮底皮肤用黄棕色，否则用亮橙色，保证在两种底色上都醒目
+            int newColor = (useSkin && skinLightBackground) ? 0xFFC38935 : Constants.COLOR_NEW_LABEL;
+            gui.drawString(mc.font, label, 0, 0, Utils.colorWithAlpha(newColor, alpha255), false);
             pose.popPose();
         }
     }

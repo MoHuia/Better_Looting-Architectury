@@ -71,6 +71,8 @@
   "gui.better_looting.config.hotbar_indicator": "Hotbar Filter Indicator",
   "gui.better_looting.config.custom_title_label": "Panel Title (Leave blank to hide):",
   "gui.better_looting.config.tooltip.custom_title": "Set a custom title for the loot overlay. Leave blank for default (max 32 characters).",
+  "gui.better_looting.config.new_label_text": "New Item Label (Leave blank to hide):",
+  "gui.better_looting.config.tooltip.new_label_text": "Customize the label shown on newly appeared items in the loot list. Default is NEW, leave blank to hide (max 16 characters).",
   "gui.better_looting.config.overlay_skin": "Overlay Skin",
   "gui.better_looting.config.overlay_skin.vanilla": "Vanilla",
   "gui.better_looting.config.overlay_skin.stardew": "Stardew Valley",

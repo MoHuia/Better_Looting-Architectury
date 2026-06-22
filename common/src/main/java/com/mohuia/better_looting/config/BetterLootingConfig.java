@@ -29,6 +29,7 @@ public class BetterLootingConfig {
     public float globalAlpha = 0.9f;
     public boolean showHotbarIndicator = true;
     public String customOverlayTitle = "Loot Detected";
+    public String newLabelText = "NEW";
     public int inventoryListWidth = 120;
     public String overlaySkin = "vanilla";
 
@@ -140,6 +141,10 @@ public class BetterLootingConfig {
             this.customOverlayTitle = "Loot Detected";
         }
 
+        if (this.newLabelText == null) {
+            this.newLabelText = "NEW";
+        }
+
         if (this.overlaySkin == null || this.overlaySkin.trim().isEmpty()) {
             this.overlaySkin = "vanilla";
         }
@@ -178,6 +183,8 @@ public class BetterLootingConfig {
             config.set("Visual.showHotbarIndicator", INSTANCE.showHotbarIndicator);
             config.setComment("Visual.customOverlayTitle", "自定义悬浮窗标题 (留空则隐藏)");
             config.set("Visual.customOverlayTitle", INSTANCE.customOverlayTitle);
+            config.setComment("Visual.newLabelText", "新物品标签文本 (留空则隐藏, 默认 NEW)");
+            config.set("Visual.newLabelText", INSTANCE.newLabelText);
             config.setComment("Visual.inventoryListWidth", "物品栏左侧掉落物列表面板宽度 (默认 120)");
             config.set("Visual.inventoryListWidth", INSTANCE.inventoryListWidth);
             config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格)。对应 texture/overlay/<skin>/ 目录, 默认 vanilla");
@@ -255,6 +262,7 @@ public class BetterLootingConfig {
             INSTANCE.globalAlpha = config.<Number>getOrElse("Visual.globalAlpha", 0.9f).floatValue();
             INSTANCE.showHotbarIndicator = config.getOrElse("Visual.showHotbarIndicator", true);
             INSTANCE.customOverlayTitle = config.getOrElse("Visual.customOverlayTitle", "Loot Detected");
+            INSTANCE.newLabelText = config.getOrElse("Visual.newLabelText", "NEW");
             INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 120);
             INSTANCE.overlaySkin = config.getOrElse("Visual.overlaySkin", "vanilla");
 

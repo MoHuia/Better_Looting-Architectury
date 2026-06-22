@@ -71,6 +71,8 @@
   "gui.better_looting.config.hotbar_indicator": "快捷栏过滤指示器",
   "gui.better_looting.config.custom_title_label": "悬浮窗标题 (留空则隐藏):",
   "gui.better_looting.config.tooltip.custom_title": "自定义拾取悬浮窗的顶部标题。留空以使用默认值（最多输入32个字符）。",
+  "gui.better_looting.config.new_label_text": "新物品标签文本 (留空则隐藏):",
+  "gui.better_looting.config.tooltip.new_label_text": "自定义物品列表中新出现物品的标签文字。默认 NEW，留空则不显示（最多输入16个字符）。",
   "gui.better_looting.config.overlay_skin": "悬浮窗背景皮肤",
   "gui.better_looting.config.overlay_skin.vanilla": "原版",
   "gui.better_looting.config.overlay_skin.stardew": "星露谷物语",
