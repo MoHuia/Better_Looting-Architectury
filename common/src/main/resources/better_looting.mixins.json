@@ -4,12 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
+    "ACSAccessor",
     "ACSDragMixin",
     "MixinMinecraft",
     "MouseHandlerMixin"
   ],
   "mixins": [
-    "ACSAccessor",
     "ItemEntityAccessor",
     "ItemEntityMixin"
   ],
