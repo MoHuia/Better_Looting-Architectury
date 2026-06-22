@@ -2,6 +2,7 @@ package com.mohuia.better_looting.client.core.pipeline;
 
 import com.mohuia.better_looting.config.FilterMode;
 import com.mohuia.better_looting.client.Utils;
+import com.mohuia.better_looting.client.filter.FilterBlacklist;
 import com.mohuia.better_looting.client.filter.FilterWhitelist;
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import net.minecraft.client.Minecraft;
@@ -79,6 +80,11 @@ public class LootScanner {
 
         for (ItemEntity entity : rawEntities) {
             ItemStack stack = entity.getItem();
+
+            // 黑名单检查：黑名单中的物品始终被屏蔽
+            if (FilterBlacklist.INSTANCE.contains(stack)) {
+                continue;
+            }
 
             if (filterMode == FilterMode.RARE_ONLY && shouldHide(stack)) {
                 continue;

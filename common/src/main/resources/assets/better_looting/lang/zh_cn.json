@@ -86,6 +86,10 @@
   "gui.better_looting.config.max_hold_seconds": "长按触发时间",
   "gui.better_looting.config.stability_threshold": "物品显示稳定延迟",
 
+  "--- GUI：过滤面板 ---": "",
+  "gui.better_looting.filter.whitelist_tip": "白名单：列表中的物品始终显示在战利品列表",
+  "gui.better_looting.filter.blacklist_tip": "黑名单：列表中的物品将从战利品列表中屏蔽",
+
   "--- GUI：布局编辑器帮助与信息 ---": "",
   "gui.better_looting.config.key_info": "绑定按键: %s",
   "gui.better_looting.config.scroll_key_info": "滚轮修饰键: %s",

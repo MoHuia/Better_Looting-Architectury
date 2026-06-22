@@ -86,6 +86,10 @@
   "gui.better_looting.config.max_hold_seconds": "Long Press Duration",
   "gui.better_looting.config.stability_threshold": "Item Display Stability Delay",
 
+  "--- GUI: Filter Panel ---": "",
+  "gui.better_looting.filter.whitelist_tip": "Whitelist: these items will always appear in the loot list",
+  "gui.better_looting.filter.blacklist_tip": "Blacklist: these items will be hidden from the loot list",
+
   "--- GUI: Layout Editor Help & Info ---": "",
   "gui.better_looting.config.key_info": "Bound Key: %s",
   "gui.better_looting.config.scroll_key_info": "Scroll Modifier: %s",

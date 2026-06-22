@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -23,9 +24,13 @@ public class FilterPanel {
     // UI 布局常量定义。集中管理以便于后期调整样式。
     private static final int COLS = 2, ROWS = 5, SLOT_SIZE = 18, GAP = 1;
     private static final int SCROLLBAR_WIDTH = 4, BUTTON_HEIGHT = 14, BUTTON_GAP = 3;
+    private static final int STRIP_HEIGHT = 10, STRIP_GAP = 1;
 
     public static final int PANEL_WIDTH = SCROLLBAR_WIDTH + COLS * SLOT_SIZE + (COLS - 1) * GAP;
-    public static final int PANEL_HEIGHT = BUTTON_HEIGHT + BUTTON_GAP + ROWS * SLOT_SIZE + (ROWS - 1) * GAP;
+    public static final int PANEL_HEIGHT = STRIP_HEIGHT + STRIP_GAP + BUTTON_HEIGHT + BUTTON_GAP + ROWS * SLOT_SIZE + (ROWS - 1) * GAP;
+
+    // 0 = 白名单, 1 = 黑名单
+    private static int activeList = 0;
 
     public static void toggle() { isOpen = !isOpen; }
     public static void close() { isOpen = false; }
@@ -39,22 +44,53 @@ public class FilterPanel {
         if (!isOpen) return;
 
         ACSAccessor acc = (ACSAccessor) screen;
-        // 面板始终停靠在主界面的左侧。
         int startX = Math.max(2, acc.getLeftPos() - PANEL_WIDTH - 2);
         int startY = acc.getTopPos() + (acc.getImageHeight() - PANEL_HEIGHT) / 2;
 
+        // === 0. 白名单/黑名单切换条 ===
+        int stripY = startY;
+        int halfW = PANEL_WIDTH / 2;
+        boolean hoverWhite = mouseX >= startX && mouseX < startX + halfW && mouseY >= stripY && mouseY < stripY + STRIP_HEIGHT;
+        boolean hoverBlack = mouseX >= startX + halfW && mouseX < startX + PANEL_WIDTH && mouseY >= stripY && mouseY < stripY + STRIP_HEIGHT;
+
+        // 白名单条
+        int whiteBg = (activeList == 0) ? 0xFFDDDDDD : (hoverWhite ? 0xFFBBBBBB : 0xFF888888);
+        int whiteBorder = (activeList == 0) ? 0xFFFFFFFF : (hoverWhite ? 0xFFCCCCCC : 0xFF666666);
+        gui.fill(startX, stripY, startX + halfW, stripY + STRIP_HEIGHT, whiteBg);
+        gui.renderOutline(startX, stripY, halfW, STRIP_HEIGHT, whiteBorder);
+        String whiteText = (activeList == 0) ? "W" : "w";
+        gui.drawCenteredString(Minecraft.getInstance().font, whiteText, startX + halfW / 2, stripY + 1, activeList == 0 ? 0xFF000000 : 0xFFAAAAAA);
+        if (hoverWhite) {
+            gui.renderTooltip(Minecraft.getInstance().font,
+                    Component.translatable("gui." + "better_looting" + ".filter.whitelist_tip"), mouseX, mouseY);
+        }
+
+        // 黑名单条
+        int blackBg = (activeList == 1) ? 0xFF444444 : (hoverBlack ? 0xFF555555 : 0xFF222222);
+        int blackBorder = (activeList == 1) ? 0xFFFFFFFF : (hoverBlack ? 0xFF888888 : 0xFF444444);
+        gui.fill(startX + halfW, stripY, startX + PANEL_WIDTH, stripY + STRIP_HEIGHT, blackBg);
+        gui.renderOutline(startX + halfW, stripY, halfW, STRIP_HEIGHT, blackBorder);
+        String blackText = (activeList == 1) ? "B" : "b";
+        gui.drawCenteredString(Minecraft.getInstance().font, blackText, startX + halfW + halfW / 2, stripY + 1, activeList == 1 ? 0xFFFFFFFF : 0xFF888888);
+        if (hoverBlack) {
+            gui.renderTooltip(Minecraft.getInstance().font,
+                    Component.translatable("gui." + "better_looting" + ".filter.blacklist_tip"), mouseX, mouseY);
+        }
+
+        int contentStartY = startY + STRIP_HEIGHT + STRIP_GAP;
+
         // 1. 渲染 "Clear" 清空按钮
-        boolean isHoveringBtn = mouseX >= startX && mouseX < startX + PANEL_WIDTH && mouseY >= startY && mouseY < startY + BUTTON_HEIGHT;
-        gui.fill(startX, startY, startX + PANEL_WIDTH, startY + BUTTON_HEIGHT, isHoveringBtn ? 0xCC990000 : 0xAA222222);
-        gui.renderOutline(startX, startY, PANEL_WIDTH, BUTTON_HEIGHT, isHoveringBtn ? 0xFFFF5555 : 0xFF444444);
-        gui.drawCenteredString(Minecraft.getInstance().font, "Clear", startX + PANEL_WIDTH / 2, startY + (BUTTON_HEIGHT - 8) / 2, isHoveringBtn ? 0xFFFFFFFF : 0xFFAAAAAA);
+        boolean isHoveringBtn = mouseX >= startX && mouseX < startX + PANEL_WIDTH && mouseY >= contentStartY && mouseY < contentStartY + BUTTON_HEIGHT;
+        gui.fill(startX, contentStartY, startX + PANEL_WIDTH, contentStartY + BUTTON_HEIGHT, isHoveringBtn ? 0xCC990000 : 0xAA222222);
+        gui.renderOutline(startX, contentStartY, PANEL_WIDTH, BUTTON_HEIGHT, isHoveringBtn ? 0xFFFF5555 : 0xFF444444);
+        gui.drawCenteredString(Minecraft.getInstance().font, "Clear", startX + PANEL_WIDTH / 2, contentStartY + (BUTTON_HEIGHT - 8) / 2, isHoveringBtn ? 0xFFFFFFFF : 0xFFAAAAAA);
 
         // 2. 准备滚动网格数据
-        List<ItemStack> items = FilterWhitelist.INSTANCE.getDisplayItems();
-        int totalRows = (int) Math.ceil((double) items.size() / COLS) + 1; // +1 是为了给添加按钮（+号）留位置
+        List<ItemStack> items = getActiveItems();
+        int totalRows = (int) Math.ceil((double) items.size() / COLS) + 1;
         int maxScroll = Math.max(0, totalRows - ROWS);
 
-        int gridStartY = startY + BUTTON_HEIGHT + BUTTON_GAP;
+        int gridStartY = contentStartY + BUTTON_HEIGHT + BUTTON_GAP;
         int gridHeight = ROWS * SLOT_SIZE + (ROWS - 1) * GAP;
 
         // OpenGL 剪裁区域 (Scissor) 计算。
@@ -127,19 +163,30 @@ public class FilterPanel {
 
         if (mouseX < startX || mouseX > startX + PANEL_WIDTH || mouseY < startY || mouseY > startY + PANEL_HEIGHT) return false;
 
+        // 处理白/黑名单切换条点击
+        int stripY = startY;
+        if (mouseY >= stripY && mouseY < stripY + STRIP_HEIGHT) {
+            int halfW = PANEL_WIDTH / 2;
+            activeList = (mouseX >= startX + halfW) ? 1 : 0;
+            playClickSound(1.0F);
+            return true;
+        }
+
+        int contentStartY = startY + STRIP_HEIGHT + STRIP_GAP;
+
         // 处理 Clear 按钮点击
-        if (mouseY >= startY && mouseY < startY + BUTTON_HEIGHT) {
-            FilterWhitelist.INSTANCE.clear();
+        if (mouseY >= contentStartY && mouseY < contentStartY + BUTTON_HEIGHT) {
+            if (activeList == 0) FilterWhitelist.INSTANCE.clear();
+            else FilterBlacklist.INSTANCE.clear();
             playClickSound(1.0F);
             return true;
         }
 
         // 处理网格区域点击
-        int gridStartY = startY + BUTTON_HEIGHT + BUTTON_GAP;
+        int gridStartY = contentStartY + BUTTON_HEIGHT + BUTTON_GAP;
         int gridHeight = ROWS * SLOT_SIZE + (ROWS - 1) * GAP;
 
         if (mouseY >= gridStartY && mouseY < gridStartY + gridHeight) {
-            // 将绝对坐标转换为受平滑滚动影响的网格相对坐标
             double relX = mouseX - (startX + SCROLLBAR_WIDTH);
             double relY = mouseY - gridStartY + (scrollOffset % 1.0f) * (SLOT_SIZE + GAP);
 
@@ -148,19 +195,19 @@ public class FilterPanel {
 
             if (col >= 0 && col < COLS) {
                 int dataIndex = ((int)scrollOffset + row) * COLS + col;
-                List<ItemStack> items = FilterWhitelist.INSTANCE.getDisplayItems();
-                ItemStack cursorStack = screen.getMenu().getCarried(); // 获取鼠标上抓取的物品
+                List<ItemStack> items = getActiveItems();
+                ItemStack cursorStack = screen.getMenu().getCarried();
 
                 if (dataIndex < items.size()) {
-                    // 点击已有物品：如果鼠标是空的，则移除该物品
                     if (cursorStack.isEmpty()) {
-                        FilterWhitelist.INSTANCE.remove(items.get(dataIndex));
-                        playClickSound(0.5F); // 音调较低，表示移除
+                        if (activeList == 0) FilterWhitelist.INSTANCE.remove(items.get(dataIndex));
+                        else FilterBlacklist.INSTANCE.remove(items.get(dataIndex));
+                        playClickSound(0.5F);
                     }
                 } else if (dataIndex == items.size() && !cursorStack.isEmpty()) {
-                    // 点击末尾的 "+" 号：如果鼠标上有物品，则将其加入白名单
-                    FilterWhitelist.INSTANCE.add(cursorStack);
-                    playClickSound(1.2F); // 音调较高，表示添加
+                    if (activeList == 0) FilterWhitelist.INSTANCE.add(cursorStack);
+                    else FilterBlacklist.INSTANCE.add(cursorStack);
+                    playClickSound(1.2F);
                 }
             }
         }
@@ -172,14 +219,17 @@ public class FilterPanel {
      */
     public static boolean scroll(double delta) {
         if (!isOpen) return false;
-        int totalRows = (int) Math.ceil((double) FilterWhitelist.INSTANCE.getDisplayItems().size() / COLS) + 1;
+        int totalRows = (int) Math.ceil((double) getActiveItems().size() / COLS) + 1;
         float maxScroll = Math.max(0, totalRows - ROWS);
         if (maxScroll > 0) {
-            // 在 Minecraft 1.20.1 中，滚轮 delta 通常是 1.0（向上）或 -1.0（向下）
             scrollOffset = Mth.clamp(scrollOffset - (float)delta, 0, maxScroll);
             return true;
         }
         return false;
+    }
+
+    private static List<ItemStack> getActiveItems() {
+        return activeList == 0 ? FilterWhitelist.INSTANCE.getDisplayItems() : FilterBlacklist.INSTANCE.getDisplayItems();
     }
 
     private static void playClickSound(float pitch) {
