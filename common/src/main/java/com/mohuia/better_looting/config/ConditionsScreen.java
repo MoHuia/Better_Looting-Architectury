@@ -281,6 +281,15 @@ public class ConditionsScreen extends Screen {
         }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
         currentY += BTN_HEIGHT + BTN_GAP + 6;
 
+        // 3.5 物品信息预览开关
+        Component tooltipPreviewText = Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip_preview");
+        this.addScrollableWidget(Button.builder(formatOptionText(tooltipPreviewText, viewModel.enableTooltipPreview), b -> {
+            viewModel.enableTooltipPreview = !viewModel.enableTooltipPreview;
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
+        currentY += BTN_HEIGHT + BTN_GAP + 6;
+
         // 4. 快捷栏指示器开关
         Component indicatorText = Component.translatable("gui." + BetterLooting.MODID + ".config.hotbar_indicator");
         this.addScrollableWidget(Button.builder(formatOptionText(indicatorText, viewModel.showHotbarIndicator), b -> {

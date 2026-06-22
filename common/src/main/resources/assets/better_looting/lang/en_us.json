@@ -69,6 +69,7 @@
   "gui.better_looting.config.mode.rare_only": "Rare Only",
   "gui.better_looting.config.opacity": "Opacity",
   "gui.better_looting.config.inventory_loot_list": "Inventory Loot List",
+  "gui.better_looting.config.tooltip_preview": "Item Tooltip Preview",
   "gui.better_looting.config.rare_item_filter": "Rare Item Filter",
   "gui.better_looting.config.hotbar_indicator": "Hotbar Filter Indicator",
   "gui.better_looting.config.custom_title_label": "Panel Title (Leave blank to hide):",

@@ -31,6 +31,9 @@ public class ConfigViewModel {
     // 物品栏左侧掉落物列表开关
     public boolean showInventoryLootList;
 
+    // 物品信息预览开关
+    public boolean enableTooltipPreview;
+
     // 悬浮窗编辑状态
     public float indicatorX, indicatorY;
     public int indicatorRotation;
@@ -91,6 +94,7 @@ public class ConfigViewModel {
         this.overlaySkin = cfg.overlaySkin;
 
         this.showInventoryLootList = cfg.showInventoryLootList;
+        this.enableTooltipPreview = cfg.enableTooltipPreview;
 
         this.indicatorX = cfg.indicatorX;
         this.indicatorY = cfg.indicatorY;
@@ -131,6 +135,7 @@ public class ConfigViewModel {
         cfg.overlaySkin = this.overlaySkin;
 
         cfg.showInventoryLootList = this.showInventoryLootList;
+        cfg.enableTooltipPreview = this.enableTooltipPreview;
 
         cfg.indicatorX = this.indicatorX;
         cfg.indicatorY = this.indicatorY;
@@ -174,6 +179,7 @@ public class ConfigViewModel {
         this.overlaySkin = defaults.overlaySkin;
 
         this.showInventoryLootList = defaults.showInventoryLootList;
+        this.enableTooltipPreview = defaults.enableTooltipPreview;
 
         this.indicatorX = defaults.indicatorX;
         this.indicatorY = defaults.indicatorY;

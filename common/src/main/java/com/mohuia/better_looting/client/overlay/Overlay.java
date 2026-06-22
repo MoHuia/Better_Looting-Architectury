@@ -174,6 +174,7 @@ public class Overlay {
      * 为当前选中的物品渲染原版物品信息提示框 (Tooltip)。
      */
     private void renderSelectedTooltip(GuiGraphics gui, Minecraft mc, Core core, List<VisualItemEntry> nearbyItems, OverlayLayout layout) {
+        if (!BetterLootingConfig.get().enableTooltipPreview) return;
         int sel = core.getSelectedIndex();
         if (sel >= 0 && sel < nearbyItems.size()) {
             var stack = nearbyItems.get(sel).getItem();
