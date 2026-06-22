@@ -222,7 +222,7 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         ItemStack oldStack = self.getItem();
 
         // 如果物品类型或 NBT 未发生变化，说明是模组自身的操作，不需要溢出
-        if (ItemStack.isSameItemSameTags(oldStack, newStack)) return;
+        if (ItemStack.isSameItemSameComponents(oldStack, newStack)) return;
 
         // 物品被外部模组改成了不同类型（如矿石→锭），溢出 ExtraCount 中的旧物品
         int maxStack = oldStack.getMaxStackSize();

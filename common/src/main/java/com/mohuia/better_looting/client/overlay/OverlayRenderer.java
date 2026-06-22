@@ -280,9 +280,9 @@ public class OverlayRenderer {
         String skin = BetterLootingConfig.get().overlaySkin;
         if (!skin.equals(cachedSkin)) {
             cachedSkin = skin;
-            skinNormal = new ResourceLocation(BetterLooting.MODID,
+            skinNormal = ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID,
                     "texture/overlay/" + skin + "/row.png");
-            skinSelected = new ResourceLocation(BetterLooting.MODID,
+            skinSelected = ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID,
                     "texture/overlay/" + skin + "/row_selected.png");
             applySkinTheme(skin);
         }
