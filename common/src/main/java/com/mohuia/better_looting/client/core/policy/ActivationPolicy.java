@@ -37,6 +37,8 @@ public class ActivationPolicy {
     public static boolean shouldIgnoreScroll(SelectionManager selectionManager, KeyTracker keyTracker) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen != null && !(mc.screen instanceof ConfigScreen)) return true;
+        // 自动拾取模式下悬浮窗隐藏，滚轮无操作对象，应交还原版（保持与 Overlay 显示条件同步）
+        if (ModeManager.INSTANCE.isAutoMode()) return true;
         if (!isHudActive(selectionManager, keyTracker)) return true;
         if (selectionManager.getNearbyItems().size() <= 1) return true;
 
