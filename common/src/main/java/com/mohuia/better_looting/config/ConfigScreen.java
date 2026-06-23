@@ -31,6 +31,9 @@ public class ConfigScreen extends Screen {
     private OverlayRenderer renderer;
     private final List<VisualItemEntry> previewItems = new ArrayList<>();
 
+    // 自定义皮肤加载错误（打开界面时扫描收集），用于界面顶部红字提示
+    private List<String> skinErrors;
+
     // 预览框的边界坐标，用于处理鼠标拖拽和裁剪
     private float boxLeft, boxTop, boxRight, boxBottom;
 
@@ -54,12 +57,29 @@ public class ConfigScreen extends Screen {
         this.viewModel = existingModel;
         this.dragController = new DragController();
 
+        // 每次打开配置界面重新扫描自定义皮肤，并把加载错误反馈给玩家
+        com.mohuia.better_looting.client.skin.SkinManager.INSTANCE.rescan();
+        this.skinErrors = com.mohuia.better_looting.client.skin.SkinManager.INSTANCE.getErrors();
+        reportSkinErrors();
+
         // 填充虚拟的预览物品数据，供渲染使用
         previewItems.add(new VisualItemEntry(new ItemStack(Items.DIAMOND, 1)));
         previewItems.add(new VisualItemEntry(new ItemStack(Items.GOLDEN_APPLE, 1)));
         previewItems.add(new VisualItemEntry(new ItemStack(Items.IRON_SWORD, 1)));
         previewItems.add(new VisualItemEntry(new ItemStack(Items.EMERALD, 64)));
         previewItems.add(new VisualItemEntry(new ItemStack(Items.BOOK, 1)));
+    }
+
+    /** 把皮肤加载错误逐条发送到聊天栏（红色），供关闭界面后查看。 */
+    private void reportSkinErrors() {
+        if (skinErrors == null || skinErrors.isEmpty()) return;
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.player == null) return;
+        for (String err : skinErrors) {
+            mc.player.displayClientMessage(
+                    Component.literal("[Better Looting] " + err).withStyle(net.minecraft.ChatFormatting.RED),
+                    false);
+        }
     }
 
     @Override
@@ -133,7 +153,15 @@ public class ConfigScreen extends Screen {
         renderInfoOverlay(gui);
         renderPreview(gui, mouseX, mouseY);
         renderIndicator(gui, mouseX, mouseY);
+        renderSkinErrorNotice(gui);
         super.render(gui, mouseX, mouseY, partialTick);
+    }
+
+    /** 顶部居中红字：提示有自定义皮肤加载失败，详情见聊天栏。 */
+    private void renderSkinErrorNotice(GuiGraphics gui) {
+        if (skinErrors == null || skinErrors.isEmpty()) return;
+        Component msg = Component.translatable("gui." + BetterLooting.MODID + ".config.skin_load_error", skinErrors.size());
+        gui.drawCenteredString(this.font, msg, this.width / 2, 4, 0xFFFF5555);
     }
 
     /**
@@ -288,12 +316,18 @@ public class ConfigScreen extends Screen {
 
         gui.enableScissor((int)boxLeft, (int)boxTop, (int)boxRight, (int)boxBottom);
 
+        // 预览使用当前选中皮肤（失效则回退 vanilla），每帧刷新以反映从条件界面返回后的切换
+        String effectiveSkin = com.mohuia.better_looting.client.skin.SkinManager.INSTANCE.isAvailable(viewModel.overlaySkin)
+                ? viewModel.overlaySkin : "vanilla";
+        renderer.setPreviewSkin(effectiveSkin);
+
         int startY = -(Constants.ITEM_HEIGHT / 2);
         for (int i = 0; i < previewItems.size(); i++) {
             int y = startY + (i * (Constants.ITEM_HEIGHT + 2));
             renderer.renderItemRow(gui, Constants.LIST_X, y, viewModel.panelWidth,
-                    previewItems.get(i), i == 0, viewModel.globalAlpha, 1.0f, i == 1);
+                    previewItems.get(i), i == 0, viewModel.globalAlpha, 1.0f, i == 1, true);
         }
+        renderer.setPreviewSkin(null);
         gui.disableScissor();
         pose.popPose();
 
