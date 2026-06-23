@@ -38,6 +38,7 @@ public class ConfigViewModel {
     public float indicatorX, indicatorY;
     public int indicatorRotation;
 
+    public BetterLootingConfig.AnimationSpeed animationSpeed;
     public BetterLootingConfig.ActivationMode activationMode;
     public BetterLootingConfig.ScrollMode scrollMode;
     public BetterLootingConfig.PickupInterceptMode pickupInterceptMode;
@@ -80,6 +81,7 @@ public class ConfigViewModel {
         this.panelWidth = cfg.panelWidth;
         this.visibleRows = cfg.visibleRows;
         this.globalAlpha = cfg.globalAlpha;
+        this.animationSpeed = cfg.animationSpeed;
         this.activationMode = cfg.activationMode;
         this.scrollMode = cfg.scrollMode;
         this.pickupInterceptMode = cfg.pickupInterceptMode;
@@ -121,6 +123,7 @@ public class ConfigViewModel {
         cfg.panelWidth = this.panelWidth;
         cfg.visibleRows = this.visibleRows;
         cfg.globalAlpha = this.globalAlpha;
+        cfg.animationSpeed = this.animationSpeed;
         cfg.activationMode = this.activationMode;
         cfg.scrollMode = this.scrollMode;
         cfg.pickupInterceptMode = this.pickupInterceptMode;
@@ -165,6 +168,7 @@ public class ConfigViewModel {
         this.panelWidth = defaults.panelWidth;
         this.visibleRows = defaults.visibleRows;
         this.globalAlpha = defaults.globalAlpha;
+        this.animationSpeed = defaults.animationSpeed;
         this.activationMode = defaults.activationMode;
         this.scrollMode = defaults.scrollMode;
         this.pickupInterceptMode = defaults.pickupInterceptMode;
