@@ -59,6 +59,11 @@ public class ConfigViewModel {
     // HUD 稳定过滤阈值
     public int stabilityThresholdTicks;
 
+    // 掉落物上方数量文字显示
+    public BetterLootingConfig.DisplayMode itemCountDisplayMode;
+    public float itemCountScale;
+    public int itemCountRenderDistance;
+
     // ==========================================
     // 拖拽快照状态 (Drag Snapshot State)
     // 用于记录鼠标按下瞬间的数值，配合差值计算避免累加误差
@@ -110,6 +115,10 @@ public class ConfigViewModel {
         this.enableSuperMerge = cfg.enableSuperMerge;
         this.mergeRangeXZ = cfg.mergeRangeXZ;
         this.mergeRangeY = cfg.mergeRangeY;
+
+        this.itemCountDisplayMode = cfg.itemCountDisplayMode;
+        this.itemCountScale = cfg.itemCountScale;
+        this.itemCountRenderDistance = cfg.itemCountRenderDistance;
     }
 
     /**
@@ -152,6 +161,10 @@ public class ConfigViewModel {
         cfg.enableSuperMerge = this.enableSuperMerge;
         cfg.mergeRangeXZ = this.mergeRangeXZ;
         cfg.mergeRangeY = this.mergeRangeY;
+
+        cfg.itemCountDisplayMode = this.itemCountDisplayMode;
+        cfg.itemCountScale = this.itemCountScale;
+        cfg.itemCountRenderDistance = this.itemCountRenderDistance;
 
         cfg.validate(); // 保存前最后校验一次，确保数据绝对安全
         BetterLootingConfig.save();
@@ -197,6 +210,10 @@ public class ConfigViewModel {
         this.enableSuperMerge = defaults.enableSuperMerge;
         this.mergeRangeXZ = defaults.mergeRangeXZ;
         this.mergeRangeY = defaults.mergeRangeY;
+
+        this.itemCountDisplayMode = defaults.itemCountDisplayMode;
+        this.itemCountScale = defaults.itemCountScale;
+        this.itemCountRenderDistance = defaults.itemCountRenderDistance;
     }
 
     /**

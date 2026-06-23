@@ -35,6 +35,15 @@ public class BetterLootingConfig {
     public boolean enableTooltipPreview = true;
     public String overlaySkin = "vanilla";
 
+    /** 掉落物上方数量文字显示模式: OFF(关闭) / ITEM_COUNT(物品数量) / STACK_COUNT(堆叠组数) */
+    public DisplayMode itemCountDisplayMode = DisplayMode.ITEM_COUNT;
+
+    /** 数量文字缩放倍率 (0.25 ~ 5.0, 默认 1.0) */
+    public float itemCountScale = 1.0f;
+
+    /** 数量文字最大渲染距离 (4 ~ 64, 默认 16) */
+    public int itemCountRenderDistance = 16;
+
     /** 所有可用的悬浮窗物品行背景皮肤（对应 texture/overlay/&lt;skin&gt;/ 目录），供游戏内循环切换使用。 */
     public static final String[] AVAILABLE_OVERLAY_SKINS = { "vanilla", "stardew" };
 
@@ -124,6 +133,18 @@ public class BetterLootingConfig {
     }
 
     /**
+     * 掉落物上方数量文字显示模式
+     */
+    public enum DisplayMode {
+        /** 关闭显示 */
+        OFF,
+        /** 显示物品总数量（K/M/B 缩写大数字） */
+        ITEM_COUNT,
+        /** 显示堆叠组数（如 3x） */
+        STACK_COUNT
+    }
+
+    /**
      * 原版拾取事件拦截策略
      */
     public enum PickupInterceptMode {
@@ -166,6 +187,10 @@ public class BetterLootingConfig {
         if (this.overlaySkin == null || this.overlaySkin.trim().isEmpty()) {
             this.overlaySkin = "vanilla";
         }
+
+        this.itemCountScale = Mth.clamp(this.itemCountScale, 0.25f, 5.0f);
+        this.itemCountRenderDistance = Mth.clamp(this.itemCountRenderDistance, 4, 64);
+        if (this.itemCountDisplayMode == null) this.itemCountDisplayMode = DisplayMode.ITEM_COUNT;
 
         this.stabilityThresholdTicks = Mth.clamp(this.stabilityThresholdTicks, 0, 20);
         this.mergeRangeXZ = Mth.clamp(this.mergeRangeXZ, 0.0f, 10.0f);
@@ -212,6 +237,12 @@ public class BetterLootingConfig {
             config.set("Visual.enableTooltipPreview", INSTANCE.enableTooltipPreview);
             config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格)。对应 texture/overlay/<skin>/ 目录, 默认 vanilla");
             config.set("Visual.overlaySkin", INSTANCE.overlaySkin);
+            config.setComment("Visual.itemCountDisplayMode", "掉落物上方数量文字显示模式: OFF(关闭) / ITEM_COUNT(物品数量) / STACK_COUNT(堆叠组数), 默认 ITEM_COUNT");
+            config.set("Visual.itemCountDisplayMode", INSTANCE.itemCountDisplayMode.name());
+            config.setComment("Visual.itemCountScale", "数量文字缩放倍率 (0.25 ~ 5.0, 默认 1.0)");
+            config.set("Visual.itemCountScale", INSTANCE.itemCountScale);
+            config.setComment("Visual.itemCountRenderDistance", "数量文字最大渲染距离 (4 ~ 64, 默认 16)");
+            config.set("Visual.itemCountRenderDistance", INSTANCE.itemCountRenderDistance);
 
             // --- 指示器设置 ---
             config.setComment("Indicator", "快捷栏指示器悬浮窗设置 (Indicator Settings)");
@@ -294,6 +325,9 @@ public class BetterLootingConfig {
             INSTANCE.showInventoryLootList = config.getOrElse("Visual.showInventoryLootList", true);
             INSTANCE.enableTooltipPreview = config.getOrElse("Visual.enableTooltipPreview", true);
             INSTANCE.overlaySkin = config.getOrElse("Visual.overlaySkin", "vanilla");
+            try { INSTANCE.itemCountDisplayMode = DisplayMode.valueOf(config.getOrElse("Visual.itemCountDisplayMode", "ITEM_COUNT")); } catch (Exception ignored) {}
+            INSTANCE.itemCountScale = config.<Number>getOrElse("Visual.itemCountScale", 1.0f).floatValue();
+            INSTANCE.itemCountRenderDistance = config.getOrElse("Visual.itemCountRenderDistance", 16);
 
             INSTANCE.indicatorX = config.<Number>getOrElse("Indicator.indicatorX", -1.0f).floatValue();
             INSTANCE.indicatorY = config.<Number>getOrElse("Indicator.indicatorY", -1.0f).floatValue();
