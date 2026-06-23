@@ -6,6 +6,8 @@
   "client": [
     "ACSAccessor",
     "ACSDragMixin",
+    "ERDAccessor",
+    "LevelRendererMixin",
     "MixinMinecraft",
     "MouseHandlerMixin"
   ],

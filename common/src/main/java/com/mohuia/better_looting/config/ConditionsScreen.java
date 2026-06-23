@@ -4,6 +4,7 @@ import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.gui.CommonSlider;
 import com.mohuia.better_looting.config.BetterLootingConfig.ActivationMode;
+import com.mohuia.better_looting.config.BetterLootingConfig.DisplayMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.PickupInterceptMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.ScrollMode;
 import net.minecraft.client.gui.GuiGraphics;
@@ -298,6 +299,41 @@ public class ConditionsScreen extends Screen {
         }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).build());
         currentY += BTN_HEIGHT + BTN_GAP + 6;
 
+        // 4.5 掉落物上方数量文字显示模式
+        Component displayModeText = Component.translatable("gui." + BetterLooting.MODID + ".config.item_count_display_mode");
+        Component displayModeLabel = Component.literal("")
+                .append(displayModeText)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(getDisplayModeName(viewModel.itemCountDisplayMode).copy().withStyle(ChatFormatting.YELLOW));
+        this.addScrollableWidget(Button.builder(displayModeLabel, b -> {
+            DisplayMode[] values = DisplayMode.values();
+            int next = (viewModel.itemCountDisplayMode.ordinal() + 1) % values.length;
+            viewModel.itemCountDisplayMode = values[next];
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).tooltip(Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.item_count_display_mode"))).build());
+        currentY += BTN_HEIGHT + BTN_GAP;
+
+        // 数量文字缩放倍率（仅非关闭模式时显示）
+        if (viewModel.itemCountDisplayMode != DisplayMode.OFF) {
+            this.addScrollableWidget(new CommonSlider(
+                    x, currentY, widgetWidth, BTN_HEIGHT,
+                    Component.translatable("gui." + BetterLooting.MODID + ".config.item_count_scale"),
+                    "x", 0.25, 5.0, (double) viewModel.itemCountScale, 2,
+                    val -> viewModel.itemCountScale = (float) (Math.round(val * 100.0) / 100.0)
+            ));
+            currentY += BTN_HEIGHT + BTN_GAP;
+
+            // 数量文字渲染距离
+            this.addScrollableWidget(new CommonSlider(
+                    x, currentY, widgetWidth, BTN_HEIGHT,
+                    Component.translatable("gui." + BetterLooting.MODID + ".config.item_count_render_distance"),
+                    "m", 4.0, 64.0, (double) viewModel.itemCountRenderDistance, 0,
+                    val -> viewModel.itemCountRenderDistance = (int) Math.round(val)
+            ));
+            currentY += BTN_HEIGHT + BTN_GAP;
+        }
+
         // 5. 白名单稀有物品过滤开关
         Component rareFilterText = Component.translatable("gui." + BetterLooting.MODID + ".config.rare_item_filter");
         this.addScrollableWidget(Button.builder(formatOptionText(rareFilterText, viewModel.enableRareItemFilter), b -> {
@@ -545,6 +581,10 @@ public class ConditionsScreen extends Screen {
 
     private Tooltip getSkinTooltip(String skin) {
         return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.overlay_skin"));
+    }
+
+    private Component getDisplayModeName(DisplayMode mode) {
+        return Component.translatable("gui." + BetterLooting.MODID + ".config.item_count_display_mode." + mode.name().toLowerCase());
     }
 
     private Component getAnimationSpeedName(BetterLootingConfig.AnimationSpeed speed) {
