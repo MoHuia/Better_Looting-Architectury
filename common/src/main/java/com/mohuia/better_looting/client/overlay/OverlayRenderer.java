@@ -7,6 +7,7 @@ import com.mohuia.better_looting.config.FilterMode;
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.Utils;
 import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
+import com.mohuia.better_looting.client.skin.SkinManager;
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -270,33 +271,69 @@ public class OverlayRenderer {
     }
 
     // ===== 九宫格贴图背景 =====
-    private static final int TEX_SIZE = 32;     // 源图尺寸 22x22
-    private static final int LEFT_INSET = 6;    // 左段宽度（含左侧高亮条 x=0~3），不横向拉伸
-    private static final int RIGHT_INSET = 4;   // 右段宽度，不横向拉伸
+    private static final int BUILTIN_TEX_SIZE = 32;     // 内置皮肤源图尺寸 32x32
+    private static final int LEFT_INSET = 6;    // 32px 基准下左段宽度（含左侧高亮条 x=0~3）
+    private static final int RIGHT_INSET = 4;   // 32px 基准下右段宽度
     private static final int HUD_CONTENT_INSET = 4;  // HUD 贴图模式行内内容右移量，让出左侧高亮条
+
+    // 左右边框相对图宽的比例（由 32px 基准换算），用于适配 16/32/64 等不同尺寸的外部皮肤
+    private static final float LEFT_INSET_RATIO = (float) LEFT_INSET / BUILTIN_TEX_SIZE;   // 6/32
+    private static final float RIGHT_INSET_RATIO = (float) RIGHT_INSET / BUILTIN_TEX_SIZE; // 4/32
+
     private String cachedSkin = null;
     private ResourceLocation skinNormal;
     private ResourceLocation skinSelected;
+    private int skinTexSize = BUILTIN_TEX_SIZE;  // 当前皮肤源图尺寸
 
     // 皮肤文字主题：亮底皮肤（如星露谷）需要深色文字与稀有度条衬底，否则会糊在一起看不清
     private boolean skinLightBackground = false;
     private int skinTextSelected = Constants.COLOR_TEXT_WHITE;
     private int skinTextNormal = Constants.COLOR_TEXT_DIM;
 
+    // 预览皮肤覆盖名：配置界面预览时设为 viewModel.overlaySkin，使切换皮肤后无需保存即可预览；
+    // 为 null 时使用全局配置的 overlaySkin（真实 HUD 场景）。
+    private String previewSkinOverride = null;
+
+    /** 设置预览皮肤覆盖名（配置界面调用）；传 null 恢复读取全局配置。 */
+    public void setPreviewSkin(String skin) {
+        this.previewSkinOverride = skin;
+    }
+
     private void ensureSkinTextures() {
-        String skin = BetterLootingConfig.get().overlaySkin;
-        if (!skin.equals(cachedSkin)) {
-            cachedSkin = skin;
+        String requested = previewSkinOverride != null
+                ? previewSkinOverride
+                : BetterLootingConfig.get().overlaySkin;
+
+        // 选中皮肤缺失时回退 vanilla（不改写配置）
+        if (requested == null || !SkinManager.INSTANCE.isAvailable(requested)) {
+            if (!SkinManager.isBuiltin(requested)) requested = "vanilla";
+        }
+
+        if (requested.equals(cachedSkin)) return;
+        cachedSkin = requested;
+
+        SkinManager.LoadedSkin ext = SkinManager.INSTANCE.getExternalSkin(requested);
+        if (ext != null) {
+            // 外部皮肤：使用动态注册的纹理与 JSON 文字主题
+            skinNormal = ext.normalTex;
+            skinSelected = ext.selectedTex;
+            skinTexSize = ext.texSize;
+            skinLightBackground = ext.lightBackground;
+            skinTextNormal = ext.textColorNormal;
+            skinTextSelected = ext.textColorSelected;
+        } else {
+            // 内置皮肤：打包资源路径 + 硬编码主题
             skinNormal = ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID,
-                    "texture/overlay/" + skin + "/row.png");
+                    "texture/overlay/" + requested + "/row.png");
             skinSelected = ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID,
-                    "texture/overlay/" + skin + "/row_selected.png");
-            applySkinTheme(skin);
+                    "texture/overlay/" + requested + "/row_selected.png");
+            skinTexSize = BUILTIN_TEX_SIZE;
+            applySkinTheme(requested);
         }
     }
 
     /**
-     * 根据皮肤名设置对应的文字配色。亮底皮肤使用深色文字以保证可读性。
+     * 根据内置皮肤名设置对应的文字配色。亮底皮肤使用深色文字以保证可读性。
      */
     private void applySkinTheme(String skin) {
         switch (skin) {
@@ -315,34 +352,41 @@ public class OverlayRenderer {
 
     /**
      * 横向三段式九宫格绘制物品行背景贴图：
-     * 左段（含左侧高亮条）与右段按原图宽度 1:1 渲染、不横向拉伸；中段横向拉伸到剩余宽度。
+     * 左段（含左侧高亮条）与右段按比例保留、不横向拉伸；中段横向拉伸到剩余宽度。
+     * 边框比例按 32px 基准换算，确保 16/32/64 等不同尺寸皮肤的边框视觉一致。
      * 垂直方向行高恒等于图高，整图不做纵向拉伸。透明度通过 shaderColor 的 alpha 通道应用。
      */
     private void renderRowBackgroundTexture(GuiGraphics gui, int x, int y, int width, int height, boolean selected, float alpha) {
         ensureSkinTextures();
         ResourceLocation tex = selected ? skinSelected : skinNormal;
+        int texSize = skinTexSize;
 
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, Mth.clamp(alpha, 0f, 1f));
 
-        int left = LEFT_INSET;
-        int right = RIGHT_INSET;
-        int srcMid = TEX_SIZE - left - right;        // 源图中段宽度
-        int dstMid = Math.max(0, width - left - right);
+        // 源图左右段宽度（按比例换算到当前 texSize，至少 1px）
+        int srcLeft = Math.max(1, Math.round(texSize * LEFT_INSET_RATIO));
+        int srcRight = Math.max(1, Math.round(texSize * RIGHT_INSET_RATIO));
+        int srcMid = Math.max(1, texSize - srcLeft - srcRight);
 
-        // 左段（含高亮条，1:1 不拉伸，整高）
-        blitStretch(gui, tex, x, y, left, height, 0, 0, left, TEX_SIZE);
+        // 目标左右段固定用 32px 基准的像素宽度，保持各皮肤在屏幕上的边框观感一致
+        int dstLeft = LEFT_INSET;
+        int dstRight = RIGHT_INSET;
+        int dstMid = Math.max(0, width - dstLeft - dstRight);
+
+        // 左段（含高亮条，整高）
+        blitStretch(gui, tex, x, y, dstLeft, height, 0, 0, srcLeft, texSize, texSize);
         // 中段（横向拉伸，整高）
-        blitStretch(gui, tex, x + left, y, dstMid, height, left, 0, srcMid, TEX_SIZE);
-        // 右段（1:1 不拉伸，整高）
-        blitStretch(gui, tex, x + width - right, y, right, height, TEX_SIZE - right, 0, right, TEX_SIZE);
+        blitStretch(gui, tex, x + dstLeft, y, dstMid, height, srcLeft, 0, srcMid, texSize, texSize);
+        // 右段（整高）
+        blitStretch(gui, tex, x + width - dstRight, y, dstRight, height, texSize - srcRight, 0, srcRight, texSize, texSize);
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     /** 将源区域拉伸到目标尺寸。 */
-    private void blitStretch(GuiGraphics gui, ResourceLocation tex, int dx, int dy, int dw, int dh, int u, int v, int sw, int sh) {
+    private void blitStretch(GuiGraphics gui, ResourceLocation tex, int dx, int dy, int dw, int dh, int u, int v, int sw, int sh, int texSize) {
         if (dw <= 0 || dh <= 0) return;
-        gui.blit(tex, dx, dy, dw, dh, (float) u, (float) v, sw, sh, TEX_SIZE, TEX_SIZE);
+        gui.blit(tex, dx, dy, dw, dh, (float) u, (float) v, sw, sh, texSize, texSize);
     }
 }

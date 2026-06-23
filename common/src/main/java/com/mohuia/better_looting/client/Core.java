@@ -30,6 +30,7 @@ public class Core {
 
     public void init() {
         FilterWhitelist.INSTANCE.init();
+        com.mohuia.better_looting.client.skin.SkinManager.INSTANCE.init();
         ModeManager.INSTANCE.init();
         InputGuard.INSTANCE.init(selectionManager, keyTracker, pickupHandler);
 

@@ -245,13 +245,11 @@ public class ConditionsScreen extends Screen {
                 .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
                 .append(getSkinName(viewModel.overlaySkin).copy().withStyle(ChatFormatting.YELLOW));
         this.addScrollableWidget(Button.builder(skinLabel, b -> {
-            // 在所有可用皮肤之间轮转切换
-            String[] skins = BetterLootingConfig.AVAILABLE_OVERLAY_SKINS;
-            int idx = 0;
-            for (int i = 0; i < skins.length; i++) {
-                if (skins[i].equals(viewModel.overlaySkin)) { idx = i; break; }
-            }
-            viewModel.overlaySkin = skins[(idx + 1) % skins.length];
+            // 在所有可用皮肤（内置 + 已加载的外部皮肤）之间轮转切换
+            java.util.List<String> skins = com.mohuia.better_looting.client.skin.SkinManager.INSTANCE.getAvailableSkins();
+            int idx = skins.indexOf(viewModel.overlaySkin);
+            if (idx < 0) idx = 0;
+            viewModel.overlaySkin = skins.get((idx + 1) % skins.size());
             this.clearWidgets();
             this.init();
         }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).tooltip(getSkinTooltip(viewModel.overlaySkin)).build());
@@ -576,7 +574,14 @@ public class ConditionsScreen extends Screen {
     }
 
     private Component getSkinName(String skin) {
-        return Component.translatable("gui." + BetterLooting.MODID + ".config.overlay_skin." + skin);
+        // 内置皮肤走翻译键；外部皮肤用其 displayName（无翻译键）
+        var ext = com.mohuia.better_looting.client.skin.SkinManager.INSTANCE.getExternalSkin(skin);
+        if (ext != null) return Component.literal(ext.displayName);
+        if (com.mohuia.better_looting.client.skin.SkinManager.isBuiltin(skin)) {
+            return Component.translatable("gui." + BetterLooting.MODID + ".config.overlay_skin." + skin);
+        }
+        // 失效/未知皮肤：直接显示原始名
+        return Component.literal(skin);
     }
 
     private Tooltip getSkinTooltip(String skin) {

@@ -44,9 +44,6 @@ public class BetterLootingConfig {
     /** 数量文字最大渲染距离 (4 ~ 64, 默认 16) */
     public int itemCountRenderDistance = 16;
 
-    /** 所有可用的悬浮窗物品行背景皮肤（对应 texture/overlay/&lt;skin&gt;/ 目录），供游戏内循环切换使用。 */
-    public static final String[] AVAILABLE_OVERLAY_SKINS = { "vanilla", "stardew" };
-
     // ==========================================
     // 快捷栏指示器悬浮窗设置 (Indicator Settings)
     // ==========================================
