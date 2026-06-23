@@ -48,6 +48,7 @@ public class BetterLootingConfig {
     // ==========================================
     // 交互模式设置 (Interaction Modes)
     // ==========================================
+    public AnimationSpeed animationSpeed = AnimationSpeed.MEDIUM;
     public ActivationMode activationMode = ActivationMode.ALWAYS;
     public ScrollMode scrollMode = ScrollMode.ALWAYS;
 
@@ -109,6 +110,20 @@ public class BetterLootingConfig {
     public enum ScrollMode { ALWAYS, KEY_BIND, INVERT_KEY, STAND_STILL }
 
     /**
+     * 动画速度模式，控制悬浮窗动画的快慢
+     */
+    public enum AnimationSpeed {
+        /** 慢速动画（0.5x） */
+        SLOW,
+        /** 中速动画（1.0x，默认） */
+        MEDIUM,
+        /** 快速动画（2.0x） */
+        FAST,
+        /** 关闭所有动画（瞬时切换） */
+        OFF
+    }
+
+    /**
      * 原版拾取事件拦截策略
      */
     public enum PickupInterceptMode {
@@ -160,6 +175,7 @@ public class BetterLootingConfig {
         if (this.indicatorRotation < 0) this.indicatorRotation += 360;
 
         if (this.activationMode == null) this.activationMode = ActivationMode.ALWAYS;
+        if (this.animationSpeed == null) this.animationSpeed = AnimationSpeed.MEDIUM;
         if (this.scrollMode == null) this.scrollMode = ScrollMode.ALWAYS;
         if (this.pickupInterceptMode == null) this.pickupInterceptMode = PickupInterceptMode.AUTO;
         if (this.lastFilterMode == null) this.lastFilterMode = FilterMode.ALL;
@@ -207,6 +223,8 @@ public class BetterLootingConfig {
 
             // --- 交互模式 ---
             config.setComment("Interaction", "交互模式设置 (Interaction Modes)");
+            config.setComment("Interaction.animationSpeed", "动画速度: SLOW(慢) / MEDIUM(中,默认) / FAST(快) / OFF(关闭)");
+            config.set("Interaction.animationSpeed", INSTANCE.animationSpeed.name());
             config.set("Interaction.activationMode", INSTANCE.activationMode.name());
             config.set("Interaction.scrollMode", INSTANCE.scrollMode.name());
 
@@ -281,6 +299,7 @@ public class BetterLootingConfig {
             INSTANCE.indicatorY = config.<Number>getOrElse("Indicator.indicatorY", -1.0f).floatValue();
             INSTANCE.indicatorRotation = config.getOrElse("Indicator.indicatorRotation", 0);
 
+            try { INSTANCE.animationSpeed = AnimationSpeed.valueOf(config.getOrElse("Interaction.animationSpeed", "MEDIUM")); } catch (Exception ignored) {}
             try { INSTANCE.activationMode = ActivationMode.valueOf(config.getOrElse("Interaction.activationMode", "ALWAYS")); } catch (Exception ignored) {}
             try { INSTANCE.scrollMode = ScrollMode.valueOf(config.getOrElse("Interaction.scrollMode", "ALWAYS")); } catch (Exception ignored) {}
 

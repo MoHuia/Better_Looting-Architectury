@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.client.overlay;
 
 import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
 import net.minecraft.util.Mth;
@@ -41,7 +42,14 @@ public class OverlayState {
 
         // 更新界面弹出的渐变进度 (0.0 完全隐藏 -> 1.0 完全显示)
         float targetPopup = shouldShow ? 1.0f : 0.0f;
-        this.popupProgress = damp(this.popupProgress, targetPopup, 10.0f, deltaTime);
+        float speedMultiplier = getAnimationSpeedMultiplier();
+
+        if (speedMultiplier <= 0f) {
+            // 关闭动画：直接设置到目标值
+            this.popupProgress = targetPopup;
+        } else {
+            this.popupProgress = damp(this.popupProgress, targetPopup, 10.0f * speedMultiplier, deltaTime);
+        }
 
         // 如果界面已隐藏且动画结束，清空动画缓存释放内存
         if (!shouldShow && this.popupProgress < 0.001f) {
@@ -56,8 +64,10 @@ public class OverlayState {
 
         if (Math.abs(this.currentScroll - clampedTarget) < 0.001f) {
             this.currentScroll = clampedTarget;
+        } else if (speedMultiplier <= 0f) {
+            this.currentScroll = clampedTarget;
         } else {
-            this.currentScroll = damp(this.currentScroll, clampedTarget, 15.0f, deltaTime);
+            this.currentScroll = damp(this.currentScroll, clampedTarget, 15.0f * speedMultiplier, deltaTime);
         }
     }
 
@@ -70,8 +80,15 @@ public class OverlayState {
         float current = itemEntryAnimations.get(entityId);
         if (current >= 1.0f) return 1.0f;
 
-        // 以每秒进度增加 6.0 的速度播放动画 (即约 0.16 秒完成)
-        float next = Math.min(1.0f, current + (6.0f * deltaTime));
+        float multiplier = getAnimationSpeedMultiplier();
+        if (multiplier <= 0f) {
+            // 关闭动画：直接完成
+            itemEntryAnimations.put(entityId, 1.0f);
+            return 1.0f;
+        }
+
+        // 以每秒进度增加 6.0 * multiplier 的速度播放动画
+        float next = Math.min(1.0f, current + (6.0f * multiplier * deltaTime));
         itemEntryAnimations.put(entityId, next);
         return next;
     }
@@ -97,5 +114,18 @@ public class OverlayState {
      */
     private float damp(float current, float target, float speed, float dt) {
         return Mth.lerp(1.0f - (float) Math.exp(-speed * dt), current, target);
+    }
+
+    /**
+     * 根据配置中的动画速度设置返回对应的速度倍率。
+     * SLOW=0.5, MEDIUM=1.0, FAST=2.0, OFF=0（关闭动画，直接跳到目标值）
+     */
+    private float getAnimationSpeedMultiplier() {
+        return switch (BetterLootingConfig.get().animationSpeed) {
+            case SLOW -> 0.5f;
+            case MEDIUM -> 1.0f;
+            case FAST -> 2.0f;
+            case OFF -> 0.0f;
+        };
     }
 }

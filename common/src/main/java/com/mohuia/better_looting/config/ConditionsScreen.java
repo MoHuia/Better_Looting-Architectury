@@ -364,6 +364,21 @@ public class ConditionsScreen extends Screen {
                 "tick", 0.0, 20.0, (double) viewModel.stabilityThresholdTicks, 1,
                 val -> viewModel.stabilityThresholdTicks = (int) Math.round(val)
         ));
+        currentY += BTN_HEIGHT + BTN_GAP;
+
+        // 动画速度设置
+        Component animSpeedText = Component.translatable("gui." + BetterLooting.MODID + ".config.animation_speed");
+        Component animSpeedLabel = Component.literal("")
+                .append(animSpeedText)
+                .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                .append(getAnimationSpeedName(viewModel.animationSpeed).copy().withStyle(ChatFormatting.YELLOW));
+        this.addScrollableWidget(Button.builder(animSpeedLabel, b -> {
+            BetterLootingConfig.AnimationSpeed[] values = BetterLootingConfig.AnimationSpeed.values();
+            int next = (viewModel.animationSpeed.ordinal() + 1) % values.length;
+            viewModel.animationSpeed = values[next];
+            this.clearWidgets();
+            this.init();
+        }).bounds(x, currentY, widgetWidth, BTN_HEIGHT).tooltip(getAnimationSpeedTooltip(viewModel.animationSpeed)).build());
     }
 
     private <T extends Enum<T>> void buildEnumList(int centerX, int startY, int widgetWidth, T[] values, T current,
@@ -530,5 +545,13 @@ public class ConditionsScreen extends Screen {
 
     private Tooltip getSkinTooltip(String skin) {
         return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.overlay_skin"));
+    }
+
+    private Component getAnimationSpeedName(BetterLootingConfig.AnimationSpeed speed) {
+        return Component.translatable("gui." + BetterLooting.MODID + ".config.animation_speed." + speed.name().toLowerCase());
+    }
+
+    private Tooltip getAnimationSpeedTooltip(BetterLootingConfig.AnimationSpeed speed) {
+        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.animation_speed." + speed.name().toLowerCase()));
     }
 }
