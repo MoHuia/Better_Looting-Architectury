@@ -27,6 +27,9 @@
   "gui.better_looting.config.conditions_title": "Display Conditions",
   "gui.better_looting.config.save": "Save & Exit",
   "gui.better_looting.config.reset": "Reset Default",
+  "gui.better_looting.hud_appearance": "HUD Appearance",
+  "gui.better_looting.trigger_conditions": "Trigger",
+  "gui.better_looting.advanced": "Advanced",
 
   "--- GUI: Overlay Activation Modes ---": "",
   "gui.better_looting.header_condition": "Overlay Display Condition",
@@ -44,7 +47,6 @@
   "gui.better_looting.angle": "Trigger Angle",
 
   "--- GUI: Scroll Interaction Modes ---": "",
-  "gui.better_looting.scroll_mode": "Scroll Wheel Conditions",
   "gui.better_looting.config.scroll_mode": "Scroll Mode",
   "gui.better_looting.config.scroll.always": "Scroll: Always",
   "gui.better_looting.config.scroll.stand_still": "Scroll: Stand Still",
@@ -56,7 +58,6 @@
   "gui.better_looting.config.tooltip.scroll.invert_key": "Scroll defaults to selecting dropped items; hold the modifier key to switch to the vanilla hotbar.",
 
   "--- GUI: Advanced & Misc Settings ---": "",
-  "gui.better_looting.other_settings": "Other Settings",
   "gui.better_looting.config.tooltip.settings": "Logic Settings",
   "gui.better_looting.config.pickup_intercept_mode_title": "Pickup Intercept Mode",
   "gui.better_looting.config.pickup_intercept.auto": "Auto (Smart)",
@@ -119,5 +120,16 @@
   "gui.better_looting.config.info.scale": "Scale: %sx",
   "gui.better_looting.config.help.move": "Drag Body: Move",
   "gui.better_looting.config.help.resize": "Drag Edge: Resize",
-  "gui.better_looting.config.help.scale": "Drag Corner: Scale"
+  "gui.better_looting.config.help.scale": "Drag Corner: Scale",
+
+  "--- GUI: Section Dividers ---": "",
+  "gui.better_looting.config.section.text": "Text",
+  "gui.better_looting.config.section.appearance": "Look",
+  "gui.better_looting.config.section.count_display": "Count Display",
+  "gui.better_looting.config.section.extra_panels": "Extra Panels",
+  "gui.better_looting.config.section.activation": "Activation",
+  "gui.better_looting.config.section.scroll_behavior": "Scroll",
+  "gui.better_looting.config.section.pickup_timing": "Pickup Timing",
+  "gui.better_looting.config.section.filter": "Filter",
+  "gui.better_looting.config.section.merge": "Merge"
 }

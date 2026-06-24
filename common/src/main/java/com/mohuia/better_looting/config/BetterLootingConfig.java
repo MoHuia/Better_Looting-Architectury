@@ -44,7 +44,7 @@ public class BetterLootingConfig {
     /** 数量文字最大渲染距离 (4 ~ 64, 默认 16) */
     public int itemCountRenderDistance = 16;
 
-    /** 所有可用的悬浮窗物品行背景皮肤（对应 texture/overlay/&lt;skin&gt;/ 目录），供游戏内循环切换使用。 */
+    /** 所有可用的悬浮窗物品行背景皮肤（对应 textures/overlay/&lt;skin&gt;/ 目录），供游戏内循环切换使用。 */
     public static final String[] AVAILABLE_OVERLAY_SKINS = { "vanilla", "stardew" };
 
     // ==========================================
@@ -235,7 +235,7 @@ public class BetterLootingConfig {
             config.set("Visual.showInventoryLootList", INSTANCE.showInventoryLootList);
             config.setComment("Visual.enableTooltipPreview", "是否在悬浮窗选中物品时显示物品信息预览");
             config.set("Visual.enableTooltipPreview", INSTANCE.enableTooltipPreview);
-            config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格)。对应 texture/overlay/<skin>/ 目录, 默认 vanilla");
+            config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格)。对应 textures/overlay/<skin>/ 目录, 默认 vanilla");
             config.set("Visual.overlaySkin", INSTANCE.overlaySkin);
             config.setComment("Visual.itemCountDisplayMode", "掉落物上方数量文字显示模式: OFF(关闭) / ITEM_COUNT(物品数量) / STACK_COUNT(堆叠组数), 默认 ITEM_COUNT");
             config.set("Visual.itemCountDisplayMode", INSTANCE.itemCountDisplayMode.name());
