@@ -324,9 +324,9 @@ public class OverlayRenderer {
         } else {
             // 内置皮肤：打包资源路径 + 硬编码主题
             skinNormal = ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID,
-                    "texture/overlay/" + requested + "/row.png");
+                    "textures/overlay/" + requested + "/row.png");
             skinSelected = ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID,
-                    "texture/overlay/" + requested + "/row_selected.png");
+                    "textures/overlay/" + requested + "/row_selected.png");
             skinTexSize = BUILTIN_TEX_SIZE;
             applySkinTheme(requested);
         }
