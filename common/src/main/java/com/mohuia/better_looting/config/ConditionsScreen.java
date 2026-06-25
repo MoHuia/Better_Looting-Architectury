@@ -95,7 +95,8 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         final int customTitleLabelY;
         final boolean showNewLabelLabel;
         final int newLabelLabelY;
-        final int keyInfoY;
+        final int activationKeyInfoY; // 激活段键位提示 Y，-1 表示不显示
+        final int scrollKeyInfoY;     // 滚动段键位提示 Y，-1 表示不显示
         final Category category;
         final double scrollAmount;
         final int mainHeight;
@@ -103,14 +104,16 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         Page(List<AbstractWidget> widgets, List<Section> sections,
              boolean showCustomTitleLabel, int customTitleLabelY,
              boolean showNewLabelLabel, int newLabelLabelY,
-             int keyInfoY, Category category, double scrollAmount, int mainHeight) {
+             int activationKeyInfoY, int scrollKeyInfoY,
+             Category category, double scrollAmount, int mainHeight) {
             this.widgets = widgets;
             this.sections = sections;
             this.showCustomTitleLabel = showCustomTitleLabel;
             this.customTitleLabelY = customTitleLabelY;
             this.showNewLabelLabel = showNewLabelLabel;
             this.newLabelLabelY = newLabelLabelY;
-            this.keyInfoY = keyInfoY;
+            this.activationKeyInfoY = activationKeyInfoY;
+            this.scrollKeyInfoY = scrollKeyInfoY;
             this.category = category;
             this.scrollAmount = scrollAmount;
             this.mainHeight = mainHeight;
@@ -121,7 +124,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     private Page snapshotCurrentPage() {
         return new Page(new ArrayList<>(scrollableWidgets), new ArrayList<>(sections),
                 showCustomTitleLabel, customTitleLabelY, showNewLabelLabel, newLabelLabelY,
-                keyInfoY, currentCategory, scrollAmount, mainHeight);
+                activationKeyInfoY, scrollKeyInfoY, currentCategory, scrollAmount, mainHeight);
     }
 
     // 文本框标题坐标
@@ -129,7 +132,9 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     private boolean showCustomTitleLabel = false;
     private int newLabelLabelY;
     private boolean showNewLabelLabel = false;
-    private int keyInfoY; // 键位提示在面板内的起始 Y（无滚动绝对坐标）
+    // 键位提示 Y（无滚动绝对坐标），-1 表示当前页不显示该段提示
+    private int activationKeyInfoY = -1;
+    private int scrollKeyInfoY = -1;
 
     private enum Category {
         APPEARANCE("hud_appearance"),
@@ -190,6 +195,8 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         calculateLayout();
         this.showCustomTitleLabel = false;
         this.showNewLabelLabel = false;
+        this.activationKeyInfoY = -1;
+        this.scrollKeyInfoY = -1;
 
         // 左上角返回箭头（贴角，从 (0,0) 开始）
         this.addRenderableWidget(new com.mohuia.better_looting.client.gui.BackButton(
@@ -205,7 +212,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
             case ADVANCED -> buildAdvancedTab(startY);
         }
 
-        // 计算内容底部（所有组件 / 标题 / 标签的最大底边）
+        // 计算内容底部（所有组件 / 标题 / 标签 / 分段键位提示的最大底边）
         int contentBottom = contentStartY;
         for (AbstractWidget w : scrollableWidgets) {
             contentBottom = Math.max(contentBottom, originalYMap.get(w) + w.getHeight());
@@ -213,13 +220,8 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         if (showCustomTitleLabel) contentBottom = Math.max(contentBottom, customTitleLabelY + 10);
         if (showNewLabelLabel) contentBottom = Math.max(contentBottom, newLabelLabelY + 10);
         for (Section s : sections) contentBottom = Math.max(contentBottom, s.y + font.lineHeight + 6);
-
-        // 键位提示作为面板内最后内容，占额外高度
-        this.keyInfoY = contentBottom + 6;
-        int keyInfoLines = countKeyInfoLines();
-        if (keyInfoLines > 0) {
-            contentBottom = keyInfoY + keyInfoLines * 12;
-        }
+        if (activationKeyInfoY >= 0) contentBottom = Math.max(contentBottom, activationKeyInfoY + 12);
+        if (scrollKeyInfoY >= 0)     contentBottom = Math.max(contentBottom, scrollKeyInfoY + 12);
 
         // 边框高度 = 内容总高 + 上下内边距；可视区放不下时按可视区裁顶部并启用滚动
         int desiredHeight = (contentBottom - mainBaseY) + PANEL_PAD;
@@ -230,16 +232,6 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         this.scrollAmount = Math.max(0, Math.min(this.scrollAmount, this.maxScroll));
         this.targetScroll = Math.max(0, Math.min(this.targetScroll, this.maxScroll));
         updateWidgetPositions();
-    }
-
-    /** 当前分类下键位提示的行数（用于把它纳入面板高度）。 */
-    private int countKeyInfoLines() {
-        if (currentCategory != Category.TRIGGER) return 0;
-        int lines = 0;
-        boolean activationHadKey = (viewModel.activationMode == ActivationMode.KEY_HOLD || viewModel.activationMode == ActivationMode.KEY_TOGGLE);
-        if (activationHadKey) lines++;
-        if (viewModel.scrollMode == ScrollMode.KEY_BIND || viewModel.scrollMode == ScrollMode.INVERT_KEY) lines++;
-        return lines;
     }
 
     // --- 下拉框宿主回调 ---
@@ -526,12 +518,24 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         y += addSectionHeader(y, "activation", GuiTheme.SECTION_ACTIVATION);
         y = buildEnumSelectList(x, y, w, ActivationMode.values(), viewModel.activationMode,
                 mode -> viewModel.activationMode = mode, this::getModeName, this::getModeTooltip);
+        // 激活段键位提示紧跟该段组件下方
+        boolean activationHadKey = (viewModel.activationMode == ActivationMode.KEY_HOLD || viewModel.activationMode == ActivationMode.KEY_TOGGLE);
+        if (activationHadKey) {
+            this.activationKeyInfoY = y;
+            y += 12;
+        }
         y += 4;
 
         // —— 滚动行为 ——
         y += addSectionHeader(y, "scroll_behavior", GuiTheme.SECTION_SCROLL);
         y = buildEnumSelectList(x, y, w, ScrollMode.values(), viewModel.scrollMode,
                 mode -> viewModel.scrollMode = mode, this::getScrollModeName, this::getScrollModeTooltip);
+        // 滚动段键位提示紧跟该段组件下方
+        boolean scrollHadKey = (viewModel.scrollMode == ScrollMode.KEY_BIND || viewModel.scrollMode == ScrollMode.INVERT_KEY);
+        if (scrollHadKey) {
+            this.scrollKeyInfoY = y;
+            y += 12;
+        }
         y += 4;
 
         // —— 拾取时机 ——
@@ -821,16 +825,16 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private void renderContextKeyInfo(GuiGraphics gui, Page page) {
-        int infoY = (int) (page.keyInfoY - page.scrollAmount); // 面板内最后内容，随滚动移动
-
-        if (page.category == Category.TRIGGER) {
-            boolean activationHadKey = (viewModel.activationMode == ActivationMode.KEY_HOLD || viewModel.activationMode == ActivationMode.KEY_TOGGLE);
-            if (activationHadKey) {
-                drawKeyString(gui, mainCenterX, infoY, KeyInit.SHOW_OVERLAY, "config.key_info");
-            }
-            if (viewModel.scrollMode == ScrollMode.KEY_BIND || viewModel.scrollMode == ScrollMode.INVERT_KEY) {
-                drawKeyString(gui, mainCenterX, activationHadKey ? infoY + 12 : infoY, KeyInit.SCROLL_MODIFIER, "config.scroll_key_info");
-            }
+        if (page.category != Category.TRIGGER) return;
+        // 激活段提示：紧跟激活触发器列表下方
+        if (page.activationKeyInfoY >= 0) {
+            drawKeyString(gui, mainCenterX, (int) (page.activationKeyInfoY - page.scrollAmount),
+                    KeyInit.SHOW_OVERLAY, "config.key_info");
+        }
+        // 滚动段提示：紧跟滚动行为列表下方
+        if (page.scrollKeyInfoY >= 0) {
+            drawKeyString(gui, mainCenterX, (int) (page.scrollKeyInfoY - page.scrollAmount),
+                    KeyInit.SCROLL_MODIFIER, "config.scroll_key_info");
         }
     }
 
