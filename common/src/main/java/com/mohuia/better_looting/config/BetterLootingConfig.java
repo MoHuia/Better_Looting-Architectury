@@ -174,7 +174,7 @@ public class BetterLootingConfig {
         this.scanRangeXZ = Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f);
         this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
         this.pickupDelaySeconds = Mth.clamp(this.pickupDelaySeconds, 0.0f, 5.0f);
-        this.maxHoldTicks = Mth.clamp(this.maxHoldTicks, 10, 100);
+        this.maxHoldTicks = Mth.clamp(this.maxHoldTicks, 0, 100);
 
         if (this.customOverlayTitle == null) {
             this.customOverlayTitle = "Loot Detected";

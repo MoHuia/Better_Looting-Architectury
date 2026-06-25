@@ -543,7 +543,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
 
         this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.max_hold_seconds"),
-                "s", 0.5, 5.0, (double) viewModel.maxHoldTicks / 20.0, 1,
+                "s", 0.0, 5.0, (double) viewModel.maxHoldTicks / 20.0, 1,
                 val -> {
                     float seconds = (float) (Math.round(val * 10.0) / 10.0);
                     viewModel.maxHoldTicks = (int) (seconds * 20);
@@ -859,7 +859,14 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private Tooltip getModeTooltip(ActivationMode mode) {
-        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip." + mode.name().toLowerCase()));
+        int color = switch (mode) {
+            case ALWAYS -> GuiTheme.TOOLTIP_GOOD;
+            case LOOK_DOWN -> GuiTheme.TOOLTIP_ACTIVE;
+            case STAND_STILL -> GuiTheme.TOOLTIP_CAUTION;
+            case KEY_HOLD -> GuiTheme.TOOLTIP_WARN;
+            case KEY_TOGGLE -> GuiTheme.TOOLTIP_TOGGLE;
+        };
+        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip." + mode.name().toLowerCase(), color);
     }
 
     private Component getScrollModeName(ScrollMode mode) {
@@ -867,7 +874,13 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private Tooltip getScrollModeTooltip(ScrollMode mode) {
-        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.scroll." + mode.name().toLowerCase()));
+        int color = switch (mode) {
+            case ALWAYS -> GuiTheme.TOOLTIP_GOOD;
+            case STAND_STILL -> GuiTheme.TOOLTIP_CAUTION;
+            case KEY_BIND -> GuiTheme.TOOLTIP_WARN;
+            case INVERT_KEY -> GuiTheme.TOOLTIP_TOGGLE;
+        };
+        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip.scroll." + mode.name().toLowerCase(), color);
     }
 
     private Component getInterceptModeName(PickupInterceptMode mode) {
@@ -875,7 +888,12 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private Tooltip getInterceptModeTooltip(PickupInterceptMode mode) {
-        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.pickup_intercept." + mode.name().toLowerCase()));
+        int color = switch (mode) {
+            case AUTO -> GuiTheme.TOOLTIP_GOOD;
+            case ALWAYS -> GuiTheme.TOOLTIP_CAUTION;
+            case NEVER -> GuiTheme.TOOLTIP_NEUTRAL;
+        };
+        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip.pickup_intercept." + mode.name().toLowerCase(), color);
     }
 
     private Component getSkinName(String skin) {
@@ -900,6 +918,17 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private Tooltip getAnimationSpeedTooltip(AnimationSpeed speed) {
-        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.animation_speed." + speed.name().toLowerCase()));
+        int color = switch (speed) {
+            case SLOW -> GuiTheme.TOOLTIP_ACTIVE;
+            case MEDIUM -> GuiTheme.TOOLTIP_GOOD;
+            case FAST -> GuiTheme.TOOLTIP_CAUTION;
+            case OFF -> GuiTheme.TOOLTIP_NEUTRAL;
+        };
+        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip.animation_speed." + speed.name().toLowerCase(), color);
+    }
+
+    /** 创建带语义色的 tooltip。 */
+    private Tooltip coloredTooltip(String langKey, int color) {
+        return Tooltip.create(Component.translatable(langKey).withStyle(style -> style.withColor(color)));
     }
 }
