@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import java.util.function.Consumer;
 
 /**
- * 与深空蓝主题统一的现代滑块。
+ * 与黑白灰主题统一的自绘现代滑块。
  * 自绘轨道、已填充进度与手柄，替代原版纹理外观；
  * 数值映射与文本格式化逻辑与 CommonSlider 保持一致。
  */
