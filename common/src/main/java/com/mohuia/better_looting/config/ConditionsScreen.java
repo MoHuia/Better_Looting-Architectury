@@ -465,7 +465,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         // 皮肤下拉框
         addSkinDropdown(x, y, w,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.overlay_skin"),
-                getSkinTooltip());
+                null);
         y += ROW_H + ROW_GAP;
 
         // 动画速度下拉框
@@ -473,7 +473,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
                 Component.translatable("gui." + BetterLooting.MODID + ".config.animation_speed"),
                 AnimationSpeed.values(), viewModel.animationSpeed, v -> viewModel.animationSpeed = v,
                 this::getAnimationSpeedName,
-                getAnimationSpeedTooltip(viewModel.animationSpeed));
+                null);
         y += ROW_H + ROW_GAP + 4;
 
         // —— 数量显示 ——
@@ -483,7 +483,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
                 Component.translatable("gui." + BetterLooting.MODID + ".config.item_count_display_mode"),
                 DisplayMode.values(), viewModel.itemCountDisplayMode, v -> viewModel.itemCountDisplayMode = v,
                 this::getDisplayModeName,
-                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.item_count_display_mode")));
+                null);
         y += ROW_H + ROW_GAP;
 
         if (viewModel.itemCountDisplayMode != DisplayMode.OFF) {
@@ -547,7 +547,8 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_delay"),
                 "s", 0.0, 5.0, (double) viewModel.pickupDelaySeconds, 1,
-                val -> viewModel.pickupDelaySeconds = (float) (Math.round(val * 10.0) / 10.0)));
+                val -> viewModel.pickupDelaySeconds = (float) (Math.round(val * 10.0) / 10.0),
+                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_delay.tooltip"))));
         y += ROW_H + ROW_GAP;
 
         this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
@@ -556,13 +557,15 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
                 val -> {
                     float seconds = (float) (Math.round(val * 10.0) / 10.0);
                     viewModel.maxHoldTicks = (int) (seconds * 20);
-                }));
+                },
+                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.max_hold_seconds.tooltip"))));
         y += ROW_H + ROW_GAP;
 
         this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.stability_threshold"),
                 "tick", 0.0, 20.0, (double) viewModel.stabilityThresholdTicks, 1,
-                val -> viewModel.stabilityThresholdTicks = (int) Math.round(val)));
+                val -> viewModel.stabilityThresholdTicks = (int) Math.round(val),
+                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.stability_threshold.tooltip"))));
     }
     // =============================================
     // 高级
@@ -588,13 +591,15 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
             this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
                     Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_xz"),
                     "m", 0.0, 10.0, (double) viewModel.mergeRangeXZ, 1,
-                    val -> viewModel.mergeRangeXZ = (float) (Math.round(val * 10.0) / 10.0)));
+                    val -> viewModel.mergeRangeXZ = (float) (Math.round(val * 10.0) / 10.0),
+                    Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_xz.tooltip"))));
             y += ROW_H + ROW_GAP;
 
             this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
                     Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_y"),
                     "m", 0.0, 10.0, (double) viewModel.mergeRangeY, 1,
-                    val -> viewModel.mergeRangeY = (float) (Math.round(val * 10.0) / 10.0)));
+                    val -> viewModel.mergeRangeY = (float) (Math.round(val * 10.0) / 10.0),
+                    Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.merge_range_y.tooltip"))));
         }
     }
 
@@ -608,13 +613,14 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     /** 添加一个开关行，needsRebuild=true 时点击会重建整个界面。 */
     private int addToggle(int x, int y, int w, String key, java.util.function.BooleanSupplier getter, Runnable toggle, boolean needsRebuild) {
         Component label = Component.translatable("gui." + BetterLooting.MODID + ".config." + key);
+        Tooltip tooltip = Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config." + key + ".tooltip"));
         this.addScrollableWidget(new ToggleButton(x, y, w, ROW_H, label, getter, () -> {
             toggle.run();
             if (needsRebuild) {
                 this.clearWidgets();
                 this.init();
             }
-        }, null));
+        }, tooltip));
         return y + ROW_H + ROW_GAP;
     }
 
@@ -637,7 +643,8 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
                 this.addScrollableWidget(new ThemedSlider(x + 16, y, w - 16, ROW_H,
                         Component.translatable("gui." + BetterLooting.MODID + ".angle"),
                         "", 0.0, 90.0, (double) viewModel.lookDownAngle, 0,
-                        val -> viewModel.lookDownAngle = val.floatValue()));
+                        val -> viewModel.lookDownAngle = val.floatValue(),
+                        Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".angle.tooltip"))));
                 y += ROW_H + ROW_GAP;
             }
         }
@@ -875,14 +882,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private Tooltip getModeTooltip(ActivationMode mode) {
-        int color = switch (mode) {
-            case ALWAYS -> GuiTheme.TOOLTIP_GOOD;
-            case LOOK_DOWN -> GuiTheme.TOOLTIP_ACTIVE;
-            case STAND_STILL -> GuiTheme.TOOLTIP_CAUTION;
-            case KEY_HOLD -> GuiTheme.TOOLTIP_WARN;
-            case KEY_TOGGLE -> GuiTheme.TOOLTIP_TOGGLE;
-        };
-        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip." + mode.name().toLowerCase(), color);
+        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip." + mode.name().toLowerCase()));
     }
 
     private Component getScrollModeName(ScrollMode mode) {
@@ -890,13 +890,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private Tooltip getScrollModeTooltip(ScrollMode mode) {
-        int color = switch (mode) {
-            case ALWAYS -> GuiTheme.TOOLTIP_GOOD;
-            case STAND_STILL -> GuiTheme.TOOLTIP_CAUTION;
-            case KEY_BIND -> GuiTheme.TOOLTIP_WARN;
-            case INVERT_KEY -> GuiTheme.TOOLTIP_TOGGLE;
-        };
-        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip.scroll." + mode.name().toLowerCase(), color);
+        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.scroll." + mode.name().toLowerCase()));
     }
 
     private Component getInterceptModeName(PickupInterceptMode mode) {
@@ -904,12 +898,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
     }
 
     private Tooltip getInterceptModeTooltip(PickupInterceptMode mode) {
-        int color = switch (mode) {
-            case AUTO -> GuiTheme.TOOLTIP_GOOD;
-            case ALWAYS -> GuiTheme.TOOLTIP_CAUTION;
-            case NEVER -> GuiTheme.TOOLTIP_NEUTRAL;
-        };
-        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip.pickup_intercept." + mode.name().toLowerCase(), color);
+        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.pickup_intercept." + mode.name().toLowerCase()));
     }
 
     private Component getSkinName(String skin) {
@@ -921,10 +910,6 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         return Component.literal(skin);
     }
 
-    private Tooltip getSkinTooltip() {
-        return Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.overlay_skin"));
-    }
-
     private Component getDisplayModeName(DisplayMode mode) {
         return Component.translatable("gui." + BetterLooting.MODID + ".config.item_count_display_mode." + mode.name().toLowerCase());
     }
@@ -933,18 +918,4 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         return Component.translatable("gui." + BetterLooting.MODID + ".config.animation_speed." + speed.name().toLowerCase());
     }
 
-    private Tooltip getAnimationSpeedTooltip(AnimationSpeed speed) {
-        int color = switch (speed) {
-            case SLOW -> GuiTheme.TOOLTIP_ACTIVE;
-            case MEDIUM -> GuiTheme.TOOLTIP_GOOD;
-            case FAST -> GuiTheme.TOOLTIP_CAUTION;
-            case OFF -> GuiTheme.TOOLTIP_NEUTRAL;
-        };
-        return coloredTooltip("gui." + BetterLooting.MODID + ".config.tooltip.animation_speed." + speed.name().toLowerCase(), color);
-    }
-
-    /** 创建带语义色的 tooltip。 */
-    private Tooltip coloredTooltip(String langKey, int color) {
-        return Tooltip.create(Component.translatable(langKey).withStyle(style -> style.withColor(color)));
-    }
 }
