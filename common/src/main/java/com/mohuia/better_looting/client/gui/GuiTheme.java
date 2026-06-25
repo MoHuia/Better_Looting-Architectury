@@ -66,6 +66,14 @@ public final class GuiTheme {
     public static final int SECTION_FILTER = 0xFFBA68C8;
     public static final int SECTION_MERGE = 0xFF4DB6AC;
 
+    // —— Tooltip 语义色 ——
+    public static final int TOOLTIP_GOOD = 0xFF81C784;      // 推荐/安全
+    public static final int TOOLTIP_WARN = 0xFFFFD54F;      // 注意
+    public static final int TOOLTIP_CAUTION = 0xFFFF8A65;   // 谨慎/冲突风险
+    public static final int TOOLTIP_NEUTRAL = 0xFFAAAAAA;    // 中性/关闭
+    public static final int TOOLTIP_ACTIVE = 0xFF4FC3F7;     // 活跃/动态
+    public static final int TOOLTIP_TOGGLE = 0xFFBA68C8;     // 切换/持久
+
     // =============================================
     // 绘制辅助
     // =============================================
