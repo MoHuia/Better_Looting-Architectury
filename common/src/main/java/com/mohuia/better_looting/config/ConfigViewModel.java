@@ -34,6 +34,9 @@ public class ConfigViewModel {
     // 物品信息预览开关
     public boolean enableTooltipPreview;
 
+    // 左侧按键提示框开关
+    public boolean showKeyPrompt;
+
     // 悬浮窗编辑状态
     public float indicatorX, indicatorY;
     public int indicatorRotation;
@@ -102,6 +105,7 @@ public class ConfigViewModel {
 
         this.showInventoryLootList = cfg.showInventoryLootList;
         this.enableTooltipPreview = cfg.enableTooltipPreview;
+        this.showKeyPrompt = cfg.showKeyPrompt;
 
         this.indicatorX = cfg.indicatorX;
         this.indicatorY = cfg.indicatorY;
@@ -148,6 +152,7 @@ public class ConfigViewModel {
 
         cfg.showInventoryLootList = this.showInventoryLootList;
         cfg.enableTooltipPreview = this.enableTooltipPreview;
+        cfg.showKeyPrompt = this.showKeyPrompt;
 
         cfg.indicatorX = this.indicatorX;
         cfg.indicatorY = this.indicatorY;
@@ -197,6 +202,7 @@ public class ConfigViewModel {
 
         this.showInventoryLootList = defaults.showInventoryLootList;
         this.enableTooltipPreview = defaults.enableTooltipPreview;
+        this.showKeyPrompt = defaults.showKeyPrompt;
 
         this.indicatorX = defaults.indicatorX;
         this.indicatorY = defaults.indicatorY;

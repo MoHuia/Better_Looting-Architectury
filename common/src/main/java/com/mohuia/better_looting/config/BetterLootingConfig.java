@@ -33,6 +33,7 @@ public class BetterLootingConfig {
     public int inventoryListWidth = 120;
     public boolean showInventoryLootList = true;
     public boolean enableTooltipPreview = true;
+    public boolean showKeyPrompt = true;
     public String overlaySkin = "vanilla";
 
     /** 掉落物上方数量文字显示模式: OFF(关闭) / ITEM_COUNT(物品数量) / STACK_COUNT(堆叠组数) */
@@ -232,7 +233,9 @@ public class BetterLootingConfig {
             config.set("Visual.showInventoryLootList", INSTANCE.showInventoryLootList);
             config.setComment("Visual.enableTooltipPreview", "是否在悬浮窗选中物品时显示物品信息预览");
             config.set("Visual.enableTooltipPreview", INSTANCE.enableTooltipPreview);
-            config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格)。对应 textures/overlay/<skin>/ 目录, 默认 vanilla");
+            config.setComment("Visual.showKeyPrompt", "是否在悬浮窗选中物品时显示左侧按键提示框");
+            config.set("Visual.showKeyPrompt", INSTANCE.showKeyPrompt);
+            config.setComment("Visual.overlaySkin", "悬浮窗物品行背景皮肤: vanilla(原版) / stardew(星露谷风格) / terraria(泰拉瑞亚风格)。对应 textures/overlay/<skin>/ 目录, 默认 vanilla");
             config.set("Visual.overlaySkin", INSTANCE.overlaySkin);
             config.setComment("Visual.itemCountDisplayMode", "掉落物上方数量文字显示模式: OFF(关闭) / ITEM_COUNT(物品数量) / STACK_COUNT(堆叠组数), 默认 ITEM_COUNT");
             config.set("Visual.itemCountDisplayMode", INSTANCE.itemCountDisplayMode.name());
@@ -321,6 +324,7 @@ public class BetterLootingConfig {
             INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 120);
             INSTANCE.showInventoryLootList = config.getOrElse("Visual.showInventoryLootList", true);
             INSTANCE.enableTooltipPreview = config.getOrElse("Visual.enableTooltipPreview", true);
+            INSTANCE.showKeyPrompt = config.getOrElse("Visual.showKeyPrompt", true);
             INSTANCE.overlaySkin = config.getOrElse("Visual.overlaySkin", "vanilla");
             try { INSTANCE.itemCountDisplayMode = DisplayMode.valueOf(config.getOrElse("Visual.itemCountDisplayMode", "ITEM_COUNT")); } catch (Exception ignored) {}
             INSTANCE.itemCountScale = config.<Number>getOrElse("Visual.itemCountScale", 1.0f).floatValue();

@@ -154,7 +154,7 @@ public class Overlay {
             gui.pose().popPose();
         }
 
-        if (renderPrompt) {
+        if (renderPrompt && BetterLootingConfig.get().showKeyPrompt) {
             // 切换为宽松裁剪区域，防止按键提示(Prompt)等略微越界的元素被切掉
             layout.applyLooseScissor();
             renderer.renderKeyPrompt(gui, Constants.LIST_X, layout.startY, layout.itemHeightTotal,
