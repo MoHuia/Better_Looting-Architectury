@@ -18,6 +18,7 @@ public class ThemedSlider extends AbstractSliderButton {
     private final Component prefix;
     private final int precision;
     private final String suffix;
+    private final HoverAnim hover = new HoverAnim();
 
     public ThemedSlider(int x, int y, int width, int height, Component prefix, String suffix,
                         double min, double max, double current, int precision, Consumer<Double> setter) {
@@ -46,20 +47,21 @@ public class ThemedSlider extends AbstractSliderButton {
     @Override
     public void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         boolean hovered = this.isHoveredOrFocused();
+        float t = hover.update(hovered);
         int x = getX(), y = getY(), w = width, h = height;
 
         // 轨道背景
         gui.fill(x, y, x + w, y + h, GuiTheme.CARD_BG);
-        gui.renderOutline(x, y, w, h, hovered ? GuiTheme.ACCENT : GuiTheme.WIDGET_BORDER);
+        gui.renderOutline(x, y, w, h, GuiTheme.lerpColor(GuiTheme.WIDGET_BORDER, GuiTheme.ACCENT, t));
 
-        // 已填充进度（左侧淡蓝）
+        // 已填充进度（左侧淡白）
         int fillW = (int) (value * w);
         gui.fill(x, y, x + fillW, y + h, GuiTheme.ACCENT_FAINT);
 
         // 手柄
         int handleW = 4;
         int handleX = x + (int) (value * (w - handleW));
-        gui.fill(handleX, y, handleX + handleW, y + h, hovered ? GuiTheme.ACCENT : GuiTheme.TEXT_MUTED);
+        gui.fill(handleX, y, handleX + handleW, y + h, GuiTheme.lerpColor(GuiTheme.TEXT_MUTED, GuiTheme.ACCENT, t));
 
         // 居中文字
         var font = Minecraft.getInstance().font;

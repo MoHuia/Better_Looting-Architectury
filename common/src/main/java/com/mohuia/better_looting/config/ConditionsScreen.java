@@ -2,7 +2,7 @@ package com.mohuia.better_looting.config;
 
 import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.KeyInit;
-import com.mohuia.better_looting.client.gui.CycleButton;
+import com.mohuia.better_looting.client.gui.Dropdown;
 import com.mohuia.better_looting.client.gui.GuiTheme;
 import com.mohuia.better_looting.client.gui.SelectButton;
 import com.mohuia.better_looting.client.gui.TabButton;
@@ -34,10 +34,13 @@ import java.util.function.Function;
 /**
  * 触发与配置界面。顶部现代标签栏，主区域为纵向滚动列表，简约黑白主题。
  */
-public class ConditionsScreen extends Screen {
+public class ConditionsScreen extends Screen implements Dropdown.Host {
 
     private final Screen parent;
     private final ConfigViewModel viewModel;
+
+    // 当前展开的下拉框（同一时刻至多一个），由其在顶层渲染浮层并优先接管输入
+    private Dropdown openDropdown = null;
 
     private static final int ROW_H = 24;
     private static final int ROW_GAP = 6;
@@ -75,8 +78,8 @@ public class ConditionsScreen extends Screen {
     private double dragStartMouseY = 0;
     private double dragStartScroll = 0;
 
-    // 分组标题（前置式：标题在其分组之上）
-    private record Section(int y, Component label) {}
+    // 分组标题（前置式：标题在其分组之上），含分区专属强调色
+    private record Section(int y, Component label, int accentColor) {}
     private final List<Section> sections = new ArrayList<>();
 
     // --- 横向滑动过渡 ---
@@ -175,6 +178,7 @@ public class ConditionsScreen extends Screen {
         this.scrollableWidgets.clear();
         this.originalYMap.clear();
         this.sections.clear();
+        this.openDropdown = null; // 组件将被重建，清空展开引用
 
         calculateLayout();
         this.showCustomTitleLabel = false;
@@ -231,6 +235,24 @@ public class ConditionsScreen extends Screen {
         return lines;
     }
 
+    // --- 下拉框宿主回调 ---
+
+    @Override
+    public void onDropdownOpen(Dropdown dropdown) {
+        // 同一时刻至多展开一个：先收起此前展开的
+        if (openDropdown != null && openDropdown != dropdown) {
+            openDropdown.collapse();
+        }
+        openDropdown = dropdown;
+    }
+
+    @Override
+    public void onDropdownClose(Dropdown dropdown) {
+        if (openDropdown == dropdown) {
+            openDropdown = null;
+        }
+    }
+
     // --- 滚动管理 ---
 
     private <T extends AbstractWidget> T addScrollableWidget(T widget) {
@@ -241,8 +263,8 @@ public class ConditionsScreen extends Screen {
     }
 
     /** 添加前置式分组标题，返回其占用的垂直高度。 */
-    private int addSectionHeader(int y, String sectionKey) {
-        sections.add(new Section(y, Component.translatable("gui." + BetterLooting.MODID + ".config.section." + sectionKey)));
+    private int addSectionHeader(int y, String sectionKey, int accentColor) {
+        sections.add(new Section(y, Component.translatable("gui." + BetterLooting.MODID + ".config.section." + sectionKey), accentColor));
         return font.lineHeight + 12;
     }
 
@@ -285,8 +307,14 @@ public class ConditionsScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         if (isSliding()) return true;
+        // 展开的下拉框优先处理浮层内部滚动
+        if (openDropdown != null && openDropdown.handleExpandedScroll(mouseX, mouseY, delta)) {
+            return true;
+        }
         if (mouseY >= viewportTop && mouseY <= viewportBottom) {
             if (maxScroll > 0) {
+                // 列表滚动会使浮层与行错位，先收起展开的下拉框
+                if (openDropdown != null) openDropdown.collapse();
                 // 只改目标值，由 render 每帧缓动逼近，实现丝滑滚动
                 this.targetScroll -= delta * 40.0;
                 this.targetScroll = Math.max(0, Math.min(this.targetScroll, this.maxScroll));
@@ -298,6 +326,14 @@ public class ConditionsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // 展开的下拉框最优先：其浮层覆盖在其他组件之上
+        if (openDropdown != null && button == 0) {
+            Dropdown d = openDropdown;
+            if (d.handleExpandedClick(mouseX, mouseY)) {
+                return true;
+            }
+            // 点击浮层外：handleExpandedClick 已收起，继续让点击落到下层组件
+        }
         // 滑动动画期间，吞掉内容区点击；标签栏区域放行以便继续切换
         if (isSliding()) {
             if (mouseY >= viewportTop && mouseY <= viewportBottom) return true;
@@ -390,7 +426,7 @@ public class ConditionsScreen extends Screen {
         int w = contentWidth;
 
         // —— 文本 ——
-        y += addSectionHeader(y, "text");
+        y += addSectionHeader(y, "text", GuiTheme.SECTION_TEXT);
 
         this.showCustomTitleLabel = true;
         this.customTitleLabelY = y;
@@ -417,33 +453,30 @@ public class ConditionsScreen extends Screen {
         y += ROW_H + ROW_GAP + 4;
 
         // —— 外观 ——
-        y += addSectionHeader(y, "appearance");
+        y += addSectionHeader(y, "appearance", GuiTheme.SECTION_APPEARANCE);
 
-        // 皮肤循环
-        this.addScrollableWidget(new CycleButton(x, y, w, ROW_H,
+        // 皮肤下拉框
+        addSkinDropdown(x, y, w,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.overlay_skin"),
-                () -> getSkinName(viewModel.overlaySkin),
-                () -> cycleSkin(1), () -> cycleSkin(-1), getSkinTooltip()));
+                getSkinTooltip());
         y += ROW_H + ROW_GAP;
 
-        // 动画速度循环
-        this.addScrollableWidget(new CycleButton(x, y, w, ROW_H,
+        // 动画速度下拉框
+        addEnumDropdown(x, y, w,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.animation_speed"),
-                () -> getAnimationSpeedName(viewModel.animationSpeed),
-                () -> cycleEnum(AnimationSpeed.values(), viewModel.animationSpeed, v -> viewModel.animationSpeed = v, 1),
-                () -> cycleEnum(AnimationSpeed.values(), viewModel.animationSpeed, v -> viewModel.animationSpeed = v, -1),
-                getAnimationSpeedTooltip(viewModel.animationSpeed)));
+                AnimationSpeed.values(), viewModel.animationSpeed, v -> viewModel.animationSpeed = v,
+                this::getAnimationSpeedName,
+                getAnimationSpeedTooltip(viewModel.animationSpeed));
         y += ROW_H + ROW_GAP + 4;
 
         // —— 数量显示 ——
-        y += addSectionHeader(y, "count_display");
+        y += addSectionHeader(y, "count_display", GuiTheme.SECTION_COUNT);
 
-        this.addScrollableWidget(new CycleButton(x, y, w, ROW_H,
+        addEnumDropdown(x, y, w,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.item_count_display_mode"),
-                () -> getDisplayModeName(viewModel.itemCountDisplayMode),
-                () -> cycleEnum(DisplayMode.values(), viewModel.itemCountDisplayMode, v -> viewModel.itemCountDisplayMode = v, 1),
-                () -> cycleEnum(DisplayMode.values(), viewModel.itemCountDisplayMode, v -> viewModel.itemCountDisplayMode = v, -1),
-                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.item_count_display_mode"))));
+                DisplayMode.values(), viewModel.itemCountDisplayMode, v -> viewModel.itemCountDisplayMode = v,
+                this::getDisplayModeName,
+                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.item_count_display_mode")));
         y += ROW_H + ROW_GAP;
 
         if (viewModel.itemCountDisplayMode != DisplayMode.OFF) {
@@ -462,7 +495,7 @@ public class ConditionsScreen extends Screen {
         y += 4;
 
         // —— 附加面板 ——
-        y += addSectionHeader(y, "extra_panels");
+        y += addSectionHeader(y, "extra_panels", GuiTheme.SECTION_PANELS);
 
         y = addToggle(x, y, w, "inventory_loot_list",
                 () -> viewModel.showInventoryLootList, () -> viewModel.showInventoryLootList = !viewModel.showInventoryLootList);
@@ -481,26 +514,25 @@ public class ConditionsScreen extends Screen {
         int w = contentWidth;
 
         // —— 激活触发器 ——
-        y += addSectionHeader(y, "activation");
+        y += addSectionHeader(y, "activation", GuiTheme.SECTION_ACTIVATION);
         y = buildEnumSelectList(x, y, w, ActivationMode.values(), viewModel.activationMode,
                 mode -> viewModel.activationMode = mode, this::getModeName, this::getModeTooltip);
         y += 4;
 
         // —— 滚动行为 ——
-        y += addSectionHeader(y, "scroll_behavior");
+        y += addSectionHeader(y, "scroll_behavior", GuiTheme.SECTION_SCROLL);
         y = buildEnumSelectList(x, y, w, ScrollMode.values(), viewModel.scrollMode,
                 mode -> viewModel.scrollMode = mode, this::getScrollModeName, this::getScrollModeTooltip);
         y += 4;
 
         // —— 拾取时机 ——
-        y += addSectionHeader(y, "pickup_timing");
+        y += addSectionHeader(y, "pickup_timing", GuiTheme.SECTION_PICKUP);
 
-        this.addScrollableWidget(new CycleButton(x, y, w, ROW_H,
+        addEnumDropdown(x, y, w,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_intercept_mode_title"),
-                () -> getInterceptModeName(viewModel.pickupInterceptMode),
-                () -> cycleEnum(PickupInterceptMode.values(), viewModel.pickupInterceptMode, v -> viewModel.pickupInterceptMode = v, 1),
-                () -> cycleEnum(PickupInterceptMode.values(), viewModel.pickupInterceptMode, v -> viewModel.pickupInterceptMode = v, -1),
-                getInterceptModeTooltip(viewModel.pickupInterceptMode)));
+                PickupInterceptMode.values(), viewModel.pickupInterceptMode, v -> viewModel.pickupInterceptMode = v,
+                this::getInterceptModeName,
+                getInterceptModeTooltip(viewModel.pickupInterceptMode));
         y += ROW_H + ROW_GAP;
 
         this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
@@ -533,13 +565,13 @@ public class ConditionsScreen extends Screen {
         int w = contentWidth;
 
         // —— 过滤 ——
-        y += addSectionHeader(y, "filter");
+        y += addSectionHeader(y, "filter", GuiTheme.SECTION_FILTER);
         y = addToggle(x, y, w, "rare_item_filter",
                 () -> viewModel.enableRareItemFilter, () -> viewModel.enableRareItemFilter = !viewModel.enableRareItemFilter);
         y += 4;
 
         // —— 合并 ——
-        y += addSectionHeader(y, "merge");
+        y += addSectionHeader(y, "merge", GuiTheme.SECTION_MERGE);
         y = addToggle(x, y, w, "super_merge",
                 () -> viewModel.enableSuperMerge, () -> viewModel.enableSuperMerge = !viewModel.enableSuperMerge);
 
@@ -596,23 +628,37 @@ public class ConditionsScreen extends Screen {
         return y;
     }
 
-    /** 循环切换枚举值并刷新界面。 */
-    private <T extends Enum<T>> void cycleEnum(T[] values, T current, Consumer<T> setter, int dir) {
-        int next = (current.ordinal() + dir + values.length) % values.length;
-        setter.accept(values[next]);
-        this.clearWidgets();
-        this.init();
+    /** 添加一个枚举下拉框（选项 = 枚举各值），选中即应用并刷新界面。 */
+    private <T extends Enum<T>> void addEnumDropdown(int x, int y, int w, Component label,
+                                                     T[] values, T current, Consumer<T> setter,
+                                                     Function<T, Component> nameProvider, Tooltip tooltip) {
+        List<Component> options = new ArrayList<>();
+        for (T v : values) options.add(nameProvider.apply(v));
+        int selected = current.ordinal();
+        this.addScrollableWidget(new Dropdown(x, y, w, ROW_H, label,
+                () -> options, () -> selected,
+                idx -> {
+                    setter.accept(values[idx]);
+                    this.clearWidgets();
+                    this.init();
+                }, this, tooltip));
     }
 
-    /** 循环切换皮肤并刷新界面。 */
-    private void cycleSkin(int dir) {
+    /** 添加皮肤下拉框（选项 = 可用皮肤列表），选中即应用并刷新界面。 */
+    private void addSkinDropdown(int x, int y, int w, Component label, Tooltip tooltip) {
         List<String> skins = com.mohuia.better_looting.client.skin.SkinManager.INSTANCE.getAvailableSkins();
-        if (skins.isEmpty()) return;
-        int idx = skins.indexOf(viewModel.overlaySkin);
-        if (idx < 0) idx = 0;
-        viewModel.overlaySkin = skins.get((idx + dir + skins.size()) % skins.size());
-        this.clearWidgets();
-        this.init();
+        List<Component> options = new ArrayList<>();
+        for (String s : skins) options.add(getSkinName(s));
+        int selected = Math.max(0, skins.indexOf(viewModel.overlaySkin));
+        this.addScrollableWidget(new Dropdown(x, y, w, ROW_H, label,
+                () -> options, () -> selected,
+                idx -> {
+                    if (idx >= 0 && idx < skins.size()) {
+                        viewModel.overlaySkin = skins.get(idx);
+                        this.clearWidgets();
+                        this.init();
+                    }
+                }, this, tooltip));
     }
     // =============================================
     // 渲染
@@ -652,6 +698,11 @@ public class ConditionsScreen extends Screen {
 
         // 渲染标签栏按钮、返回箭头
         super.render(gui, mouseX, mouseY, partialTick);
+
+        // 展开的下拉框浮层：最顶层渲染，脱离裁剪区，盖住一切
+        if (!animating && openDropdown != null && openDropdown.isExpanded()) {
+            openDropdown.renderPopup(gui, mouseX, mouseY);
+        }
     }
 
     /** 渲染单个页面（面板 + 分组标题 + 文本框标签 + 组件 + 键位提示），整体横向偏移 xOffset。 */
@@ -666,17 +717,17 @@ public class ConditionsScreen extends Screen {
 
         // 分组标题（相对边框固定，随滚动移动）
         for (Section s : page.sections) {
-            renderSectionHeader(gui, (int) (s.y - page.scrollAmount), s.label);
+            renderSectionHeader(gui, (int) (s.y - page.scrollAmount), s);
         }
 
         // 文本框标签
         if (page.showCustomTitleLabel) {
             gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.custom_title_label"),
-                    contentX + 1, (int) (page.customTitleLabelY - page.scrollAmount), GuiTheme.TEXT_MUTED, false);
+                    contentX + 1, (int) (page.customTitleLabelY - page.scrollAmount), GuiTheme.TEXT, false);
         }
         if (page.showNewLabelLabel) {
             gui.drawString(this.font, Component.translatable("gui." + BetterLooting.MODID + ".config.new_label_text"),
-                    contentX + 1, (int) (page.newLabelLabelY - page.scrollAmount), GuiTheme.TEXT_MUTED, false);
+                    contentX + 1, (int) (page.newLabelLabelY - page.scrollAmount), GuiTheme.TEXT, false);
         }
 
         // 滚动组件（动画期间强制可见，越界部分由 scissor 裁剪）
@@ -693,14 +744,17 @@ public class ConditionsScreen extends Screen {
         gui.pose().popPose();
     }
 
-    /** 前置式分组标题：左侧短强调竖条 + 文字 + 向右延伸的细分隔线。 */
-    private void renderSectionHeader(GuiGraphics gui, int y, Component label) {
-        int textW = font.width(label);
-        gui.fill(contentX, y, contentX + 2, y + font.lineHeight, GuiTheme.ACCENT);
-        gui.drawString(font, label, contentX + 7, y, GuiTheme.ACCENT, false);
-        int lineStart = contentX + 7 + textW + 8;
-        int lineY = y + font.lineHeight / 2;
-        gui.fill(lineStart, lineY, contentX + contentWidth, lineY + 1, GuiTheme.DIVIDER_LINE);
+    /** 前置式分组标题：左侧加宽强调竖条 + 半透明背景条 + 文字，使用分区专属强调色。 */
+    private void renderSectionHeader(GuiGraphics gui, int y, Section section) {
+        int color = section.accentColor;
+        // 文字色亮色，背景色用同色系低透明度
+        int bgColor = (color & 0x00FFFFFF) | 0x1A000000;
+        // 半透明背景条（从左竖条到内容区右边界）
+        gui.fill(contentX, y, contentX + contentWidth, y + font.lineHeight, bgColor);
+        // 4px 宽强调竖条（左侧）
+        gui.fill(contentX, y, contentX + 4, y + font.lineHeight, color);
+        // 标题文字（同色）
+        gui.drawString(font, section.label, contentX + 9, y, color, false);
     }
 
     /** 滚动条轨道范围：返回 {x, y, width, height}，位于边框右外侧、可视区内。 */
