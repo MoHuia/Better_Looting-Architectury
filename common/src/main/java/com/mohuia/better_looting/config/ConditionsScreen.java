@@ -675,6 +675,11 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         // ==== Scissor：限制在可视区内（标签栏下方到屏幕底部），滑出/滑入部分被裁掉 ====
         gui.enableScissor(mainX, viewportTop, mainX + mainWidth, viewportBottom);
 
+        // 展开的下拉框浮层盖住下层组件时，用虚假坐标渲染背景，阻止穿透高亮
+        boolean popupCovering = !animating && openDropdown != null && openDropdown.isExpanded()
+                && !openDropdown.isMouseOver(mouseX, mouseY)
+                && openDropdown.isMouseOverExpanded(mouseX, mouseY);
+
         if (animating) {
             double p = slideAnim.progress();
             int dir = slideAnim.direction();
@@ -686,7 +691,9 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
             renderPage(gui, snapshotCurrentPage(), newOffset, Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, partialTick, true);
         } else {
             if (outgoingPage != null) outgoingPage = null; // 动画结束，释放旧页快照
-            renderPage(gui, snapshotCurrentPage(), 0, mouseX, mouseY, partialTick, false);
+            int rx = popupCovering ? Integer.MIN_VALUE / 2 : mouseX;
+            int ry = popupCovering ? Integer.MIN_VALUE / 2 : mouseY;
+            renderPage(gui, snapshotCurrentPage(), 0, rx, ry, partialTick, false);
         }
 
         gui.disableScissor();
