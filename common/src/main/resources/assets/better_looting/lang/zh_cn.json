@@ -71,6 +71,7 @@
   "gui.better_looting.config.opacity": "透明度",
   "gui.better_looting.config.inventory_loot_list": "物品栏掉落物列表",
   "gui.better_looting.config.tooltip_preview": "物品信息预览",
+  "gui.better_looting.config.key_prompt": "按键提示框",
   "gui.better_looting.config.rare_item_filter": "稀有物品过滤",
   "gui.better_looting.config.hotbar_indicator": "快捷栏过滤指示器",
   "gui.better_looting.config.custom_title_label": "悬浮窗标题 (留空则隐藏):",

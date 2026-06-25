@@ -149,6 +149,13 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         this.viewModel = viewModel;
     }
 
+    @Override
+    public void onClose() {
+        if (this.minecraft != null) {
+            this.minecraft.setScreen(parent);
+        }
+    }
+
     private void calculateLayout() {
         // Tab 栏：顶部，左侧给返回箭头让位
         this.tabBarY = 0;
@@ -501,6 +508,8 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
                 () -> viewModel.showInventoryLootList, () -> viewModel.showInventoryLootList = !viewModel.showInventoryLootList);
         y = addToggle(x, y, w, "tooltip_preview",
                 () -> viewModel.enableTooltipPreview, () -> viewModel.enableTooltipPreview = !viewModel.enableTooltipPreview);
+        y = addToggle(x, y, w, "key_prompt",
+                () -> viewModel.showKeyPrompt, () -> viewModel.showKeyPrompt = !viewModel.showKeyPrompt);
         addToggle(x, y, w, "hotbar_indicator",
                 () -> viewModel.showHotbarIndicator, () -> viewModel.showHotbarIndicator = !viewModel.showHotbarIndicator);
     }
@@ -573,7 +582,7 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         // —— 合并 ——
         y += addSectionHeader(y, "merge", GuiTheme.SECTION_MERGE);
         y = addToggle(x, y, w, "super_merge",
-                () -> viewModel.enableSuperMerge, () -> viewModel.enableSuperMerge = !viewModel.enableSuperMerge);
+                () -> viewModel.enableSuperMerge, () -> viewModel.enableSuperMerge = !viewModel.enableSuperMerge, true);
 
         if (viewModel.enableSuperMerge) {
             this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
@@ -591,13 +600,20 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
 
     // --- 通用构建辅助 ---
 
-    /** 添加一个开关行并返回下一个 y。 */
+    /** 添加一个开关行并返回下一个 y。默认不重建界面以消除闪烁，仅当开关会影响其他组件显隐时才需要重建。 */
     private int addToggle(int x, int y, int w, String key, java.util.function.BooleanSupplier getter, Runnable toggle) {
+        return addToggle(x, y, w, key, getter, toggle, false);
+    }
+
+    /** 添加一个开关行，needsRebuild=true 时点击会重建整个界面。 */
+    private int addToggle(int x, int y, int w, String key, java.util.function.BooleanSupplier getter, Runnable toggle, boolean needsRebuild) {
         Component label = Component.translatable("gui." + BetterLooting.MODID + ".config." + key);
         this.addScrollableWidget(new ToggleButton(x, y, w, ROW_H, label, getter, () -> {
             toggle.run();
-            this.clearWidgets();
-            this.init();
+            if (needsRebuild) {
+                this.clearWidgets();
+                this.init();
+            }
         }, null));
         return y + ROW_H + ROW_GAP;
     }
