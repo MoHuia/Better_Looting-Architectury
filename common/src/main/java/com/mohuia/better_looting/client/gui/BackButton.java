@@ -18,6 +18,7 @@ public class BackButton extends AbstractButton {
     private static final int TEX_SIZE = 64;
 
     private final Runnable onPress;
+    private final HoverAnim hover = new HoverAnim();
 
     public BackButton(int x, int y, int size, Runnable onPress) {
         super(x, y, size, size, CommonComponents.GUI_BACK);
@@ -32,10 +33,11 @@ public class BackButton extends AbstractButton {
     @Override
     protected void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         boolean hovered = this.isHoveredOrFocused();
+        float t = hover.update(hovered);
         int x = getX(), y = getY(), w = width, h = height;
 
-        if (hovered) {
-            gui.fill(x, y, x + w, y + h, GuiTheme.ACCENT_SOFT);
+        if (t > 0.01f) {
+            gui.fill(x, y, x + w, y + h, GuiTheme.lerpColor(0x00FFFFFF, GuiTheme.ACCENT_SOFT, t));
         }
 
         // 线性过滤降采样，贴图高清不糊

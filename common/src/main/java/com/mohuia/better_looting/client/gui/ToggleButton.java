@@ -17,6 +17,8 @@ public class ToggleButton extends AbstractButton {
     private final Component label;
     private final BooleanSupplier stateGetter;
     private final Runnable onToggle;
+    private final HoverAnim hover = new HoverAnim();
+    private final HoverAnim knobAnim = new HoverAnim();
 
     private static final int TRACK_W = 26;
     private static final int TRACK_H = 12;
@@ -39,31 +41,35 @@ public class ToggleButton extends AbstractButton {
     protected void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         boolean hovered = this.isHoveredOrFocused();
         boolean on = stateGetter.getAsBoolean();
+        float t = hover.update(hovered);
+        float k = knobAnim.update(on); // 圆点位置进度：关 0 → 开 1
         int x = getX(), y = getY(), w = width, h = height;
 
         // 行背景
-        gui.fill(x, y, x + w, y + h, hovered ? GuiTheme.ACCENT_FAINT : GuiTheme.CARD_BG);
-        if (hovered) {
-            gui.fill(x, y, x + 2, y + h, GuiTheme.ACCENT); // 左侧高亮条
+        gui.fill(x, y, x + w, y + h, GuiTheme.lerpColor(GuiTheme.CARD_BG, GuiTheme.ACCENT_FAINT, t));
+        if (t > 0.01f) {
+            gui.fill(x, y, x + 2, y + h, GuiTheme.lerpColor(0x00FFFFFF, GuiTheme.ACCENT, t)); // 左侧高亮条渐显
         }
 
         var font = Minecraft.getInstance().font;
-        int textColor = hovered ? GuiTheme.TEXT : GuiTheme.TEXT_MUTED;
-        gui.drawString(font, label, x + 8, y + (h - 8) / 2, textColor, false);
+        gui.drawString(font, label, x + 8, y + (h - 8) / 2, GuiTheme.lerpColor(GuiTheme.TEXT_MUTED, GuiTheme.TEXT, t), false);
 
-        // 右侧开关
+        // 右侧开关：轨道颜色随状态插值
         int trackX = x + w - TRACK_W - 8;
         int trackY = y + (h - TRACK_H) / 2;
-        int trackColor = on ? GuiTheme.TOGGLE_TRACK_ON : GuiTheme.TOGGLE_TRACK_OFF;
+        int trackColor = GuiTheme.lerpColor(GuiTheme.TOGGLE_TRACK_OFF, GuiTheme.TOGGLE_TRACK_ON, k);
         gui.fill(trackX, trackY, trackX + TRACK_W, trackY + TRACK_H, trackColor);
-        if (on) {
+        if (k > 0.5f) {
             gui.renderOutline(trackX, trackY, TRACK_W, TRACK_H, GuiTheme.ACCENT);
         }
-        // 圆点
+        // 圆点：在两端之间滑动
         int knobSize = TRACK_H - 4;
-        int knobX = on ? (trackX + TRACK_W - knobSize - 2) : (trackX + 2);
+        int knobLeft = trackX + 2;
+        int knobRight = trackX + TRACK_W - knobSize - 2;
+        int knobX = (int) (knobLeft + (knobRight - knobLeft) * k);
         int knobY = trackY + 2;
-        gui.fill(knobX, knobY, knobX + knobSize, knobY + knobSize, on ? GuiTheme.TOGGLE_KNOB_ON : GuiTheme.TOGGLE_KNOB_OFF);
+        int knobColor = GuiTheme.lerpColor(GuiTheme.TOGGLE_KNOB_OFF, GuiTheme.TOGGLE_KNOB_ON, k);
+        gui.fill(knobX, knobY, knobX + knobSize, knobY + knobSize, knobColor);
     }
 
     @Override
