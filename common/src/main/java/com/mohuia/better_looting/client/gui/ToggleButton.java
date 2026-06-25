@@ -29,6 +29,7 @@ public class ToggleButton extends AbstractButton {
         this.label = label;
         this.stateGetter = stateGetter;
         this.onToggle = onToggle;
+        this.knobAnim.snap(stateGetter.getAsBoolean()); // 避免首次渲染时滑块从OFF动画到ON
         if (tooltip != null) this.setTooltip(tooltip);
     }
 
@@ -66,7 +67,7 @@ public class ToggleButton extends AbstractButton {
         int knobSize = TRACK_H - 4;
         int knobLeft = trackX + 2;
         int knobRight = trackX + TRACK_W - knobSize - 2;
-        int knobX = (int) (knobLeft + (knobRight - knobLeft) * k);
+        int knobX = Math.round(knobLeft + (knobRight - knobLeft) * k);
         int knobY = trackY + 2;
         int knobColor = GuiTheme.lerpColor(GuiTheme.TOGGLE_KNOB_OFF, GuiTheme.TOGGLE_KNOB_ON, k);
         gui.fill(knobX, knobY, knobX + knobSize, knobY + knobSize, knobColor);
