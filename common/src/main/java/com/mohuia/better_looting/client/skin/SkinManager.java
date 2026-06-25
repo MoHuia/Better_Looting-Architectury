@@ -37,7 +37,7 @@ public class SkinManager {
     private static final Gson GSON = new Gson();
 
     /** 内置皮肤名（优先级高于外部同名皮肤）。 */
-    public static final String[] BUILTIN_SKINS = { "vanilla", "stardew" };
+    public static final String[] BUILTIN_SKINS = { "vanilla", "stardew", "terraria" };
 
     /** 已成功加载的外部皮肤，按文件夹名（即配置中存储的皮肤标识）保序存放。 */
     private final Map<String, LoadedSkin> externalSkins = new LinkedHashMap<>();

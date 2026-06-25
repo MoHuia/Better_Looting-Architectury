@@ -80,6 +80,7 @@
   "gui.better_looting.config.overlay_skin": "Overlay Skin",
   "gui.better_looting.config.overlay_skin.vanilla": "Vanilla",
   "gui.better_looting.config.overlay_skin.stardew": "Stardew Valley",
+  "gui.better_looting.config.overlay_skin.terraria": "Terraria",
   "gui.better_looting.config.tooltip.overlay_skin": "Cycle through background skin styles for loot overlay item rows",
   "gui.better_looting.config.skin_load_error": "%s custom skin(s) failed to load, see chat for details",
   "gui.better_looting.config.item_count_display_mode": "Display Mode",
