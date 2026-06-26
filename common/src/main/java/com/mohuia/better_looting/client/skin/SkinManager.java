@@ -62,20 +62,23 @@ public class SkinManager {
         public final ResourceLocation normalTex;
         public final ResourceLocation selectedTex;
         public final int texSize;              // 纹理边长（正方形，16 的倍数），用于九宫格切片
-        public final boolean lightBackground;
         public final int textColorNormal;
         public final int textColorSelected;
+        public final boolean rarityBarGroove;
+        public final int newLabelColor;
 
         LoadedSkin(String name, String displayName, ResourceLocation normalTex, ResourceLocation selectedTex,
-                   int texSize, boolean lightBackground, int textColorNormal, int textColorSelected) {
+                   int texSize, int textColorNormal, int textColorSelected,
+                   boolean rarityBarGroove, int newLabelColor) {
             this.name = name;
             this.displayName = displayName;
             this.normalTex = normalTex;
             this.selectedTex = selectedTex;
             this.texSize = texSize;
-            this.lightBackground = lightBackground;
             this.textColorNormal = textColorNormal;
             this.textColorSelected = textColorSelected;
+            this.rarityBarGroove = rarityBarGroove;
+            this.newLabelColor = newLabelColor;
         }
     }
 
@@ -206,12 +209,22 @@ public class SkinManager {
             catch (Exception e) { errors.add("皮肤 \"" + folderName + "\" 选中文字颜色无效，使用默认值: " + e.getMessage()); }
         }
 
+        // 稀有度条凹槽开关，缺省 false
+        boolean rarityBarGroove = def.rarityBarGroove;
+
+        // NEW 标签颜色，缺省/解析失败用亮橙色
+        int newLabelColor = Constants.COLOR_NEW_LABEL;
+        if (def.newLabelColor != null && !def.newLabelColor.trim().isEmpty()) {
+            try { newLabelColor = SkinDefinition.parseColor(def.newLabelColor); }
+            catch (Exception e) { errors.add("皮肤 \"" + folderName + "\" NEW 标签颜色无效，使用默认值: " + e.getMessage()); }
+        }
+
         String displayName = (def.displayName == null || def.displayName.trim().isEmpty())
                 ? folderName : def.displayName.trim();
 
         externalSkins.put(folderName, new LoadedSkin(
                 folderName, displayName, normal.id, selected.id, normal.size,
-                def.lightBackground, textNormal, textSelected));
+                textNormal, textSelected, rarityBarGroove, newLabelColor));
     }
 
     /** registerTexture 的返回值：纹理 id + 边长。 */
@@ -304,18 +317,20 @@ public class SkinManager {
             - displayName        界面显示名，缺省用文件夹名
             - normalTexture      普通行贴图文件名，缺省 row.png
             - selectedTexture    选中行贴图文件名，缺省 row_selected.png
-            - lightBackground    是否亮底皮肤(true/false)，亮底自动用深色文字，缺省 false
             - textColorNormal    普通行文字颜色，#RRGGBB 或 #AARRGGBB
             - textColorSelected  选中行文字颜色，#RRGGBB 或 #AARRGGBB
+            - rarityBarGroove    是否显示稀有度条凹槽(true/false)，缺省 false
+            - newLabelColor      NEW 标签文字颜色，#RRGGBB 或 #AARRGGBB
 
             【JSON 范例】
             {
-              "displayName": "我的粉色皮肤",
+              "displayName": "我的皮肤",
               "normalTexture": "row.png",
               "selectedTexture": "row_selected.png",
-              "lightBackground": true,
               "textColorNormal": "#5A3A1E",
-              "textColorSelected": "#3A2410"
+              "textColorSelected": "#3A2410",
+              "rarityBarGroove": true,
+              "newLabelColor": "#C38935"
             }
 
             【使用方法】

@@ -11,9 +11,10 @@ package com.mohuia.better_looting.client.skin;
  *   "displayName": "星露谷-粉色",
  *   "normalTexture": "row.png",
  *   "selectedTexture": "row_selected.png",
- *   "lightBackground": true,
  *   "textColorNormal": "#FF5A3A1E",
- *   "textColorSelected": "#FF3A2410"
+ *   "textColorSelected": "#FF3A2410",
+ *   "rarityBarGroove": true,
+ *   "newLabelColor": "#FFC38935"
  * }
  * </pre>
  */
@@ -27,14 +28,17 @@ public class SkinDefinition {
     /** 选中行背景贴图文件名（相对皮肤文件夹）；缺省 row_selected.png。 */
     public String selectedTexture;
 
-    /** 是否为亮底皮肤（亮底需深色文字与稀有度条衬底）；缺省 false。 */
-    public boolean lightBackground;
-
     /** 普通行文字颜色，#AARRGGBB 或 #RRGGBB；缺省/解析失败用 vanilla 默认。 */
     public String textColorNormal;
 
     /** 选中行文字颜色，#AARRGGBB 或 #RRGGBB；缺省/解析失败用 vanilla 默认。 */
     public String textColorSelected;
+
+    /** 是否显示稀有度条凹槽（深色衬底，凸显稀有度条）；缺省 false。 */
+    public boolean rarityBarGroove;
+
+    /** NEW 标签文字颜色，#AARRGGBB 或 #RRGGBB；缺省/解析失败用亮橙色。 */
+    public String newLabelColor;
 
     public String getNormalTexture() {
         return (normalTexture == null || normalTexture.trim().isEmpty()) ? "row.png" : normalTexture.trim();
