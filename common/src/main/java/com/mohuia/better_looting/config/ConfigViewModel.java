@@ -31,6 +31,14 @@ public class ConfigViewModel {
     // 物品栏左侧掉落物列表开关
     public boolean showInventoryLootList;
 
+    // 物品栏掉落列表布局（独立配置界面编辑）
+    public int inventoryListWidth;
+    public float inventoryListXOffset;
+    public float inventoryListYOffset;
+    public float inventoryListScale;
+    public float inventoryListAlpha;
+    public int inventoryListHeight;
+
     // 物品信息预览开关
     public boolean enableTooltipPreview;
 
@@ -104,6 +112,12 @@ public class ConfigViewModel {
         this.overlaySkin = cfg.overlaySkin;
 
         this.showInventoryLootList = cfg.showInventoryLootList;
+        this.inventoryListWidth = cfg.inventoryListWidth;
+        this.inventoryListXOffset = cfg.inventoryListXOffset;
+        this.inventoryListYOffset = cfg.inventoryListYOffset;
+        this.inventoryListScale = cfg.inventoryListScale;
+        this.inventoryListAlpha = cfg.inventoryListAlpha;
+        this.inventoryListHeight = cfg.inventoryListHeight;
         this.enableTooltipPreview = cfg.enableTooltipPreview;
         this.showKeyPrompt = cfg.showKeyPrompt;
 
@@ -151,6 +165,12 @@ public class ConfigViewModel {
         cfg.overlaySkin = this.overlaySkin;
 
         cfg.showInventoryLootList = this.showInventoryLootList;
+        cfg.inventoryListWidth = this.inventoryListWidth;
+        cfg.inventoryListXOffset = this.inventoryListXOffset;
+        cfg.inventoryListYOffset = this.inventoryListYOffset;
+        cfg.inventoryListScale = this.inventoryListScale;
+        cfg.inventoryListAlpha = this.inventoryListAlpha;
+        cfg.inventoryListHeight = this.inventoryListHeight;
         cfg.enableTooltipPreview = this.enableTooltipPreview;
         cfg.showKeyPrompt = this.showKeyPrompt;
 
@@ -201,6 +221,12 @@ public class ConfigViewModel {
         this.overlaySkin = defaults.overlaySkin;
 
         this.showInventoryLootList = defaults.showInventoryLootList;
+        this.inventoryListWidth = defaults.inventoryListWidth;
+        this.inventoryListXOffset = defaults.inventoryListXOffset;
+        this.inventoryListYOffset = defaults.inventoryListYOffset;
+        this.inventoryListScale = defaults.inventoryListScale;
+        this.inventoryListAlpha = defaults.inventoryListAlpha;
+        this.inventoryListHeight = defaults.inventoryListHeight;
         this.enableTooltipPreview = defaults.enableTooltipPreview;
         this.showKeyPrompt = defaults.showKeyPrompt;
 

@@ -81,17 +81,20 @@ public class LootListInteraction {
     public boolean isMouseOverList(double mouseX, double mouseY) {
         InventoryLootList list = InventoryLootList.INSTANCE;
         if (list.cachedImageHeight == 0) return false;
-        return mouseX >= list.cachedPanelStartX && mouseX <= list.cachedPanelStartX + Constants.LIST_X + list.cachedPanelWidth
+        float scale = list.cachedScale;
+        return mouseX >= list.cachedPanelStartX
+                && mouseX <= list.cachedPanelStartX + (Constants.LIST_X + list.cachedPanelWidth) * scale
                 && mouseY >= list.cachedTopPos && mouseY <= list.cachedTopPos + list.cachedImageHeight;
     }
 
     public boolean isMouseOverScrollbar(double mouseX, double mouseY) {
         InventoryLootList list = InventoryLootList.INSTANCE;
         if (list.cachedImageHeight == 0) return false;
+        float scale = list.cachedScale;
         int hitMargin = 3;
-        int scrollbarX = list.cachedPanelStartX + (Constants.LIST_X - 2 - 2);
+        float scrollbarX = list.cachedPanelStartX + (Constants.LIST_X - 2 - 2) * scale;
         return mouseX >= scrollbarX - hitMargin
-                && mouseX <= scrollbarX + 2 + hitMargin
+                && mouseX <= scrollbarX + 2 * scale + hitMargin
                 && mouseY >= list.cachedTopPos && mouseY <= list.cachedTopPos + list.cachedImageHeight;
     }
 
@@ -195,15 +198,16 @@ public class LootListInteraction {
     private int getItemAtMouse(double mouseX, double mouseY) {
         InventoryLootList list = InventoryLootList.INSTANCE;
         if (list.cachedImageHeight == 0 || list.nearbyItems.isEmpty()) return -1;
-        int itemLeft = list.cachedPanelStartX + Constants.LIST_X;
-        int itemRight = itemLeft + list.cachedPanelWidth;
+        float scale = list.cachedScale;
+        int itemLeft = list.cachedPanelStartX + (int) (Constants.LIST_X * scale);
+        int itemRight = itemLeft + (int) (list.cachedPanelWidth * scale);
         if (mouseX < itemLeft || mouseX > itemRight) return -1;
 
         int listTop = list.cachedTopPos;
         int listBottom = listTop + list.cachedImageHeight;
         if (mouseY < listTop || mouseY > listBottom) return -1;
 
-        float relY = (float) (mouseY - listTop) / (Constants.ITEM_HEIGHT + 2);
+        float relY = (float) (mouseY - listTop) / ((Constants.ITEM_HEIGHT + 2) * scale);
         int idx = Mth.floor(list.scrollState.currentScroll + relY);
         if (idx < 0 || idx >= list.nearbyItems.size()) return -1;
         return idx;

@@ -37,6 +37,7 @@ public class InventoryLootList {
     private static final int ITEM_HEIGHT_TOTAL = Constants.ITEM_HEIGHT + 2;
     private static final int ENTRY_STAGGER_MS = 40;
     private static final float ENTRY_SPEED = 6.0f;
+    public static final int DEFAULT_LIST_WIDTH = 120;
 
     // 包内可见，供 LootListInteraction 访问
     List<VisualItemEntry> nearbyItems = List.of();
@@ -48,6 +49,7 @@ public class InventoryLootList {
     int cachedPanelWidth;
     float cachedVisibleRows;
     float cachedMaxScroll;
+    float cachedScale = 1.0f;
 
     private OverlayRenderer renderer;
 
@@ -99,20 +101,27 @@ public class InventoryLootList {
         ACSAccessor acc = (ACSAccessor) screen;
         int leftPos = acc.getLeftPos();
         int topPos = acc.getTopPos();
-        int imageHeight = acc.getImageHeight();
         int gap = 2;
-        int maxPanelWidth = leftPos - 2 - gap - Constants.LIST_X;
-        if (maxPanelWidth < 80) return;
-        int panelWidth = Math.min(cfg.inventoryListWidth, maxPanelWidth);
-        int panelStartX = leftPos - Constants.LIST_X - panelWidth - gap;
-        float visibleRows = (float) imageHeight / ITEM_HEIGHT_TOTAL;
+        int panelWidth = cfg.inventoryListWidth;
+
+        // 用户可调：相对默认贴合位置的偏移、整体缩放、独立透明度、面板高度
+        float scale = cfg.inventoryListScale;
+        float listAlpha = cfg.inventoryListAlpha;
+        int panelHeight = cfg.inventoryListHeight; // 局部高度（缩放前）
+
+        // 左上角锚点仅由偏移决定，宽/高/缩放统一向右下方生长
+        int panelStartX = leftPos - gap - Constants.LIST_X - DEFAULT_LIST_WIDTH + Math.round(cfg.inventoryListXOffset);
+        int panelTop = topPos + Math.round(cfg.inventoryListYOffset);
+
+        float visibleRows = (float) panelHeight / ITEM_HEIGHT_TOTAL;
 
         this.cachedPanelStartX = panelStartX;
-        this.cachedTopPos = topPos;
-        this.cachedImageHeight = imageHeight;
+        this.cachedTopPos = panelTop;
+        this.cachedImageHeight = Math.round(panelHeight * scale); // 屏幕像素高，供命中检测
         this.cachedPanelWidth = panelWidth;
         this.cachedVisibleRows = visibleRows;
         this.cachedMaxScroll = Math.max(0, nearbyItems.size() - visibleRows);
+        this.cachedScale = scale;
 
         // === 滚动物理 ===
         scrollState.tick(true, interaction.getTargetScroll(), nearbyItems.size(), visibleRows);
@@ -136,12 +145,16 @@ public class InventoryLootList {
         }
         entryTimes.keySet().retainAll(currentIds);
 
-        // === 渲染物品行 ===
+        // === 渲染物品行（统一在锚点 pose 内按 scale 缩放绘制） ===
         int startIdx = Mth.floor(scrollValue);
         int endIdx = Mth.ceil(scrollValue + visibleRows);
 
         boolean isDraggingItem = interaction.isDraggingItem();
         int dragIndex = interaction.getDragIndex();
+
+        gui.pose().pushPose();
+        gui.pose().translate(panelStartX, panelTop, 0);
+        gui.pose().scale(scale, scale, 1.0f);
 
         for (int i = 0; i < nearbyItems.size(); i++) {
             if (i < startIdx - 1 || i > endIdx + 1) continue;
@@ -154,7 +167,7 @@ public class InventoryLootList {
             Long startMs = entryTimes.get(entry.getPrimaryId());
             if (startMs != null && now < startMs) continue;
 
-            int baseY = topPos + Math.round(relIdx * ITEM_HEIGHT_TOTAL);
+            int baseY = Math.round(relIdx * ITEM_HEIGHT_TOTAL);
             float entryYOffset = 0f;
             if (startMs != null) {
                 float elapsed = (now - startMs) / 1000f;
@@ -167,26 +180,27 @@ public class InventoryLootList {
             float rowBgAlpha = (isDraggingItem && dragIndex == i) ? 0.3f : itemAlpha;
             boolean isNew = !core.isItemInInventory(entry.getItem().getItem());
 
-            renderer.renderItemRow(gui, panelStartX + Constants.LIST_X, drawY, panelWidth, entry,
-                    false, rowBgAlpha, itemAlpha, isNew, true);
+            renderer.renderItemRow(gui, Constants.LIST_X, drawY, panelWidth, entry,
+                    false, rowBgAlpha * listAlpha, itemAlpha * listAlpha, isNew, true);
         }
+
+        // === 滚动条（局部坐标，随 scale 一同缩放） ===
+        if (nearbyItems.size() > visibleRows) {
+            renderer.renderScrollBar(gui, nearbyItems.size(), visibleRows,
+                    SCROLLBAR_TRACK_X_OFFSET, 0, panelHeight,
+                    interaction.isDraggingScrollbar() ? 1.0f : 0.7f, scrollValue);
+        }
+
+        gui.pose().popPose();
 
         // === 槽位高亮：拖拽模式下，无效槽位标红 ===
         if (isDraggingItem && interaction.isDragModeActive() && dragIndex >= 0 && dragIndex < nearbyItems.size()) {
             renderSlotHighlights(gui, screen, nearbyItems.get(dragIndex).getItem());
         }
 
-        // === 拖拽中的物品跟随鼠标 ===
+        // === 拖拽中的物品跟随鼠标（屏幕坐标） ===
         if (isDraggingItem && interaction.isDragModeActive() && dragIndex >= 0) {
             renderDragGhost(gui, nearbyItems.get(dragIndex), interaction.getDragCurrentX(), interaction.getDragCurrentY());
-        }
-
-        // === 滚动条 ===
-        if (nearbyItems.size() > visibleRows) {
-            int trackX = panelStartX + SCROLLBAR_TRACK_X_OFFSET;
-            renderer.renderScrollBar(gui, nearbyItems.size(), visibleRows,
-                    trackX, topPos, imageHeight,
-                    interaction.isDraggingScrollbar() ? 1.0f : 0.7f, scrollValue);
         }
     }
 

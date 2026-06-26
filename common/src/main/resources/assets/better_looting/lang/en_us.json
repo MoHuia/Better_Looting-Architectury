@@ -55,6 +55,9 @@
 
   "--- GUI: Advanced & Misc Settings ---": "",
   "gui.better_looting.config.tooltip.settings": "Logic Settings",
+  "gui.better_looting.config.tooltip.inventory_config": "Inventory List Settings",
+  "gui.better_looting.inventory_config.title": "Inventory List Settings",
+  "gui.better_looting.inventory_config.mock_inventory": "Inventory Window",
   "gui.better_looting.config.pickup_intercept_mode_title": "Pickup Intercept Mode",
   "gui.better_looting.config.pickup_intercept.auto": "Auto (Smart)",
   "gui.better_looting.config.pickup_intercept.always": "Always Intercept",

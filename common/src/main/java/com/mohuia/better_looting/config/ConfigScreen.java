@@ -48,6 +48,10 @@ public class ConfigScreen extends Screen {
     private static final int COLOR_PANEL_BORDER = 0x50FFFFFF; // 面板边框
     private static final int COLOR_TEXT_MUTED = 0xFFAAAAAA; // 次要文本颜色
 
+    private static final net.minecraft.resources.ResourceLocation INVENTORY_CONFIG_ICON =
+            net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID, "textures/gui/inventory_config.png");
+    private static final int INVENTORY_CONFIG_ICON_SIZE = 64;
+
     public ConfigScreen() {
         this(new ConfigViewModel());
     }
@@ -96,24 +100,41 @@ public class ConfigScreen extends Screen {
         // ==========================================
         // 右上角紧凑控制区
         // ==========================================
-        int panelWidth = 160;
+        int panelWidth = 190;
         int startX = this.width - panelWidth - 10;
 
-        // 底部：重置按钮 (1.20.1 布局已整合至控制区)
         this.addRenderableWidget(new ModernButton(startX + 5, 15, 60, 20, Component.translatable("gui." + BetterLooting.MODID + ".config.reset"), () -> {
             viewModel.resetToDefault();
             this.clearWidgets();
             this.init();
         }));
 
-        // 底部：保存按钮 (1.20.1 布局已整合至控制区)
         this.addRenderableWidget(new ModernButton(startX + 70, 15, 60, 20, Component.translatable("gui." + BetterLooting.MODID + ".config.save"), () -> {
             viewModel.saveToConfig();
             this.onClose();
         }));
 
-        // 右上角：跳转到详细条件设置的齿轮按钮
+        // 跳转到背包列表配置界面（图片按钮）
         this.addRenderableWidget(new ModernButton(startX + 135, 15, 20, 20, Component.empty(), () -> {
+            if (this.minecraft != null) {
+                this.minecraft.setScreen(new InventoryConfigScreen(this, this.viewModel));
+            }
+        }, Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.tooltip.inventory_config"))) {
+            @Override
+            protected void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+                super.renderWidget(gui, mouseX, mouseY, partialTick);
+                var tex = net.minecraft.client.Minecraft.getInstance().getTextureManager().getTexture(INVENTORY_CONFIG_ICON);
+                tex.setFilter(true, false);
+                int pad = 3;
+                gui.blit(INVENTORY_CONFIG_ICON, this.getX() + pad, this.getY() + pad,
+                        this.width - pad * 2, this.height - pad * 2,
+                        0f, 0f, INVENTORY_CONFIG_ICON_SIZE, INVENTORY_CONFIG_ICON_SIZE,
+                        INVENTORY_CONFIG_ICON_SIZE, INVENTORY_CONFIG_ICON_SIZE);
+            }
+        });
+
+        // 跳转到详细条件设置的齿轮按钮
+        this.addRenderableWidget(new ModernButton(startX + 160, 15, 20, 20, Component.empty(), () -> {
             if (this.minecraft != null) {
                 this.minecraft.setScreen(new ConditionsScreen(this, this.viewModel));
             }
@@ -146,9 +167,9 @@ public class ConfigScreen extends Screen {
             }
         });
 
-        // 底部：全局透明度调节滑块 (1.20.1 布局已整合至控制区)
+        // 全局透明度调节滑块
         this.addRenderableWidget(new CommonSlider(
-                startX + 5, 40, 150, 20,
+                startX + 5, 40, panelWidth - 10, 20,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.opacity"),
                 0.1, 1.0, (double) viewModel.globalAlpha,
                 val -> viewModel.globalAlpha = val.floatValue()
@@ -221,7 +242,7 @@ public class ConfigScreen extends Screen {
      * 为右上角的按钮区域绘制一个半透明背景面板，使其看起来像一个整体的控制台。
      */
     private void renderControlPanelBackground(GuiGraphics gui) {
-        int panelWidth = 160;
+        int panelWidth = 190;
         int startX = this.width - panelWidth - 10;
         gui.fill(startX, 10, startX + panelWidth + 10, 65, COLOR_PANEL_BG);
         gui.renderOutline(startX, 10, panelWidth + 10, 55, COLOR_PANEL_BORDER);
