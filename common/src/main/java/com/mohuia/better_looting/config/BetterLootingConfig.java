@@ -30,7 +30,7 @@ public class BetterLootingConfig {
     public boolean showHotbarIndicator = true;
     public String customOverlayTitle = "Loot Detected";
     public String newLabelText = "NEW";
-    public int inventoryListWidth = 120;
+    public int inventoryListWidth = 100;
     public boolean showInventoryLootList = true;
     /** 物品栏掉落列表相对默认贴合位置的额外 X 偏移 */
     public float inventoryListXOffset = 0.0f;
@@ -245,7 +245,7 @@ public class BetterLootingConfig {
             config.set("Visual.customOverlayTitle", INSTANCE.customOverlayTitle);
             config.setComment("Visual.newLabelText", "新物品标签文本 (留空则隐藏, 默认 NEW)");
             config.set("Visual.newLabelText", INSTANCE.newLabelText);
-            config.setComment("Visual.inventoryListWidth", "物品栏左侧掉落物列表面板宽度 (默认 120)");
+            config.setComment("Visual.inventoryListWidth", "物品栏左侧掉落物列表面板宽度 (默认 100)");
             config.set("Visual.inventoryListWidth", INSTANCE.inventoryListWidth);
             config.setComment("Visual.inventoryListXOffset", "物品栏掉落列表相对默认贴合位置的额外 X 偏移");
             config.set("Visual.inventoryListXOffset", INSTANCE.inventoryListXOffset);
@@ -349,7 +349,7 @@ public class BetterLootingConfig {
             INSTANCE.showHotbarIndicator = config.getOrElse("Visual.showHotbarIndicator", true);
             INSTANCE.customOverlayTitle = config.getOrElse("Visual.customOverlayTitle", "Loot Detected");
             INSTANCE.newLabelText = config.getOrElse("Visual.newLabelText", "NEW");
-            INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 120);
+            INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 100);
             INSTANCE.inventoryListXOffset = config.<Number>getOrElse("Visual.inventoryListXOffset", 0.0f).floatValue();
             INSTANCE.inventoryListYOffset = config.<Number>getOrElse("Visual.inventoryListYOffset", 0.0f).floatValue();
             INSTANCE.inventoryListScale = config.<Number>getOrElse("Visual.inventoryListScale", 1.0f).floatValue();

@@ -37,7 +37,7 @@ public class InventoryLootList {
     private static final int ENTRY_STAGGER_MS = 40;
     private static final float ENTRY_SPEED = 6.0f;
     // 默认面板宽度参照值：偏移为 0、宽度为默认值、缩放 1 时，列表右缘恰好贴合背包左侧
-    public static final int DEFAULT_LIST_WIDTH = 120;
+    public static final int DEFAULT_LIST_WIDTH = 100;
 
     // 包内可见，供 LootListInteraction 访问
     List<VisualItemEntry> nearbyItems = List.of();
