@@ -75,7 +75,7 @@ public class InventoryConfigScreen extends Screen {
             viewModel.inventoryListXOffset = 0f;
             viewModel.inventoryListYOffset = 0f;
             viewModel.inventoryListScale = 1.0f;
-            viewModel.inventoryListWidth = 120;
+            viewModel.inventoryListWidth = 100;
             viewModel.inventoryListHeight = 166;
             viewModel.inventoryListAlpha = 0.9f;
             this.clearWidgets();
@@ -117,8 +117,8 @@ public class InventoryConfigScreen extends Screen {
         this.invLeft = (this.width - INV_W) / 2;
         this.invTop = (this.height - INV_H) / 2;
 
-        renderControlPanelBackground(gui);
         renderMockInventory(gui);
+        renderControlPanelBackground(gui);
         renderPreviewList(gui, mouseX, mouseY);
     }
 

@@ -37,7 +37,7 @@ public class InventoryLootList {
     private static final int ITEM_HEIGHT_TOTAL = Constants.ITEM_HEIGHT + 2;
     private static final int ENTRY_STAGGER_MS = 40;
     private static final float ENTRY_SPEED = 6.0f;
-    public static final int DEFAULT_LIST_WIDTH = 120;
+    public static final int DEFAULT_LIST_WIDTH = 100;
 
     // 包内可见，供 LootListInteraction 访问
     List<VisualItemEntry> nearbyItems = List.of();
