@@ -49,6 +49,12 @@ public class OverlayState {
             this.popupProgress = targetPopup;
         } else {
             this.popupProgress = damp(this.popupProgress, targetPopup, 10.0f * speedMultiplier, deltaTime);
+            // 收敛吸附：damp 指数衰减末尾有数帧微变，slideOffset 慢漂导致
+            // 矩阵 translate 亚像素位移 → 纹理/字体/边框逐帧抖动。0.97 时
+            // easeOutCubic≈0.9987、slideOffset=0.9px，一跳完全不可见。
+            if (Math.abs(this.popupProgress - targetPopup) < 0.005f) {
+                this.popupProgress = targetPopup;
+            }
         }
 
         // 如果界面已隐藏且动画结束，清空动画缓存释放内存
@@ -62,7 +68,8 @@ public class OverlayState {
         float maxScroll = Math.max(0, itemCount - visibleRows);
         float clampedTarget = Mth.clamp(targetScroll, 0, maxScroll);
 
-        if (Math.abs(this.currentScroll - clampedTarget) < 0.001f) {
+        // 0.04≈0.8px 视觉差，配合 Math.round 给足安全间距，杜绝末尾亚像素抖变
+        if (Math.abs(this.currentScroll - clampedTarget) < 0.04f) {
             this.currentScroll = clampedTarget;
         } else if (speedMultiplier <= 0f) {
             this.currentScroll = clampedTarget;
@@ -89,6 +96,8 @@ public class OverlayState {
 
         // 以每秒进度增加 6.0 * multiplier 的速度播放动画
         float next = Math.min(1.0f, current + (6.0f * multiplier * deltaTime));
+        // 收敛吸附：entryProgress 末尾微变 → entryOffset 亚像素漂移 → 行内所有元素抖动
+        if (next >= 0.97f) next = 1.0f;
         itemEntryAnimations.put(entityId, next);
         return next;
     }

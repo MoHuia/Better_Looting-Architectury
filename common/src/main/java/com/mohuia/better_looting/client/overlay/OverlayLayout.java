@@ -38,9 +38,12 @@ public class OverlayLayout {
         this.baseX = (float) (win.getGuiScaledWidth() / 2.0f + cfg.xOffset);
         this.baseY = (float) (win.getGuiScaledHeight() / 2.0f + cfg.yOffset);
 
-        // 结合配置的缩放和弹出动画缓动曲线，计算当前帧的实际缩放比例
-        this.finalScale = (float) (cfg.uiScale * Utils.easeOutBack(popupProgress));
-        this.slideOffset = (1.0f - popupProgress) * 30.0f;
+        // 几何与透明度解耦：缩放/滑入在视觉上到达 99% 后立即锁定，
+        // 杜绝文字在动画末尾的亚像素重采样抖动；alpha 仍用 popupProgress 平滑淡入。
+        float eased = Utils.easeOutCubic(popupProgress);
+        float geom = (eased > 0.99f) ? 1.0f : eased;
+        this.finalScale = (float) (cfg.uiScale * geom);
+        this.slideOffset = (1.0f - geom) * 30.0f;
 
         this.startY = -(Constants.ITEM_HEIGHT / 2);
         this.itemHeightTotal = Constants.ITEM_HEIGHT + 2;
@@ -53,13 +56,13 @@ public class OverlayLayout {
         // 计算 X 轴的物理裁剪坐标与宽度
         double localLeft = Constants.LIST_X - 25.0;
         double currentXOnScreen = this.baseX + ((localLeft + slideOffset) * finalScale);
-        this.scX = (int) (currentXOnScreen * guiScale);
-        this.scW = (int) ((panelWidth + 30.0) * finalScale * guiScale);
+        this.scX = (int) Math.round(currentXOnScreen * guiScale);
+        this.scW = (int) Math.round((panelWidth + 30.0) * finalScale * guiScale);
 
         // 计算 Y 轴相关的物理高度参数
         double listTopOnScreen = this.baseY + (this.startY * finalScale);
-        int listPhyH = (int) ((visibleRows * itemHeightTotal) * finalScale * guiScale);
-        int topBuffer = (int) (itemHeightTotal * 1.5 * finalScale * guiScale);
+        int listPhyH = (int) Math.round((visibleRows * itemHeightTotal) * finalScale * guiScale);
+        int topBuffer = (int) Math.round(itemHeightTotal * 1.5 * finalScale * guiScale);
 
         // 严格裁剪区域：主要用于截断滑动出界的列表元素
         // 注意：OpenGL 中 Y 轴是向上增长的，所以用窗口高度减去 GUI 坐标
