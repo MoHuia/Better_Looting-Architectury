@@ -153,7 +153,7 @@ public class InventoryLootList {
             Long startMs = entryTimes.get(entry.getPrimaryId());
             if (startMs != null && now < startMs) continue;
 
-            int baseY = topPos + (int) (relIdx * ITEM_HEIGHT_TOTAL);
+            int baseY = topPos + Math.round(relIdx * ITEM_HEIGHT_TOTAL);
             float entryYOffset = 0f;
             if (startMs != null) {
                 float elapsed = (now - startMs) / 1000f;
