@@ -32,6 +32,16 @@ public class BetterLootingConfig {
     public String newLabelText = "NEW";
     public int inventoryListWidth = 120;
     public boolean showInventoryLootList = true;
+    /** 物品栏掉落列表相对默认贴合位置的额外 X 偏移 */
+    public float inventoryListXOffset = 0.0f;
+    /** 物品栏掉落列表相对背包顶部的额外 Y 偏移 */
+    public float inventoryListYOffset = 0.0f;
+    /** 物品栏掉落列表整体缩放倍率 (0.1 ~ 4.0) */
+    public float inventoryListScale = 1.0f;
+    /** 物品栏掉落列表独立透明度 (0.1 ~ 1.0) */
+    public float inventoryListAlpha = 0.9f;
+    /** 物品栏掉落列表面板像素高度 (默认 166, 约等于背包高度) */
+    public int inventoryListHeight = 166;
     public boolean enableTooltipPreview = true;
     public boolean showKeyPrompt = true;
     public String overlaySkin = "vanilla";
@@ -169,6 +179,11 @@ public class BetterLootingConfig {
         this.uiScale = Mth.clamp(this.uiScale, 0.1f, 4.0f);
         this.panelWidth = Mth.clamp(this.panelWidth, 80, 500);
         this.inventoryListWidth = Mth.clamp(this.inventoryListWidth, 80, 500);
+        this.inventoryListXOffset = Mth.clamp(this.inventoryListXOffset, -2000.0f, 2000.0f);
+        this.inventoryListYOffset = Mth.clamp(this.inventoryListYOffset, -2000.0f, 2000.0f);
+        this.inventoryListScale = Mth.clamp(this.inventoryListScale, 0.1f, 4.0f);
+        this.inventoryListAlpha = Mth.clamp(this.inventoryListAlpha, 0.1f, 1.0f);
+        this.inventoryListHeight = Mth.clamp(this.inventoryListHeight, 40, 1000);
         this.visibleRows = Mth.clamp(this.visibleRows, 1.0f, 20.0f);
         this.globalAlpha = Mth.clamp(this.globalAlpha, 0.1f, 1.0f);
         this.lookDownAngle = Mth.clamp(this.lookDownAngle, 0.0f, 90.0f);
@@ -232,6 +247,16 @@ public class BetterLootingConfig {
             config.set("Visual.newLabelText", INSTANCE.newLabelText);
             config.setComment("Visual.inventoryListWidth", "物品栏左侧掉落物列表面板宽度 (默认 120)");
             config.set("Visual.inventoryListWidth", INSTANCE.inventoryListWidth);
+            config.setComment("Visual.inventoryListXOffset", "物品栏掉落列表相对默认贴合位置的额外 X 偏移");
+            config.set("Visual.inventoryListXOffset", INSTANCE.inventoryListXOffset);
+            config.setComment("Visual.inventoryListYOffset", "物品栏掉落列表相对背包顶部的额外 Y 偏移");
+            config.set("Visual.inventoryListYOffset", INSTANCE.inventoryListYOffset);
+            config.setComment("Visual.inventoryListScale", "物品栏掉落列表整体缩放倍率 (0.1 ~ 4.0, 默认 1.0)");
+            config.set("Visual.inventoryListScale", INSTANCE.inventoryListScale);
+            config.setComment("Visual.inventoryListAlpha", "物品栏掉落列表独立透明度 (0.1 ~ 1.0, 默认 0.9)");
+            config.set("Visual.inventoryListAlpha", INSTANCE.inventoryListAlpha);
+            config.setComment("Visual.inventoryListHeight", "物品栏掉落列表面板像素高度 (默认 166)");
+            config.set("Visual.inventoryListHeight", INSTANCE.inventoryListHeight);
             config.setComment("Visual.showInventoryLootList", "是否在物品栏左侧显示掉落物列表");
             config.set("Visual.showInventoryLootList", INSTANCE.showInventoryLootList);
             config.setComment("Visual.enableTooltipPreview", "是否在悬浮窗选中物品时显示物品信息预览");
@@ -325,6 +350,11 @@ public class BetterLootingConfig {
             INSTANCE.customOverlayTitle = config.getOrElse("Visual.customOverlayTitle", "Loot Detected");
             INSTANCE.newLabelText = config.getOrElse("Visual.newLabelText", "NEW");
             INSTANCE.inventoryListWidth = config.getOrElse("Visual.inventoryListWidth", 120);
+            INSTANCE.inventoryListXOffset = config.<Number>getOrElse("Visual.inventoryListXOffset", 0.0f).floatValue();
+            INSTANCE.inventoryListYOffset = config.<Number>getOrElse("Visual.inventoryListYOffset", 0.0f).floatValue();
+            INSTANCE.inventoryListScale = config.<Number>getOrElse("Visual.inventoryListScale", 1.0f).floatValue();
+            INSTANCE.inventoryListAlpha = config.<Number>getOrElse("Visual.inventoryListAlpha", 0.9f).floatValue();
+            INSTANCE.inventoryListHeight = config.getOrElse("Visual.inventoryListHeight", 166);
             INSTANCE.showInventoryLootList = config.getOrElse("Visual.showInventoryLootList", true);
             INSTANCE.enableTooltipPreview = config.getOrElse("Visual.enableTooltipPreview", true);
             INSTANCE.showKeyPrompt = config.getOrElse("Visual.showKeyPrompt", true);

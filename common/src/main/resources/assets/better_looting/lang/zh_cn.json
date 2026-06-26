@@ -55,6 +55,11 @@
 
   "--- GUI：高级与杂项设置 ---": "",
   "gui.better_looting.config.tooltip.settings": "逻辑设置",
+  "gui.better_looting.config.tooltip.inventory_config": "背包列表设置",
+  "gui.better_looting.inventory_config.title": "背包列表设置",
+  "gui.better_looting.inventory_config.mock_inventory": "背包窗口",
+  "gui.better_looting.inventory_config.info.width": "宽度: %spx",
+  "gui.better_looting.inventory_config.preview_hint": "左键拖拽移动 | 拖右边缘调宽 | 拖右下角缩放",
   "gui.better_looting.config.pickup_intercept_mode_title": "拾取拦截策略",
   "gui.better_looting.config.pickup_intercept.auto": "智能兼容",
   "gui.better_looting.config.pickup_intercept.always": "始终拦截",
