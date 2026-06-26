@@ -93,8 +93,8 @@ public class OverlayRenderer {
         int ix = x + (useSkin ? HUD_CONTENT_INSET : 0);
 
         // 绘制基于物品稀有度或自定义颜色的左侧指示条
-        // 亮底皮肤下先垫一层深色凹槽，避免白色/亮色稀有度条与奶油底融成一片
-        if (useSkin && skinLightBackground) {
+        // 稀有度条凹槽：在亮底皮肤下先垫一层深色衬底，凸显稀有度条
+        if (useSkin && skinRarityBarGroove) {
             gui.fill(ix + 19, y + 2, ix + 22, y + Constants.ITEM_HEIGHT - 2,
                     Utils.colorWithAlpha(0xFF3A2410, alpha255));
         }
@@ -110,7 +110,7 @@ public class OverlayRenderer {
         if (alpha255 <= 10) return;
 
         var pose = gui.pose();
-        // 贴图模式套用皮肤文字主题（亮底皮肤用深色字）；纯色底模式沿用原版亮色
+        // 贴图模式套用皮肤文字主题；纯色底模式沿用原版亮色
         int baseTextColor = useSkin
                 ? (selected ? skinTextSelected : skinTextNormal)
                 : (selected ? Constants.COLOR_TEXT_WHITE : Constants.COLOR_TEXT_DIM);
@@ -140,8 +140,8 @@ public class OverlayRenderer {
             pose.pushPose();
             pose.translate(x + width - 22, y + 8, 0);
             pose.scale(0.75f, 0.75f, 1.0f);
-            // 亮底皮肤用黄棕色，否则用亮橙色，保证在两种底色上都醒目
-            int newColor = (useSkin && skinLightBackground) ? 0xFFC38935 : Constants.COLOR_NEW_LABEL;
+            // 皮肤模式用皮肤指定的 NEW 标签颜色，否则用默认亮橙色
+            int newColor = useSkin ? skinNewLabelColor : Constants.COLOR_NEW_LABEL;
             gui.drawString(mc.font, label, 0, 0, Utils.colorWithAlpha(newColor, alpha255), false);
             pose.popPose();
         }
@@ -282,10 +282,11 @@ public class OverlayRenderer {
     private ResourceLocation skinSelected;
     private int skinTexSize = BUILTIN_TEX_SIZE;  // 当前皮肤源图尺寸
 
-    // 皮肤文字主题：亮底皮肤（如星露谷）需要深色文字与稀有度条衬底，否则会糊在一起看不清
-    private boolean skinLightBackground = false;
+    // 皮肤文字主题与稀有度条凹槽
+    private boolean skinRarityBarGroove = false;
     private int skinTextSelected = Constants.COLOR_TEXT_WHITE;
     private int skinTextNormal = Constants.COLOR_TEXT_DIM;
+    private int skinNewLabelColor = Constants.COLOR_NEW_LABEL;
 
     // 预览皮肤覆盖名：配置界面预览时设为 viewModel.overlaySkin，使切换皮肤后无需保存即可预览；
     // 为 null 时使用全局配置的 overlaySkin（真实 HUD 场景）。
@@ -315,9 +316,10 @@ public class OverlayRenderer {
             skinNormal = ext.normalTex;
             skinSelected = ext.selectedTex;
             skinTexSize = ext.texSize;
-            skinLightBackground = ext.lightBackground;
+            skinRarityBarGroove = ext.rarityBarGroove;
             skinTextNormal = ext.textColorNormal;
             skinTextSelected = ext.textColorSelected;
+            skinNewLabelColor = ext.newLabelColor;
         } else {
             // 内置皮肤：打包资源路径 + 硬编码主题
             skinNormal = new ResourceLocation(BetterLooting.MODID,
@@ -335,14 +337,16 @@ public class OverlayRenderer {
     private void applySkinTheme(String skin) {
         switch (skin) {
             case "stardew" -> {
-                skinLightBackground = true;
+                skinRarityBarGroove = true;
                 skinTextSelected = 0xFF3A2410; // 深棕（选中）
                 skinTextNormal = 0xFF5A3A1E;   // 稍浅棕（普通）
+                skinNewLabelColor = 0xFFC38935; // 黄棕色，在亮底上醒目
             }
             default -> {
-                skinLightBackground = false;
+                skinRarityBarGroove = false;
                 skinTextSelected = Constants.COLOR_TEXT_WHITE;
                 skinTextNormal = Constants.COLOR_TEXT_DIM;
+                skinNewLabelColor = Constants.COLOR_NEW_LABEL;
             }
         }
     }
