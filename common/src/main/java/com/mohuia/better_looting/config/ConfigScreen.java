@@ -48,11 +48,6 @@ public class ConfigScreen extends Screen {
     private static final int COLOR_PANEL_BORDER = 0x50FFFFFF; // 面板边框
     private static final int COLOR_TEXT_MUTED = 0xFFAAAAAA; // 次要文本颜色
 
-    // 跳转到背包列表配置界面的图标纹理
-    private static final net.minecraft.resources.ResourceLocation INVENTORY_CONFIG_ICON =
-            new net.minecraft.resources.ResourceLocation(BetterLooting.MODID, "textures/gui/inventory_config.png");
-    private static final int INVENTORY_CONFIG_ICON_SIZE = 64;
-
     public ConfigScreen() {
         this(new ConfigViewModel());
     }
@@ -108,7 +103,7 @@ public class ConfigScreen extends Screen {
             this.onClose();
         }));
 
-        // 跳转到背包列表配置界面（图片按钮）
+        // 跳转到背包列表配置界面（代码绘制图标）
         this.addRenderableWidget(new ModernButton(startX + 135, 15, 20, 20, Component.empty(), () -> {
             if (this.minecraft != null) {
                 this.minecraft.setScreen(new InventoryConfigScreen(this, this.viewModel));
@@ -117,13 +112,19 @@ public class ConfigScreen extends Screen {
             @Override
             protected void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
                 super.renderWidget(gui, mouseX, mouseY, partialTick);
-                var tex = net.minecraft.client.Minecraft.getInstance().getTextureManager().getTexture(INVENTORY_CONFIG_ICON);
-                tex.setFilter(true, false);
-                int pad = 3;
-                gui.blit(INVENTORY_CONFIG_ICON, this.getX() + pad, this.getY() + pad,
-                        this.width - pad * 2, this.height - pad * 2,
-                        0f, 0f, INVENTORY_CONFIG_ICON_SIZE, INVENTORY_CONFIG_ICON_SIZE,
-                        INVENTORY_CONFIG_ICON_SIZE, INVENTORY_CONFIG_ICON_SIZE);
+
+                boolean hovered = this.isHoveredOrFocused();
+                int iconColor = hovered ? 0xFFFFFFFF : COLOR_TEXT_MUTED;
+
+                int cx = this.getX() + this.width / 2;
+                int cy = this.getY() + this.height / 2;
+
+                // 提手
+                gui.fill(cx - 2, cy - 5, cx + 2, cy - 3, iconColor);
+                // 盖子（稍宽）
+                gui.fill(cx - 5, cy - 2, cx + 5, cy, iconColor);
+                // 主体
+                gui.fill(cx - 4, cy + 1, cx + 4, cy + 5, iconColor);
             }
         });
 
