@@ -86,6 +86,8 @@ public class BetterLootingConfig {
     public boolean enableSuperMerge = true;
     public float mergeRangeXZ = 5.0f;
     public float mergeRangeY = 5.0f;
+    /** 运输方块黑名单，逗号分隔的方块ID关键词。物品站在含有关键词的方块上将跳过超大堆叠合并，避免干扰机械动力等模组的传送带/漏斗/溜槽运输逻辑。 */
+    public String mergeTransportBlacklist = "belt,conveyor,chute,funnel,depot";
     public float pickupDelaySeconds = 1.0f;
     public int maxHoldTicks = 20;
 
@@ -302,6 +304,8 @@ public class BetterLootingConfig {
             config.set("Core.mergeRangeXZ", INSTANCE.mergeRangeXZ);
             config.setComment("Core.mergeRangeY", "垂直合并范围 (最大 10)");
             config.set("Core.mergeRangeY", INSTANCE.mergeRangeY);
+            config.setComment("Core.mergeTransportBlacklist", "运输方块黑名单，用逗号分隔方块ID关键词。物品站在匹配的方块上将跳过超大堆叠合并，避免干扰传送带等运输模组。默认: belt,conveyor,chute,funnel,depot");
+            config.set("Core.mergeTransportBlacklist", INSTANCE.mergeTransportBlacklist);
             config.setComment("Core.pickupDelaySeconds", "拾取延迟保护 (秒)");
             config.set("Core.pickupDelaySeconds", INSTANCE.pickupDelaySeconds);
             config.setComment("Core.maxHoldTicks", "长按触发时间 (默认 20 ticks = 1秒)");
@@ -373,6 +377,7 @@ public class BetterLootingConfig {
             INSTANCE.enableSuperMerge = config.getOrElse("Core.enableSuperMerge", true);
             INSTANCE.mergeRangeXZ = config.<Number>getOrElse("Core.mergeRangeXZ", 5.0f).floatValue();
             INSTANCE.mergeRangeY = config.<Number>getOrElse("Core.mergeRangeY", 5.0f).floatValue();
+            INSTANCE.mergeTransportBlacklist = config.getOrElse("Core.mergeTransportBlacklist", "belt,conveyor,chute,funnel,depot");
             INSTANCE.pickupDelaySeconds = config.<Number>getOrElse("Core.pickupDelaySeconds", 1.0f).floatValue();
             INSTANCE.maxHoldTicks = config.getOrElse("Core.maxHoldTicks", 20);
 
