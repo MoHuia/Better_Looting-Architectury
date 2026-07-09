@@ -164,9 +164,7 @@ public class BetterLootingConfig {
         /** 智能模式：仅在其他模组未处理拾取事件时才拦截（推荐，兼容性最好） */
         AUTO,
         /** 始终拦截：无条件阻止原版拾取（可能与背包类模组冲突） */
-        ALWAYS,
-        /** 不拦截：完全放行原版拾取，仅保留 F 键自定义拾取 */
-        NEVER
+        ALWAYS
     }
 
     private static BetterLootingConfig INSTANCE = new BetterLootingConfig();
@@ -300,7 +298,7 @@ public class BetterLootingConfig {
 
             // --- 核心功能 ---
             config.setComment("Core", "核心功能设置 (Core Feature Settings)");
-            config.setComment("Core.pickupInterceptMode", "拾取拦截策略: AUTO(智能,推荐) / ALWAYS(始终拦截) / NEVER(不拦截)");
+            config.setComment("Core.pickupInterceptMode", "拾取拦截策略: AUTO(智能,推荐) / ALWAYS(始终拦截)");
             config.set("Core.pickupInterceptMode", INSTANCE.pickupInterceptMode.name());
             config.setComment("Core.stabilityThresholdTicks", "物品必须连续存在多少 tick 才在悬浮窗显示（默认4=0.2秒，0=关闭）");
             config.set("Core.stabilityThresholdTicks", INSTANCE.stabilityThresholdTicks);

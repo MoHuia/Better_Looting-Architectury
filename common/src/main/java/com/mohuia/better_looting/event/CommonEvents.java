@@ -26,6 +26,5 @@ public class CommonEvents {
             // 智能模式：使用平台特定的策略，仅在无其他模组处理时才拦截
             PlatformHooks.setupPickupInterception();
         }
-        // NEVER 模式：不做任何拦截，完全放行原版拾取
     }
 }
