@@ -116,8 +116,8 @@ public class MouseHandlerMixin {
         double mouseX = better_looting$getScaledMouseX();
         double mouseY = better_looting$getScaledMouseY();
 
-        // 物品栏列表：滚动条按下优先
-        if (action == 1 && containerScreen instanceof InventoryScreen) {
+        // 物品栏列表：滚动条按下优先（面板打开时跳过，避免抢夺面板的点击）
+        if (action == 1 && containerScreen instanceof InventoryScreen && !FilterPanel.isOpen()) {
             if (LootListInteraction.INSTANCE.isMouseOverScrollbar(mouseX, mouseY)) {
                 ci.cancel();
                 LootListInteraction.INSTANCE.onScrollbarPress(mouseX, mouseY);
@@ -125,9 +125,9 @@ public class MouseHandlerMixin {
             }
         }
 
-        // 物品栏列表：物品按下（仅左键，玩家手上没有已拿起的物品时）
+        // 物品栏列表：物品按下（仅左键，玩家手上没有已拿起的物品时；面板打开时跳过）
         if (action == 1 && button == 0 && containerScreen instanceof InventoryScreen
-                && containerScreen.getMenu().getCarried().isEmpty()) {
+                && containerScreen.getMenu().getCarried().isEmpty() && !FilterPanel.isOpen()) {
             if (LootListInteraction.INSTANCE.onItemPress(mouseX, mouseY)) {
                 ci.cancel();
                 return;
