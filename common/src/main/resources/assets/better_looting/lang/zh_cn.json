@@ -113,7 +113,7 @@
 
   "--- GUI：过滤面板 ---": "",
   "gui.better_looting.filter.whitelist_tip": "过滤模式下始终显示在列表中",
-  "gui.better_looting.filter.blacklist_tip": "默认模式下屏蔽的物品",
+  "gui.better_looting.filter.blacklist_tip": "全局屏蔽物品",
 
   "--- GUI：布局编辑器帮助与信息 ---": "",
   "gui.better_looting.config.key_info": "绑定按键: %s",
