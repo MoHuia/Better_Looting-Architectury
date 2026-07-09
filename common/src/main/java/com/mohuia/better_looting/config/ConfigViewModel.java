@@ -62,6 +62,7 @@ public class ConfigViewModel {
     public boolean enableSuperMerge;
     public float mergeRangeXZ;
     public float mergeRangeY;
+    public String mergeTransportBlacklist;
 
     // 拾取保护时间延迟
     public float pickupDelaySeconds;
@@ -133,6 +134,7 @@ public class ConfigViewModel {
         this.enableSuperMerge = cfg.enableSuperMerge;
         this.mergeRangeXZ = cfg.mergeRangeXZ;
         this.mergeRangeY = cfg.mergeRangeY;
+        this.mergeTransportBlacklist = cfg.mergeTransportBlacklist == null ? "belt,conveyor,chute,funnel,depot" : cfg.mergeTransportBlacklist;
 
         this.itemCountDisplayMode = cfg.itemCountDisplayMode;
         this.itemCountScale = cfg.itemCountScale;
@@ -186,6 +188,7 @@ public class ConfigViewModel {
         cfg.enableSuperMerge = this.enableSuperMerge;
         cfg.mergeRangeXZ = this.mergeRangeXZ;
         cfg.mergeRangeY = this.mergeRangeY;
+        cfg.mergeTransportBlacklist = this.mergeTransportBlacklist;
 
         cfg.itemCountDisplayMode = this.itemCountDisplayMode;
         cfg.itemCountScale = this.itemCountScale;
@@ -242,6 +245,7 @@ public class ConfigViewModel {
         this.enableSuperMerge = defaults.enableSuperMerge;
         this.mergeRangeXZ = defaults.mergeRangeXZ;
         this.mergeRangeY = defaults.mergeRangeY;
+        this.mergeTransportBlacklist = defaults.mergeTransportBlacklist;
 
         this.itemCountDisplayMode = defaults.itemCountDisplayMode;
         this.itemCountScale = defaults.itemCountScale;

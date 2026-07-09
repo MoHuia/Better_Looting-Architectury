@@ -2,6 +2,8 @@ package com.mohuia.better_looting.mixin;
 
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.config.BetterLootingConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -123,6 +125,11 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         if (!BetterLootingConfig.get().enableSuperMerge) return; // 关闭功能时不干预
 
         if (!this.getItem().isStackable()) return;
+
+        // 跳过正在被运输的物品（如机械动力传送带/漏斗/溜槽），避免干扰其运输逻辑
+        // 通过检测物品脚下方块的注册名来判断是否处于运输系统中
+        if (betterlooting$isOnTransportBlock()) return;
+
         cir.setReturnValue(true);
     }
 
@@ -144,11 +151,17 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             return;
         }
 
+        // 跳过正在被运输的物品（如机械动力传送带/漏斗/溜槽），避免干扰运输逻辑
+        if (betterlooting$isOnTransportBlock()) return;
+
         ISuperStack selfDuck = (ISuperStack) self;
         ISuperStack otherDuck = (ISuperStack) other;
 
         // 获取双方中最年轻的存活时间（寿命）
         int youngestAge = Math.min(((ItemEntityAccessor) self).getAge(), ((ItemEntityAccessor) other).getAge());
+
+        // 获取双方当前的拾取延迟，取较大值，与原版逻辑保持一致
+        int maxPickupDelay = Math.max(((ItemEntityAccessor) self).getPickupDelay(), ((ItemEntityAccessor) other).getPickupDelay());
 
         // 计算双方的总数量（原版数量 + 我们的额外数量）
         int selfTotal = stackSelf.getCount() + selfDuck.betterlooting$getExtraCount();
@@ -157,12 +170,14 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         // 谁的数量多谁就存活，把另一个实体的数量吸收过来，然后销毁较小的那个实体
         if (selfTotal >= otherTotal) {
             selfDuck.betterlooting$addExtraCount(otherTotal);
-            self.setPickUpDelay(15);
+            otherDuck.betterlooting$setExtraCount(0); // 清零防止 remove 时重复溢出
+            self.setPickUpDelay(maxPickupDelay);
             ((ItemEntityAccessor) self).setAge(youngestAge); // 更新寿命为最年轻的
             other.discard();
         } else {
             otherDuck.betterlooting$addExtraCount(selfTotal);
-            other.setPickUpDelay(15);
+            selfDuck.betterlooting$setExtraCount(0); // 清零防止 remove 时重复溢出
+            other.setPickUpDelay(maxPickupDelay);
             ((ItemEntityAccessor) other).setAge(youngestAge); // 更新寿命为最年轻的
             self.discard();
         }
@@ -234,4 +249,34 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         }
         this.betterlooting$setExtraCount(0);
     }
+
+    /**
+     * 检测物品实体是否站在运输方块上（如机械动力传送带、漏斗、溜槽等）。
+     * 通过检查物品所在位置及下方方块的注册名，与配置中的黑名单关键词做匹配。
+     * @return true 表示物品处于运输系统中，应跳过超大堆叠合并
+     */
+    @Unique
+    private boolean betterlooting$isOnTransportBlock() {
+        String blacklist = BetterLootingConfig.get().mergeTransportBlacklist;
+        if (blacklist == null || blacklist.trim().isEmpty()) return false;
+
+        String[] keywords = blacklist.split(",");
+        BlockPos pos = this.blockPosition();
+
+        // 检查物品所在方块和下方方块的注册名
+        String idAt = BuiltInRegistries.BLOCK.getKey(this.level().getBlockState(pos).getBlock()).toString();
+        String idBelow = BuiltInRegistries.BLOCK.getKey(this.level().getBlockState(pos.below()).getBlock()).toString();
+
+        for (String kw : keywords) {
+            String keyword = kw.trim().toLowerCase();
+            if (keyword.isEmpty()) continue;
+            if (idAt.contains(keyword) || idBelow.contains(keyword)) return true;
+        }
+        return false;
+    }
+
+    // 注：extraCount 物品丢失保护需要注入 Entity.remove(RemovalReason)，
+    // 但 Mixin refmap 中不包含 ItemEntity 未直接覆写的继承方法。
+    // 作为替代，当运输模组通过 setItem 改变物品类型时会触发 spillExtraOnItemChange 溢出；
+    // 若运输模组直接调用 discard()，则由 superMerge 中 discard 前清零 extraCount 保证不丢失。
 }
