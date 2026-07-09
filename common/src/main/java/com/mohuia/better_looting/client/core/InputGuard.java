@@ -67,10 +67,10 @@ public class InputGuard {
      */
     private void suppressVanillaOverlappingKeys() {
         Minecraft mc = Minecraft.getInstance();
-        if (KeyInit.PICKUP.same(mc.options.keySwapOffhand)) {
+        if (KeyInit.PICKUP.same(mc.options.keySwapOffhand) || KeyInit.PICKUP_ALT.same(mc.options.keySwapOffhand)) {
             while (mc.options.keySwapOffhand.consumeClick()) {}
         }
-        if (KeyInit.PICKUP.same(mc.options.keyDrop)) {
+        if (KeyInit.PICKUP.same(mc.options.keyDrop) || KeyInit.PICKUP_ALT.same(mc.options.keyDrop)) {
             while (mc.options.keyDrop.consumeClick()) {}
         }
     }

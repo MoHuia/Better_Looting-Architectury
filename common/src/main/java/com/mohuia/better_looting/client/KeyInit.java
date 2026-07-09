@@ -35,6 +35,14 @@ public class KeyInit {
             CATEGORY
     );
 
+    // 备用拾取键 (默认未绑定)
+    public static final KeyMapping PICKUP_ALT = new KeyMapping(
+            "key.better_looting.pickup_alt",
+            InputConstants.Type.KEYSYM,
+            InputConstants.UNKNOWN.getValue(),
+            CATEGORY
+    );
+
     // 打开模组配置界面 (默认: K)
     public static final KeyMapping OPEN_CONFIG = new KeyMapping(
             "key.better_looting.open_config",

@@ -2,6 +2,7 @@
   "--- Keybindings ---": "",
   "key.categories.better_looting": "Better Looting",
   "key.better_looting.pickup": "Loot Nearest Item",
+  "key.better_looting.pickup_alt": "Loot Nearest Item (Alt)",
   "key.better_looting.toggle_filter": "Toggle Filter Mode",
   "key.better_looting.open_config": "Open Config",
   "key.better_looting.toggle_auto": "Toggle Auto Looting",

@@ -50,7 +50,8 @@ public class Core {
 
         selectionManager.updateItems(LootScanner.scan(mc, ModeManager.INSTANCE.getFilterMode()));
 
-        boolean isPhysicalDown = keyTracker.isPhysicalKeyDown(KeyInit.PICKUP);
+        boolean isPhysicalDown = keyTracker.isPhysicalKeyDown(KeyInit.PICKUP)
+                || keyTracker.isPhysicalKeyDown(KeyInit.PICKUP_ALT);
         InputGuard.INSTANCE.tick(isPhysicalDown);
 
         keyTracker.tickOverlayToggle();
@@ -70,7 +71,8 @@ public class Core {
     private void handleInputLogic() {
         keyTracker.tickActionToggles(ModeManager.INSTANCE::toggleFilterMode, ModeManager.INSTANCE::toggleAutoMode);
 
-        boolean isKeyDown = keyTracker.isPhysicalKeyDown(KeyInit.PICKUP);
+        boolean isKeyDown = keyTracker.isPhysicalKeyDown(KeyInit.PICKUP)
+                || keyTracker.isPhysicalKeyDown(KeyInit.PICKUP_ALT);
         boolean hasTargets = isHudActive();
 
         var action = pickupHandler.tickInput(isKeyDown, hasTargets);

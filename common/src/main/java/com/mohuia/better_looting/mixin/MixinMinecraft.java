@@ -33,6 +33,7 @@ public abstract class MixinMinecraft {
             // 定义需要优先响应的模组按键
             KeyMapping[] modKeys = {
                     KeyInit.PICKUP,
+                    KeyInit.PICKUP_ALT,
                     KeyInit.TOGGLE_FILTER,
                     KeyInit.TOGGLE_AUTO
             };
