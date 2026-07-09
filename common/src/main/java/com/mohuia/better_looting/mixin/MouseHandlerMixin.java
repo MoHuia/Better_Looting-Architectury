@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.mixin;
 
 import com.mohuia.better_looting.client.Core;
+import com.mohuia.better_looting.client.filter.FilterBlacklist;
 import com.mohuia.better_looting.client.filter.FilterEvents;
 import com.mohuia.better_looting.client.filter.FilterPanel;
 import com.mohuia.better_looting.client.filter.FilterWhitelist;
@@ -166,11 +167,19 @@ public class MouseHandlerMixin {
                     // 优先取原版槽位里的物品，如果没有则取 JEI 里的物品
                     ItemStack target = (hoveredSlot != null && hoveredSlot.hasItem()) ? hoveredSlot.getItem() : jeiStack;
 
-                    // 左键（button == 0）添加进白名单，右键移除
+                    // 左键添加进当前激活的列表，右键移除
                     if (button == 0) {
-                        FilterWhitelist.INSTANCE.add(target);
+                        if (FilterPanel.isWhitelistActive()) {
+                            FilterWhitelist.INSTANCE.add(target);
+                        } else {
+                            FilterBlacklist.INSTANCE.add(target);
+                        }
                     } else {
-                        FilterWhitelist.INSTANCE.remove(target);
+                        if (FilterPanel.isWhitelistActive()) {
+                            FilterWhitelist.INSTANCE.remove(target);
+                        } else {
+                            FilterBlacklist.INSTANCE.remove(target);
+                        }
                     }
 
                     // 播放点击音效作为反馈，左键和右键音调不同
