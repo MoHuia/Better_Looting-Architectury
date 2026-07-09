@@ -115,7 +115,7 @@
 
   "--- GUI: Filter Panel ---": "",
   "gui.better_looting.filter.whitelist_tip": "Always shown in filter mode",
-  "gui.better_looting.filter.blacklist_tip": "Items blocked in default mode",
+  "gui.better_looting.filter.blacklist_tip": "Globally blocked items",
 
   "--- GUI: Layout Editor Help & Info ---": "",
   "gui.better_looting.config.key_info": "Bound Key: %s",
