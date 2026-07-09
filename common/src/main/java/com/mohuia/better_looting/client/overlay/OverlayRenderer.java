@@ -6,6 +6,7 @@ import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.config.FilterMode;
 import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.Utils;
+import net.minecraft.client.KeyMapping;
 import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import com.mohuia.better_looting.client.skin.SkinManager;
 import com.mohuia.better_looting.config.BetterLootingConfig;
@@ -198,7 +199,8 @@ public class OverlayRenderer {
         }
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        String text = KeyInit.PICKUP.getTranslatedKeyMessage().getString().toUpperCase();
+        KeyMapping displayKey = KeyInit.PICKUP.isUnbound() ? KeyInit.PICKUP_ALT : KeyInit.PICKUP;
+        String text = displayKey.getTranslatedKeyMessage().getString().toUpperCase();
         int tw = mc.font.width(text);
         int tc = Utils.colorWithAlpha(Constants.COLOR_TEXT_WHITE, (int) (finalAlpha * 255));
         int margin = 2, mw = boxSize - (margin * 2);

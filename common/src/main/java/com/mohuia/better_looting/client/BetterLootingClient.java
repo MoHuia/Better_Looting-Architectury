@@ -21,6 +21,7 @@ public class BetterLootingClient {
         // 1. 注册所有的按键绑定
         KeyMappingRegistry.register(KeyInit.TOGGLE_FILTER);
         KeyMappingRegistry.register(KeyInit.PICKUP);
+        KeyMappingRegistry.register(KeyInit.PICKUP_ALT);
         KeyMappingRegistry.register(KeyInit.OPEN_CONFIG);
         KeyMappingRegistry.register(KeyInit.TOGGLE_AUTO);
         KeyMappingRegistry.register(KeyInit.SHOW_OVERLAY);
