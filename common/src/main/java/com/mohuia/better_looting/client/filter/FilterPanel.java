@@ -35,6 +35,7 @@ public class FilterPanel {
     public static void toggle() { isOpen = !isOpen; }
     public static void close() { isOpen = false; }
     public static boolean isOpen() { return isOpen; }
+    public static boolean isWhitelistActive() { return activeList == 0; }
 
     /**
      * 核心渲染逻辑。
