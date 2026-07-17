@@ -43,6 +43,14 @@ public class KeyInit {
             CATEGORY
     );
 
+    // 物品栏列表全量拾取修饰键，按住时单击/拖拽均拾取该行全部物品 (默认未绑定)
+    public static final KeyMapping PICKUP_ALL_MODIFIER = new KeyMapping(
+            "key.better_looting.pickup_all_modifier",
+            InputConstants.Type.KEYSYM,
+            InputConstants.UNKNOWN.getValue(),
+            CATEGORY
+    );
+
     // 打开模组配置界面 (默认: K)
     public static final KeyMapping OPEN_CONFIG = new KeyMapping(
             "key.better_looting.open_config",

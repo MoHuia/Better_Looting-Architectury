@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.client.inventory;
 
 import com.mohuia.better_looting.client.Constants;
+import com.mohuia.better_looting.client.KeyInit;
 import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import com.mohuia.better_looting.mixin.ACSAccessor;
 import com.mohuia.better_looting.network.C2S.PacketBatchPickup;
@@ -166,7 +167,18 @@ public class LootListInteraction {
 
         VisualItemEntry entry = list.nearbyItems.get(dragIndex);
 
-        if (dragModeActive) {
+        // 按住全量拾取修饰键时，无论单击还是拖拽均拾取该行全部物品
+        boolean pickupAllMod = KeyInit.PICKUP_ALL_MODIFIER.isDown();
+
+        if (pickupAllMod) {
+            List<Integer> ids = new ArrayList<>();
+            for (ItemEntity e : entry.getSourceEntities()) {
+                if (e.isAlive()) ids.add(e.getId());
+            }
+            if (!ids.isEmpty()) {
+                NetworkHandler.sendToServer(new PacketBatchPickup(ids, false, false));
+            }
+        } else if (dragModeActive) {
             Slot slot = getHoveredSlot(screen, dragCurrentX, dragCurrentY);
             if (slot != null && slot.mayPlace(entry.getItem())) {
                 List<Integer> ids = new ArrayList<>();
