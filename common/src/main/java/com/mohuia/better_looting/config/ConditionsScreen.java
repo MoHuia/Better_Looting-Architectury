@@ -11,6 +11,7 @@ import com.mohuia.better_looting.client.gui.ToggleButton;
 import com.mohuia.better_looting.config.BetterLootingConfig.ActivationMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.AnimationSpeed;
 import com.mohuia.better_looting.config.BetterLootingConfig.DisplayMode;
+import com.mohuia.better_looting.config.BetterLootingConfig.LongPressMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.PickupInterceptMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.ScrollMode;
 import net.minecraft.client.KeyMapping;
@@ -548,6 +549,13 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
                 getInterceptModeTooltip(viewModel.pickupInterceptMode));
         y += ROW_H + ROW_GAP;
 
+        addEnumDropdown(x, y, w,
+                Component.translatable("gui." + BetterLooting.MODID + ".config.long_press_mode"),
+                LongPressMode.values(), viewModel.longPressMode, v -> viewModel.longPressMode = v,
+                this::getLongPressModeName,
+                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.long_press_mode.tooltip")));
+        y += ROW_H + ROW_GAP;
+
         this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
                 Component.translatable("gui." + BetterLooting.MODID + ".config.pickup_delay"),
                 "s", 0.0, 5.0, (double) viewModel.pickupDelaySeconds, 1,
@@ -920,6 +928,10 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
 
     private Component getAnimationSpeedName(AnimationSpeed speed) {
         return Component.translatable("gui." + BetterLooting.MODID + ".config.animation_speed." + speed.name().toLowerCase());
+    }
+
+    private Component getLongPressModeName(LongPressMode mode) {
+        return Component.translatable("gui." + BetterLooting.MODID + ".config.long_press_mode." + mode.name().toLowerCase());
     }
 
 }

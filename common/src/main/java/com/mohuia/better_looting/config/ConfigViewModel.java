@@ -53,6 +53,7 @@ public class ConfigViewModel {
     public BetterLootingConfig.ActivationMode activationMode;
     public BetterLootingConfig.ScrollMode scrollMode;
     public BetterLootingConfig.PickupInterceptMode pickupInterceptMode;
+    public BetterLootingConfig.LongPressMode longPressMode;
     public float lookDownAngle;
 
     // 白名单稀有物品过滤开关
@@ -102,6 +103,7 @@ public class ConfigViewModel {
         this.activationMode = cfg.activationMode;
         this.scrollMode = cfg.scrollMode;
         this.pickupInterceptMode = cfg.pickupInterceptMode;
+        this.longPressMode = cfg.longPressMode;
         this.lookDownAngle = cfg.lookDownAngle;
         this.showHotbarIndicator = cfg.showHotbarIndicator;
 
@@ -156,6 +158,7 @@ public class ConfigViewModel {
         cfg.activationMode = this.activationMode;
         cfg.scrollMode = this.scrollMode;
         cfg.pickupInterceptMode = this.pickupInterceptMode;
+        cfg.longPressMode = this.longPressMode;
         cfg.lookDownAngle = this.lookDownAngle;
         cfg.showHotbarIndicator = this.showHotbarIndicator;
 
@@ -213,6 +216,7 @@ public class ConfigViewModel {
         this.activationMode = defaults.activationMode;
         this.scrollMode = defaults.scrollMode;
         this.pickupInterceptMode = defaults.pickupInterceptMode;
+        this.longPressMode = defaults.longPressMode;
         this.lookDownAngle = defaults.lookDownAngle;
         this.showHotbarIndicator = defaults.showHotbarIndicator;
 

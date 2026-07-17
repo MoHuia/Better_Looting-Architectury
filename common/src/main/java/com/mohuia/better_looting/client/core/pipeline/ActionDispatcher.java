@@ -47,6 +47,25 @@ public class ActionDispatcher {
     }
 
     /**
+     * 发送单行拾取请求，拾取当前选中行对应同类物品的所有实体（不限数量）。
+     * @param selection 选区管理器实例
+     */
+    public static void sendRowPickup(SelectionManager selection) {
+        List<VisualItemEntry> items = selection.getNearbyItems();
+        int index = selection.getSelectedIndex();
+
+        if (index >= 0 && index < items.size()) {
+            VisualItemEntry entry = items.get(index);
+            List<Integer> ids = new ArrayList<>();
+            entry.getSourceEntities().forEach(e -> { if(e.isAlive()) ids.add(e.getId()); });
+
+            if (!ids.isEmpty()) {
+                NetworkHandler.sendToServer(new PacketBatchPickup(ids, false, false));
+            }
+        }
+    }
+
+    /**
      * 处理自动拾取触发时的发包，并重置自动拾取冷却。
      * @param selection     选区管理器实例
      * @param pickupHandler 拾取处理器实例

@@ -84,10 +84,15 @@ public class Core {
                 InputGuard.INSTANCE.setGraceTicks(delayTicks);
             }
             case BATCH -> {
-                List<ItemEntity> all = new ArrayList<>();
-                // 使用未过滤的全量数据，确保长按拾取不被 StabilityFilter 延迟
-                selectionManager.getUnfilteredItems().forEach(e -> all.addAll(e.getSourceEntities()));
-                ActionDispatcher.sendBatchPickup(all, false);
+                var mode = BetterLootingConfig.get().longPressMode;
+                if (mode == BetterLootingConfig.LongPressMode.PICKUP_ROW) {
+                    ActionDispatcher.sendRowPickup(selectionManager);
+                } else {
+                    List<ItemEntity> all = new ArrayList<>();
+                    // 使用未过滤的全量数据，确保长按拾取不被 StabilityFilter 延迟
+                    selectionManager.getUnfilteredItems().forEach(e -> all.addAll(e.getSourceEntities()));
+                    ActionDispatcher.sendBatchPickup(all, false);
+                }
                 InputGuard.INSTANCE.setGraceTicks(delayTicks);
             }
         }
