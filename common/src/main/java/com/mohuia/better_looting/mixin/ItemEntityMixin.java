@@ -13,6 +13,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -63,6 +64,27 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     @Override
     public void betterlooting$addExtraCount(int count) {
         this.betterlooting$setExtraCount(this.betterlooting$getExtraCount() + count);
+    }
+
+    /**
+     * 拦截原版 playerTouch 入口，从源头阻断拾取流程。
+     * <p>
+     * 修复 pick-up-notifier 兼容性问题：在 NeoForge 上 pick-up-notifier 使用
+     * LOW 优先级 + receiveCancelled=true 监听 ItemEntityPickupEvent.Pre，
+     * 单纯调整 BL 的优先级无法阻止其触发（partialPickUps 默认开启且不检查 canPickup）。
+     * 在 Fabric 上 FabricPlayerEvents.ITEM_TOUCH 与 Architectury PICKUP_ITEM_PRE
+     * 是独立注入点，同样无法通过事件层面阻止。
+     * <p>
+     * 在 playerTouch HEAD 直接取消确保所有下游事件（NeoForge/Fabric/Architectury）
+     * 均不触发。实际拾取由 PacketBatchPickup 完全接管。
+     */
+    @Inject(method = "playerTouch", at = @At("HEAD"), cancellable = true)
+    private void betterlooting$interceptPlayerTouch(Player player, CallbackInfo ci) {
+        if (this.level().isClientSide) return;
+        BetterLootingConfig.PickupInterceptMode mode = BetterLootingConfig.get().pickupInterceptMode;
+        if (mode == BetterLootingConfig.PickupInterceptMode.ALWAYS || mode == BetterLootingConfig.PickupInterceptMode.AUTO) {
+            ci.cancel();
+        }
     }
 
     /**

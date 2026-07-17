@@ -17,19 +17,22 @@ public class PlatformHooksImpl {
         NeoForge.EVENT_BUS.post(new ItemEntityPickupEvent.Post(player, itemEntity, stack));
     }
 
+    /**
+     * AUTO 模式：以 HIGH 优先级的 NeoForge 事件拦截作为辅助防线。
+     * 主防线在 ItemEntityMixin#playerTouch HEAD（跨平台统一拦截，确保事件根本不被触发）。
+     * 此处仅处理绕过 playerTouch 直接触发 ItemEntityPickupEvent.Pre 的边缘情况。
+     */
     public static void setupPickupInterception() {
         NeoForge.EVENT_BUS.register(new NeoForgePickupInterceptor());
     }
 
     private static class NeoForgePickupInterceptor {
-        @SubscribeEvent(priority = EventPriority.LOWEST)
+        @SubscribeEvent(priority = EventPriority.HIGH)
         public void onItemPickup(ItemEntityPickupEvent.Pre event) {
-            if (BetterLootingConfig.get().pickupInterceptMode == PickupInterceptMode.AUTO) {
-                // 仅在其他模组未做决定时才拦截（canPickup 仍为 DEFAULT）
-                if (event.canPickup() == TriState.DEFAULT) {
-                    event.setCanPickup(TriState.FALSE);
-                }
-            }
+            if (BetterLootingConfig.get().pickupInterceptMode != PickupInterceptMode.AUTO) return;
+            // 已被其他模组主动接管则不重复拦截
+            if (event.canPickup() != TriState.DEFAULT) return;
+            event.setCanPickup(TriState.FALSE);
         }
     }
 }
