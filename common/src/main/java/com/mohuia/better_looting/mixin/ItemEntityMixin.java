@@ -11,6 +11,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -61,6 +62,28 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     @Override
     public void betterlooting$addExtraCount(int count) {
         this.betterlooting$setExtraCount(this.betterlooting$getExtraCount() + count);
+    }
+
+    /**
+     * 拦截原版 playerTouch 入口，从源头阻断拾取流程。
+     * <p>
+     * 为什么需要这个方法：在 Fabric 上 Architectury 的 PICKUP_ITEM_PRE 是"复合事件"，
+     * 即便 BL 返回 interruptFalse() 也会调用所有已注册的监听器，导致 pick-up-notifier 等
+     * 观察者模组在每 tick 收到拾取事件并疯狂刷屏。在 playerTouch HEAD 直接取消则
+     * 事件根本不会触发。
+     * <p>
+     * 在 Forge 上此方法作为 ForgePickupInterceptor 的底层防线，避免 EntityItemPickupEvent
+     * 每 tick 重复触发的性能开销。
+     * <p>
+     * 实际拾取操作由 PacketBatchPickup 完全接管，不走此路径。
+     */
+    @Inject(method = "playerTouch", at = @At("HEAD"), cancellable = true)
+    private void betterlooting$interceptPlayerTouch(Player player, CallbackInfo ci) {
+        if (this.level().isClientSide) return;
+        BetterLootingConfig.PickupInterceptMode mode = BetterLootingConfig.get().pickupInterceptMode;
+        if (mode == BetterLootingConfig.PickupInterceptMode.ALWAYS || mode == BetterLootingConfig.PickupInterceptMode.AUTO) {
+            ci.cancel();
+        }
     }
 
     /**
