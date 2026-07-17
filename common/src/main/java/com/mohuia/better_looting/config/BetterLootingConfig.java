@@ -81,6 +81,7 @@ public class BetterLootingConfig {
     // 核心功能设置 (Core Feature Settings)
     // ==========================================
     public PickupInterceptMode pickupInterceptMode = PickupInterceptMode.AUTO;
+    public LongPressMode longPressMode = LongPressMode.PICKUP_ALL;
     public int stabilityThresholdTicks = 4;
     public boolean enableRareItemFilter = true;
     public boolean enableSuperMerge = true;
@@ -159,6 +160,16 @@ public class BetterLootingConfig {
         ALWAYS
     }
 
+    /**
+     * 长按拾取行为模式
+     */
+    public enum LongPressMode {
+        /** 全部拾取：长按一键拾取范围内所有掉落物 */
+        PICKUP_ALL,
+        /** 单行全部拾取：长按一键拾取当前选中行同类物品的全部 */
+        PICKUP_ROW
+    }
+
     private static BetterLootingConfig INSTANCE = new BetterLootingConfig();
     public static BetterLootingConfig get() { return INSTANCE; }
 
@@ -211,6 +222,7 @@ public class BetterLootingConfig {
         if (this.animationSpeed == null) this.animationSpeed = AnimationSpeed.MEDIUM;
         if (this.scrollMode == null) this.scrollMode = ScrollMode.ALWAYS;
         if (this.pickupInterceptMode == null) this.pickupInterceptMode = PickupInterceptMode.AUTO;
+        if (this.longPressMode == null) this.longPressMode = LongPressMode.PICKUP_ALL;
         if (this.lastFilterMode == null) this.lastFilterMode = FilterMode.ALL;
     }
 
@@ -292,6 +304,8 @@ public class BetterLootingConfig {
             config.setComment("Core", "核心功能设置 (Core Feature Settings)");
             config.setComment("Core.pickupInterceptMode", "拾取拦截策略: AUTO(智能,推荐) / ALWAYS(始终拦截)");
             config.set("Core.pickupInterceptMode", INSTANCE.pickupInterceptMode.name());
+            config.setComment("Core.longPressMode", "长按拾取模式: PICKUP_ALL(全部拾取,默认) / PICKUP_ROW(单行全部拾取)");
+            config.set("Core.longPressMode", INSTANCE.longPressMode.name());
             config.setComment("Core.stabilityThresholdTicks", "物品必须连续存在多少 tick 才在悬浮窗显示（默认4=0.2秒，0=关闭）");
             config.set("Core.stabilityThresholdTicks", INSTANCE.stabilityThresholdTicks);
             config.setComment("Core.enableRareItemFilter", "白名单是否启用默认稀有物品过滤。关闭后仅显示白名单内的物品");
@@ -370,6 +384,7 @@ public class BetterLootingConfig {
             INSTANCE.scanRangeY = config.<Number>getOrElse("Scanning.scanRangeY", 1.0f).floatValue();
 
             try { INSTANCE.pickupInterceptMode = PickupInterceptMode.valueOf(config.getOrElse("Core.pickupInterceptMode", "AUTO")); } catch (Exception ignored) {}
+            try { INSTANCE.longPressMode = LongPressMode.valueOf(config.getOrElse("Core.longPressMode", "PICKUP_ALL")); } catch (Exception ignored) {}
             INSTANCE.stabilityThresholdTicks = config.getOrElse("Core.stabilityThresholdTicks", 4);
             INSTANCE.enableRareItemFilter = config.getOrElse("Core.enableRareItemFilter", true);
             INSTANCE.enableSuperMerge = config.getOrElse("Core.enableSuperMerge", true);
