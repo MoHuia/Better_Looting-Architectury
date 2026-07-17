@@ -43,11 +43,11 @@ public class KeyInit {
             CATEGORY
     );
 
-    // 物品栏列表全量拾取修饰键，按住时单击/拖拽均拾取该行全部物品 (默认未绑定)
+    // 物品栏列表全量拾取修饰键，按住时单击/拖拽均拾取该行全部物品 (默认: 左 Shift)
     public static final KeyMapping PICKUP_ALL_MODIFIER = new KeyMapping(
             "key.better_looting.pickup_all_modifier",
             InputConstants.Type.KEYSYM,
-            InputConstants.UNKNOWN.getValue(),
+            GLFW.GLFW_KEY_LEFT_SHIFT,
             CATEGORY
     );
 

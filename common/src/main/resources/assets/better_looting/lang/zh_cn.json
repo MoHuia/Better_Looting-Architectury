@@ -3,7 +3,7 @@
   "key.categories.better_looting": "Better Looting",
   "key.better_looting.pickup": "拾取最近物品",
   "key.better_looting.pickup_alt": "拾取最近物品（备用）",
-  "key.better_looting.pickup_all_modifier": "物品栏列表全量拾取修饰键",
+  "key.better_looting.pickup_all_modifier": "整行拾取修饰键",
   "key.better_looting.toggle_filter": "切换过滤模式",
   "key.better_looting.open_config": "打开配置菜单",
   "key.better_looting.toggle_auto": "自动拾取开关",

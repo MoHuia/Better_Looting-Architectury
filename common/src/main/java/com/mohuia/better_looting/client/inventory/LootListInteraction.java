@@ -7,7 +7,9 @@ import com.mohuia.better_looting.mixin.ACSAccessor;
 import com.mohuia.better_looting.network.C2S.PacketBatchPickup;
 import com.mohuia.better_looting.network.C2S.PacketPlaceIntoSlot;
 import com.mohuia.better_looting.network.NetworkHandler;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -159,6 +161,12 @@ public class LootListInteraction {
 
         InventoryLootList list = InventoryLootList.INSTANCE;
 
+        // 直接查 GLFW 原始按键状态，绕过 KeyMapping.isDown() 的 tick 更新时序问题
+        // saveString() 返回当前绑定键名，经 InputConstants.getKey 解析回 Key，无需 Accessor mixin
+        long w = Minecraft.getInstance().getWindow().getWindow();
+        var key = InputConstants.getKey(KeyInit.PICKUP_ALL_MODIFIER.saveString());
+        boolean pickupAllMod = key.getValue() != -1 && InputConstants.isKeyDown(w, key.getValue());
+
         if (dragIndex < 0 || dragIndex >= list.nearbyItems.size()) {
             dragIndex = -1;
             dragModeActive = false;
@@ -166,9 +174,6 @@ public class LootListInteraction {
         }
 
         VisualItemEntry entry = list.nearbyItems.get(dragIndex);
-
-        // 按住全量拾取修饰键时，无论单击还是拖拽均拾取该行全部物品
-        boolean pickupAllMod = KeyInit.PICKUP_ALL_MODIFIER.isDown();
 
         if (pickupAllMod) {
             List<Integer> ids = new ArrayList<>();
