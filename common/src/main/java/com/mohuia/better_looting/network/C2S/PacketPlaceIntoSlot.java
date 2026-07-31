@@ -67,83 +67,87 @@ public class PacketPlaceIntoSlot {
             int toTake = Math.min(totalAvailable, 64);
             if (toTake <= 0) return;
 
+            // 光标上已有物品时不处理，否则交换出的旧物品会覆盖并销毁它
+            if (!player.containerMenu.getCarried().isEmpty()) return;
+
             // 目标槽位
             Slot slot = player.containerMenu.getSlot(slotIndex);
             if (slot == null || !slot.mayPlace(groundStack)) return;
 
             ItemStack insertStack = groundStack.copy();
             insertStack.setCount(toTake);
+            int maxStack = insertStack.getMaxStackSize();
             ItemStack existing = slot.getItem();
-            ItemStack remainder = ItemStack.EMPTY;
+
+            // actuallyTaken 只统计真正离开地面的数量（进入槽位 + 进入光标的地面物品）
+            // toCarry 是要放到光标上的物品，可能是地面溢出物，也可能是被顶出的旧物品
+            int actuallyTaken;
+            ItemStack toCarry = ItemStack.EMPTY;
 
             if (existing.isEmpty()) {
-                // 空槽位：全部放入
-                int inSlot = Math.min(toTake, insertStack.getMaxStackSize());
+                // 空槽位：先填满槽位，溢出部分放到光标
+                int inSlot = Math.min(toTake, maxStack);
                 slot.set(insertStack.copyWithCount(inSlot));
-                if (toTake > inSlot) {
-                    remainder = insertStack.copyWithCount(toTake - inSlot);
+                actuallyTaken = inSlot;
+                int overflow = Math.min(toTake - inSlot, maxStack);
+                if (overflow > 0) {
+                    toCarry = insertStack.copyWithCount(overflow);
+                    actuallyTaken += overflow;
                 }
             } else if (ItemStack.isSameItemSameTags(existing, insertStack)) {
-                // 同类型：补满堆叠
+                // 同类型：补满堆叠，溢出部分放到光标
                 int canAdd = Math.min(existing.getMaxStackSize() - existing.getCount(), toTake);
-                existing.grow(canAdd);
-                slot.setChanged();
-                int leftover = toTake - canAdd;
-                if (leftover > 0) {
-                    remainder = insertStack.copyWithCount(leftover);
+                if (canAdd > 0) {
+                    existing.grow(canAdd);
+                    slot.setChanged();
+                }
+                actuallyTaken = canAdd;
+                int overflow = Math.min(toTake - canAdd, maxStack);
+                if (overflow > 0) {
+                    toCarry = insertStack.copyWithCount(overflow);
+                    actuallyTaken += overflow;
                 }
             } else {
-                // 异类：交换，旧物品移到 carried
-                remainder = existing.copy();
-                int inSlot = Math.min(toTake, insertStack.getMaxStackSize());
+                // 异类：交换，旧物品占用光标，因此地面溢出物只能留在地上
+                if (!slot.mayPickup(player)) return;
+                int inSlot = Math.min(toTake, maxStack);
                 slot.set(insertStack.copyWithCount(inSlot));
-                if (toTake > inSlot) {
-                    // 如果剩余放不进 carried（已有旧物品），继续作为剩余叠加
-                    // carried 只能有一个，这里优先级：old item 在 carried，多余同种物品合并
-                    ItemStack extra = insertStack.copyWithCount(toTake - inSlot);
-                    if (ItemStack.isSameItemSameTags(existing, extra)) {
-                        remainder.grow(extra.getCount());
-                    }
-                    // 否则只能丢弃（极端情况，一般不触发）
-                }
+                actuallyTaken = inSlot;
+                toCarry = existing.copy();
             }
 
-            int actuallyTaken = toTake;
-            if (!remainder.isEmpty()) {
-                actuallyTaken = toTake - remainder.getCount();
+            if (actuallyTaken <= 0) {
+                player.containerMenu.broadcastChanges();
+                return;
             }
 
-            // 设置 carried
-            player.containerMenu.setCarried(remainder);
+            player.containerMenu.setCarried(toCarry);
 
-            if (actuallyTaken > 0) {
-                // 更新统计数据
-                player.awardStat(Stats.ITEM_PICKED_UP.get(groundStack.getItem()), actuallyTaken);
+            // 更新统计数据
+            player.awardStat(Stats.ITEM_PICKED_UP.get(groundStack.getItem()), actuallyTaken);
 
-                int animAmount = Math.min(actuallyTaken, Math.max(1, groundStack.getCount() - 1));
-                player.take(item, animAmount);
+            player.take(item, actuallyTaken);
 
-                try {
-                    ItemStack pickedUp = groundStack.copy();
-                    pickedUp.setCount(actuallyTaken);
-                    PlatformHooks.fireItemPickupEvent(player, item, pickedUp);
-                } catch (Throwable t) {
-                    player.sendSystemMessage(net.minecraft.network.chat.Component.literal("§c[BetterLooting] Platform hook failed: " + t));
-                }
-
-                // 更新地面实体
-                int remainingAfterTake = totalAvailable - actuallyTaken;
-                if (remainingAfterTake <= 0) {
-                    item.discard();
-                } else {
-                    int newBase = Math.min(remainingAfterTake, groundStack.getMaxStackSize());
-                    groundStack.setCount(newBase);
-                    item.setItem(groundStack.copy());
-                    superStack.betterlooting$setExtraCount(remainingAfterTake - newBase);
-                }
-
-                player.playNotifySound(SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, 2.0F);
+            try {
+                ItemStack pickedUp = groundStack.copy();
+                pickedUp.setCount(actuallyTaken);
+                PlatformHooks.fireItemPickupEvent(player, item, pickedUp);
+            } catch (Throwable t) {
+                player.sendSystemMessage(net.minecraft.network.chat.Component.literal("§c[BetterLooting] Platform hook failed: " + t));
             }
+
+            // 更新地面实体
+            int remainingAfterTake = totalAvailable - actuallyTaken;
+            if (remainingAfterTake <= 0) {
+                item.discard();
+            } else {
+                int newBase = Math.min(remainingAfterTake, groundStack.getMaxStackSize());
+                groundStack.setCount(newBase);
+                item.setItem(groundStack.copy());
+                superStack.betterlooting$setExtraCount(remainingAfterTake - newBase);
+            }
+
+            player.playNotifySound(SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, 2.0F);
 
             // 同步库存到客户端
             player.containerMenu.broadcastChanges();
