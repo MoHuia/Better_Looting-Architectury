@@ -18,20 +18,23 @@ public class PlatformHooksImpl {
     }
 
     /**
-     * AUTO 模式：以 HIGH 优先级的 NeoForge 事件拦截作为辅助防线。
-     * 主防线在 ItemEntityMixin#playerTouch HEAD（跨平台统一拦截，确保事件根本不被触发）。
-     * 此处仅处理绕过 playerTouch 直接触发 ItemEntityPickupEvent.Pre 的边缘情况。
+     * AUTO 模式：以 LOWEST 优先级的 NeoForge 事件拦截作为兜底。
+     * <p>
+     * 让默认 NORMAL 优先级的"拾取响应"模组（如精妙背包的拾取升级，它监听 ItemEntityPickupEvent.Pre
+     * 把物品装入背包并 setCanPickup(FALSE)）先处理事件；若事件已被它们接管，BL 直接放行；
+     * 若无人处理，BL 才设置 canPickup(FALSE) 阻止原版拾取，由 PacketBatchPickup 接管。
      */
     public static void setupPickupInterception() {
         NeoForge.EVENT_BUS.register(new NeoForgePickupInterceptor());
     }
 
     private static class NeoForgePickupInterceptor {
-        @SubscribeEvent(priority = EventPriority.HIGH)
+        @SubscribeEvent(priority = EventPriority.LOWEST)
         public void onItemPickup(ItemEntityPickupEvent.Pre event) {
             if (BetterLootingConfig.get().pickupInterceptMode != PickupInterceptMode.AUTO) return;
-            // 已被其他模组主动接管则不重复拦截
+            // 已被其他模组主动接管（如精妙背包拾取升级已把物品装入背包）→ 放行
             if (event.canPickup() != TriState.DEFAULT) return;
+            // 无人处理 → 兜底阻止原版拾取进入玩家背包
             event.setCanPickup(TriState.FALSE);
         }
     }
