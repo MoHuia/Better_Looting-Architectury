@@ -2,6 +2,7 @@ package com.mohuia.better_looting.mixin;
 
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.config.BetterLootingConfig;
+import dev.architectury.platform.Platform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -65,15 +66,14 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     }
 
     /**
-     * 拦截原版 playerTouch 入口，从源头阻断拾取流程。
+     * 拦截原版 playerTouch 入口。
      * <p>
-     * 为什么需要这个方法：在 Fabric 上 Architectury 的 PICKUP_ITEM_PRE 是"复合事件"，
-     * 即便 BL 返回 interruptFalse() 也会调用所有已注册的监听器，导致 pick-up-notifier 等
-     * 观察者模组在每 tick 收到拾取事件并疯狂刷屏。在 playerTouch HEAD 直接取消则
-     * 事件根本不会触发。
+     * ALWAYS 模式：无条件取消原版拾取，完全由 BL 接管（用户主动选择，可能与背包类模组冲突）。
      * <p>
-     * 在 Forge 上此方法作为 ForgePickupInterceptor 的底层防线，避免 EntityItemPickupEvent
-     * 每 tick 重复触发的性能开销。
+     * AUTO 模式（默认）：
+     * - Forge：放行 playerTouch，让 Forge 的 EntityItemPickupEvent 正常抛出。精妙背包等"拾取响应"
+     *   模组依赖该事件实现拾取升级，BL 的 ForgePickupInterceptor（LOWEST 优先级）作为兜底。
+     * - Fabric：保持拦截（Fabric 无优先级事件总线，由 PICKUP_ITEM_PRE 兜底；官方精妙背包无 Fabric 版）。
      * <p>
      * 实际拾取操作由 PacketBatchPickup 完全接管，不走此路径。
      */
@@ -81,7 +81,12 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     private void betterlooting$interceptPlayerTouch(Player player, CallbackInfo ci) {
         if (this.level().isClientSide) return;
         BetterLootingConfig.PickupInterceptMode mode = BetterLootingConfig.get().pickupInterceptMode;
-        if (mode == BetterLootingConfig.PickupInterceptMode.ALWAYS || mode == BetterLootingConfig.PickupInterceptMode.AUTO) {
+        if (mode == BetterLootingConfig.PickupInterceptMode.ALWAYS) {
+            ci.cancel();
+            return;
+        }
+        // AUTO 模式：仅 Fabric 端拦截（详见方法注释）
+        if (Platform.isFabric()) {
             ci.cancel();
         }
     }

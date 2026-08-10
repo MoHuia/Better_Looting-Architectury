@@ -19,22 +19,23 @@ public class PlatformHooksImpl {
     }
 
     /**
-     * AUTO 模式：在 Forge 事件总线上以 HIGH 优先级注册拾取拦截器。
-     * 高于默认 NORMAL 优先级，确保在拾取提示类观察者模组之前取消事件。
-     * receiveCanceled=true 配合 isCanceled() 检查，保证已被其他模组取消的事件不会被重复拦截，
-     * 从而兼容精妙背包等模组的拾取升级（它们一般不通过 EntityItemPickupEvent 工作，但以防万一）。
+     * AUTO 模式：在 Forge 事件总线上以 LOWEST 优先级注册拾取拦截器（兜底）。
+     * <p>
+     * 让默认 NORMAL 优先级的"拾取响应"模组（如精妙背包的拾取升级，它监听 EntityItemPickupEvent
+     * 把物品装入背包并取消事件）先处理事件；若事件已被它们取消，BL 直接放行；
+     * 若无人处理，BL 才取消事件阻止原版拾取，由 PacketBatchPickup 接管。
      */
     public static void setupPickupInterception() {
         MinecraftForge.EVENT_BUS.register(new ForgePickupInterceptor());
     }
 
     private static class ForgePickupInterceptor {
-        @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
+        @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
         public void onItemPickup(EntityItemPickupEvent event) {
             if (BetterLootingConfig.get().pickupInterceptMode != PickupInterceptMode.AUTO) return;
-            // 如果已被其他模组取消（说明有模组正在主动接管拾取），则不重复拦截
+            // 已被其他模组取消（如精妙背包拾取升级已把物品装入背包）→ 放行，不重复拦截
             if (event.isCanceled()) return;
-            // 以 HIGH 优先级取消，使得 NORMAL 优先级的观察者模组（如 pick-up-notifier）不再收到此事件
+            // 无人处理 → 兜底取消，阻止原版拾取进入玩家背包
             event.setCanceled(true);
         }
     }
