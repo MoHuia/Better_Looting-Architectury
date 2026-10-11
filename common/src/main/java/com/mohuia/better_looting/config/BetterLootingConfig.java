@@ -84,7 +84,7 @@ public class BetterLootingConfig {
     public LongPressMode longPressMode = LongPressMode.PICKUP_ALL;
     public int stabilityThresholdTicks = 4;
     public boolean enableRareItemFilter = true;
-    public boolean enableSuperMerge = true;
+    public boolean enableSuperMerge = !Platform.isModLoaded("create");
     public float mergeRangeXZ = 5.0f;
     public float mergeRangeY = 5.0f;
     /** 运输方块黑名单，逗号分隔的方块ID关键词。物品站在含有关键词的方块上将跳过超大堆叠合并，避免干扰机械动力等模组的传送带/漏斗/溜槽运输逻辑。 */
@@ -97,6 +97,8 @@ public class BetterLootingConfig {
     // ==========================================
     public FilterMode lastFilterMode = FilterMode.ALL;
     public boolean lastAutoMode = false;
+    /** 首次检测 Create 后应用默认关闭一次，随后保留用户手动设置。 */
+    public boolean createMergeDefaultApplied = Platform.isModLoaded("create");
 
     /**
      * 获取实际生效的水平拾取范围。
@@ -190,8 +192,8 @@ public class BetterLootingConfig {
         this.visibleRows = Mth.clamp(this.visibleRows, 1.0f, 20.0f);
         this.globalAlpha = Mth.clamp(this.globalAlpha, 0.1f, 1.0f);
         this.lookDownAngle = Mth.clamp(this.lookDownAngle, 0.0f, 90.0f);
-        this.scanRangeXZ = Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f);
-        this.scanRangeY = Mth.clamp(this.scanRangeY, 0.5f, 5.0f);
+        this.scanRangeXZ = Float.isFinite(this.scanRangeXZ) ? Mth.clamp(this.scanRangeXZ, 0.5f, 8.0f) : 1.0f;
+        this.scanRangeY = Float.isFinite(this.scanRangeY) ? Mth.clamp(this.scanRangeY, 0.5f, 5.0f) : 1.0f;
         this.pickupDelaySeconds = Mth.clamp(this.pickupDelaySeconds, 0.0f, 5.0f);
         this.maxHoldTicks = Mth.clamp(this.maxHoldTicks, 0, 100);
 
@@ -310,7 +312,7 @@ public class BetterLootingConfig {
             config.set("Core.stabilityThresholdTicks", INSTANCE.stabilityThresholdTicks);
             config.setComment("Core.enableRareItemFilter", "白名单是否启用默认稀有物品过滤。关闭后仅显示白名单内的物品");
             config.set("Core.enableRareItemFilter", INSTANCE.enableRareItemFilter);
-            config.setComment("Core.enableSuperMerge", "是否开启掉落物超大堆叠合并");
+            config.setComment("Core.enableSuperMerge", "是否开启掉落物超大堆叠合并。检测到机械动力时默认关闭；手动开启可能影响运输和加工");
             config.set("Core.enableSuperMerge", INSTANCE.enableSuperMerge);
             config.setComment("Core.mergeRangeXZ", "水平合并范围 (最大 10)");
             config.set("Core.mergeRangeXZ", INSTANCE.mergeRangeXZ);
@@ -327,6 +329,8 @@ public class BetterLootingConfig {
             config.setComment("State.lastFilterMode", "状态持久化数据，请勿更改此处");
             config.set("State.lastFilterMode", INSTANCE.lastFilterMode.name());
             config.set("State.lastAutoMode", INSTANCE.lastAutoMode);
+            config.setComment("State.createMergeDefaultApplied", "机械动力兼容默认设置已应用，请勿更改；应用一次后保留用户手动选择");
+            config.set("State.createMergeDefaultApplied", INSTANCE.createMergeDefaultApplied);
 
             config.save();
         } catch (Exception e) {
@@ -344,6 +348,7 @@ public class BetterLootingConfig {
             return;
         }
 
+        boolean saveCreateDefault = false;
         try (CommentedFileConfig config = CommentedFileConfig.builder(CONFIG_FILE).sync().build()) {
             config.load();
 
@@ -387,7 +392,7 @@ public class BetterLootingConfig {
             try { INSTANCE.longPressMode = LongPressMode.valueOf(config.getOrElse("Core.longPressMode", "PICKUP_ALL")); } catch (Exception ignored) {}
             INSTANCE.stabilityThresholdTicks = config.getOrElse("Core.stabilityThresholdTicks", 4);
             INSTANCE.enableRareItemFilter = config.getOrElse("Core.enableRareItemFilter", true);
-            INSTANCE.enableSuperMerge = config.getOrElse("Core.enableSuperMerge", true);
+            INSTANCE.enableSuperMerge = config.getOrElse("Core.enableSuperMerge", !Platform.isModLoaded("create"));
             INSTANCE.mergeRangeXZ = config.<Number>getOrElse("Core.mergeRangeXZ", 5.0f).floatValue();
             INSTANCE.mergeRangeY = config.<Number>getOrElse("Core.mergeRangeY", 5.0f).floatValue();
             INSTANCE.mergeTransportBlacklist = config.getOrElse("Core.mergeTransportBlacklist", "belt,conveyor,chute,funnel,depot");
@@ -396,6 +401,12 @@ public class BetterLootingConfig {
 
             try { INSTANCE.lastFilterMode = FilterMode.valueOf(config.getOrElse("State.lastFilterMode", "ALL")); } catch (Exception ignored) {}
             INSTANCE.lastAutoMode = config.getOrElse("State.lastAutoMode", false);
+            INSTANCE.createMergeDefaultApplied = config.getOrElse("State.createMergeDefaultApplied", false);
+            if (Platform.isModLoaded("create") && !INSTANCE.createMergeDefaultApplied) {
+                INSTANCE.enableSuperMerge = false;
+                INSTANCE.createMergeDefaultApplied = true;
+                saveCreateDefault = true;
+            }
 
             INSTANCE.validate();
         } catch (Exception e) {
@@ -403,6 +414,7 @@ public class BetterLootingConfig {
             INSTANCE = new BetterLootingConfig();
             save();
         }
+        if (saveCreateDefault) save();
     }
 
     public static void init() {

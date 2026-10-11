@@ -3,6 +3,7 @@ package com.mohuia.better_looting.network.C2S;
 import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.platform.PlatformHooks;
+import com.mohuia.better_looting.network.PickupRangeRules;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,6 +30,10 @@ public record PacketPlaceIntoSlot(
         int slotIndex
 ) implements CustomPacketPayload {
 
+    public PacketPlaceIntoSlot {
+        entityIds = List.copyOf(entityIds.subList(0, Math.min(entityIds.size(), PickupRangeRules.MAX_ENTITY_IDS)));
+    }
+
     public static final Type<PacketPlaceIntoSlot> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID, "place_into_slot")
     );
@@ -41,6 +46,9 @@ public record PacketPlaceIntoSlot(
             },
             buf -> {
                 int count = buf.readVarInt();
+                if (count < 0 || count > PickupRangeRules.MAX_ENTITY_IDS || count > buf.readableBytes() / Integer.BYTES) {
+                    throw new IllegalArgumentException("Invalid pickup entity count: " + count);
+                }
                 List<Integer> ids = new ArrayList<>(count);
                 for (int i = 0; i < count; i++) {
                     ids.add(buf.readInt());
@@ -56,14 +64,16 @@ public record PacketPlaceIntoSlot(
 
     public void handle(NetworkManager.PacketContext ctx) {
         ctx.queue(() -> {
-            ServerPlayer player = (ServerPlayer) ctx.getPlayer();
-            if (player == null || !player.isAlive()) return;
+            if (!(ctx.getPlayer() instanceof ServerPlayer player)) return;
+            if (!player.isAlive() || player.isSpectator()) return;
+
+            if (this.slotIndex() < 0 || this.slotIndex() >= player.containerMenu.slots.size()) return;
 
             // 仅处理第一个有效实体
             ItemEntity item = null;
             for (int id : this.entityIds()) {
                 Entity e = player.level().getEntity(id);
-                if (e instanceof ItemEntity ie && ie.isAlive() && player.distanceToSqr(ie) < 100.0) {
+                if (e instanceof ItemEntity ie && PickupRangeRules.canReach(player, ie)) {
                     item = ie;
                     break;
                 }

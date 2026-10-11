@@ -3,6 +3,7 @@ package com.mohuia.better_looting.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;
@@ -22,6 +23,12 @@ public class ThemedSlider extends AbstractSliderButton {
 
     public ThemedSlider(int x, int y, int width, int height, Component prefix, String suffix,
                         double min, double max, double current, int precision, Consumer<Double> setter) {
+        this(x, y, width, height, prefix, suffix, min, max, current, precision, setter, null);
+    }
+
+    public ThemedSlider(int x, int y, int width, int height, Component prefix, String suffix,
+                        double min, double max, double current, int precision, Consumer<Double> setter,
+                        Tooltip tooltip) {
         super(x, y, width, height, prefix, (current - min) / (max - min));
         this.prefix = prefix;
         this.min = min;
@@ -29,6 +36,7 @@ public class ThemedSlider extends AbstractSliderButton {
         this.precision = precision;
         this.suffix = suffix;
         this.setter = setter;
+        if (tooltip != null) this.setTooltip(tooltip);
         updateMessage();
     }
 
@@ -46,7 +54,7 @@ public class ThemedSlider extends AbstractSliderButton {
 
     @Override
     public void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        boolean hovered = this.isHoveredOrFocused();
+        boolean hovered = this.active && this.isHoveredOrFocused();
         float t = hover.update(hovered);
         int x = getX(), y = getY(), w = width, h = height;
 
@@ -66,6 +74,7 @@ public class ThemedSlider extends AbstractSliderButton {
         // 居中文字
         var font = Minecraft.getInstance().font;
         int tw = font.width(getMessage());
-        gui.drawString(font, getMessage(), x + (w - tw) / 2, y + (h - 8) / 2, GuiTheme.TEXT, false);
+        gui.drawString(font, getMessage(), x + (w - tw) / 2, y + (h - 8) / 2,
+                this.active ? GuiTheme.TEXT : GuiTheme.TEXT_MUTED, false);
     }
 }

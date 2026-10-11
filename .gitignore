@@ -1,56 +1,89 @@
+# ============================================================
+# Better Looting - Git ignore rules
+# Architectury multiplatform mod: common / fabric / neoforge
+# ============================================================
+
 # === Gradle ===
 .gradle/
+**/.gradle/
 build/
+**/build/
+gradle-app.setting
+.gradletasknamecache
+local.properties
+
+# === Architectury / Loom / Mixin generated sources ===
+.architectury-transformer/
+**/.architectury-transformer/
+mixin.out/
+**/mixin.out/
+remappedSrc/
+**/remappedSrc/
+
+# === Runtime (game saves, logs, configs, crash reports) ===
+run/
+**/run/
+crash-reports/
+**/crash-reports/
+logs/
+**/logs/
+saves/
+**/saves/
+**/run/**/*.zip
+
+# === Java / JVM ===
+*.class
+hs_err_pid*
+replay_pid*
+*.hprof
+*.jfr
+*.orig
+*.rej
+
+# === Build output ===
+output/
+bin/
+out/
+**/out/
+*.jar
+# Gradle wrapper must ship with the repo, so re-include it after the *.jar rule
 !gradle/wrapper/gradle-wrapper.jar
-*/build/
-*/.gradle/
 
 # === IDE ===
 .idea/
 *.iml
 *.ipr
 *.iws
+*.launch
 .vscode/
 *.swp
 *.swo
 *~
+.settings/
+.project
+.classpath
+.factorypath
+.metadata/
+.fleet/
+.kotlin/
 
-# === Runtime (game saves, logs, configs, crash reports) ===
-run/
-*/run/
-*.log
-*.log.gz
-*.zip
-crash-reports/
-saves/
-logs/
-
-# === Build output ===
-output/
-bin/
-out/
-*.class
-*.jar
-!gradle/wrapper/gradle-wrapper.jar
-
-# === Architectury transformer ===
-.architectury-transformer/
-*/.architectury-transformer/
+# === Agent / tooling (local-only working rules, not distributed) ===
+graphify-out/
+.claude/settings.local.json
+AGENTS.md
+AGENTS.local.md
+CLAUDE.md
+CLAUDE.local.md
+docs/agents/
 
 # === Legacy forge (project migrated to neoforge) ===
 forge/
 
-# === Graphify ===
-graphify-out/
-
 # === OS files ===
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# === Java ===
-hs_err_pid*
-replay_pid*
-
-# === Project Config ===
-CLAUDE.md
-docs/agents/
+# === Logs ===
+*.log
+*.log.gz

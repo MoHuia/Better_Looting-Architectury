@@ -4,6 +4,7 @@ import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.mixin.ItemEntityAccessor;
 import com.mohuia.better_looting.platform.PlatformHooks;
+import com.mohuia.better_looting.network.PickupRangeRules;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -37,6 +38,10 @@ public record PacketBatchPickup(
         boolean limitToMaxStack
 ) implements CustomPacketPayload {
 
+    public PacketBatchPickup {
+        entityIds = List.copyOf(entityIds.subList(0, Math.min(entityIds.size(), PickupRangeRules.MAX_ENTITY_IDS)));
+    }
+
     public static final Type<PacketBatchPickup> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(BetterLooting.MODID, "batch_pickup")
     );
@@ -57,6 +62,9 @@ public record PacketBatchPickup(
                 boolean isAuto = buf.readBoolean();
                 boolean limitToMaxStack = buf.readBoolean();
                 int count = buf.readVarInt();
+                if (count < 0 || count > PickupRangeRules.MAX_ENTITY_IDS || count > buf.readableBytes() / Integer.BYTES) {
+                    throw new IllegalArgumentException("Invalid pickup entity count: " + count);
+                }
                 List<Integer> entityIds = new ArrayList<>(count);
                 for (int i = 0; i < count; i++) {
                     entityIds.add(buf.readInt());
@@ -77,9 +85,9 @@ public record PacketBatchPickup(
     public void handle(NetworkManager.PacketContext ctx) {
         // 将逻辑放入主线程队列执行，确保线程安全（操作实体和背包必须在主线程）
         ctx.queue(() -> {
-            ServerPlayer player = (ServerPlayer) ctx.getPlayer();
+            if (!(ctx.getPlayer() instanceof ServerPlayer player)) return;
             // 基础校验：玩家必须在线且存活
-            if (player == null || !player.isAlive()) return;
+            if (!player.isAlive() || player.isSpectator()) return;
 
             // 如果启用了限制，则本次网络包最多只能拾取 64 个物品，否则无限制
             int remainingQuota = this.limitToMaxStack() ? 64 : Integer.MAX_VALUE;
@@ -94,9 +102,9 @@ public record PacketBatchPickup(
                 Entity target = player.level().getEntity(id);
 
                 // --- 1. 安全与防作弊校验 ---
-                // 必须是物品实体、必须存活、距离玩家不能超过 10 格 (100.0 = 10^2)
+                // 必须在服务端允许的拾取范围内，不信任客户端本地配置
                 // 如果是自动拾取，原版机制中的“拾取冷却延迟 (PickupDelay)”必须已经归零
-                if (!(target instanceof ItemEntity item) || !item.isAlive() || player.distanceToSqr(target) >= 100.0 ||
+                if (!(target instanceof ItemEntity item) || !PickupRangeRules.canReach(player, item) ||
                         (this.isAuto() && ((ItemEntityAccessor) item).getPickupDelay() > 0)) continue;
 
                 ItemStack stack = item.getItem();

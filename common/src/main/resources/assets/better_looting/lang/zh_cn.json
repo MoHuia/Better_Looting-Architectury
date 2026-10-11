@@ -134,5 +134,12 @@
   "gui.better_looting.config.section.scroll_behavior": "滚动行为",
   "gui.better_looting.config.section.pickup_timing": "拾取时机",
   "gui.better_looting.config.section.filter": "过滤",
-  "gui.better_looting.config.section.merge": "合并"
+  "gui.better_looting.config.section.merge": "合并",
+  "gui.better_looting.config.super_merge.create_tooltip": "检测到机械动力，堆叠优化默认关闭，以免影响运输和加工。你仍可手动开启，但可能导致产线物品丢失或滞留。",
+  "gui.better_looting.config.section.pickup_range": "拾取范围",
+  "gui.better_looting.config.scan_range_xz": "水平拾取范围",
+  "gui.better_looting.config.scan_range_y": "垂直拾取范围",
+  "gui.better_looting.config.readonly": "（只读）",
+  "gui.better_looting.config.pickup_range.readonly": "只读：需要开启作弊或拥有管理员权限才能修改。当前范围由服务器决定。",
+  "gui.better_looting.config.pickup_range.editable": "点击保存后更新服务器的全局拾取范围，所有玩家都会同步。"
 }

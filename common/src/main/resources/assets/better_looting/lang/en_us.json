@@ -134,5 +134,12 @@
   "gui.better_looting.config.section.scroll_behavior": "Scroll",
   "gui.better_looting.config.section.pickup_timing": "Pickup Timing",
   "gui.better_looting.config.section.filter": "Filter",
-  "gui.better_looting.config.section.merge": "Merge"
+  "gui.better_looting.config.section.merge": "Merge",
+  "gui.better_looting.config.super_merge.create_tooltip": "Create detected. Stack optimization is disabled by default to protect transport and processing. You can enable it manually, but items may be lost or get stuck in production lines.",
+  "gui.better_looting.config.section.pickup_range": "Pickup Range",
+  "gui.better_looting.config.scan_range_xz": "Horizontal Pickup Range",
+  "gui.better_looting.config.scan_range_y": "Vertical Pickup Range",
+  "gui.better_looting.config.readonly": " (Read-only)",
+  "gui.better_looting.config.pickup_range.readonly": "Read-only: enable cheats or obtain operator permissions to edit. The server controls the current range.",
+  "gui.better_looting.config.pickup_range.editable": "Save to update the server's global pickup range. All players receive the new values."
 }

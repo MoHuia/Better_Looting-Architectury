@@ -2,6 +2,7 @@ package com.mohuia.better_looting.config;
 
 import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.KeyInit;
+import com.mohuia.better_looting.client.PickupRangeSettings;
 import com.mohuia.better_looting.client.gui.Dropdown;
 import com.mohuia.better_looting.client.gui.GuiTheme;
 import com.mohuia.better_looting.client.gui.SelectButton;
@@ -14,6 +15,7 @@ import com.mohuia.better_looting.config.BetterLootingConfig.DisplayMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.LongPressMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.PickupInterceptMode;
 import com.mohuia.better_looting.config.BetterLootingConfig.ScrollMode;
+import dev.architectury.platform.Platform;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -585,6 +587,38 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         int x = contentX;
         int w = contentWidth;
 
+        // 拾取范围由服务器决定；本地配置保存不会写入这两个值。
+        y += addSectionHeader(y, "pickup_range", GuiTheme.SECTION_PICKUP);
+        boolean editable = PickupRangeSettings.canEdit();
+        String rangeTooltip = "gui." + BetterLooting.MODID + ".config.pickup_range."
+                + (editable ? "editable" : "readonly");
+        Component xzLabel = Component.translatable("gui." + BetterLooting.MODID + ".config.scan_range_xz");
+        Component yLabel = Component.translatable("gui." + BetterLooting.MODID + ".config.scan_range_y");
+        if (!editable) {
+            xzLabel = xzLabel.copy().append(Component.translatable("gui." + BetterLooting.MODID + ".config.readonly"));
+            yLabel = yLabel.copy().append(Component.translatable("gui." + BetterLooting.MODID + ".config.readonly"));
+        }
+        ThemedSlider xzSlider = new ThemedSlider(x, y, w, ROW_H,
+                xzLabel,
+                "m", 0.5, 8.0, viewModel.scanRangeXZ, 1, val -> {
+                    if (!PickupRangeSettings.canEdit()) return;
+                    viewModel.scanRangeXZ = (float) (Math.round(val * 10.0) / 10.0);
+                    viewModel.pickupRangeChanged = true;
+                }, Tooltip.create(Component.translatable(rangeTooltip)));
+        xzSlider.active = editable;
+        this.addScrollableWidget(xzSlider);
+        y += ROW_H + ROW_GAP;
+        ThemedSlider ySlider = new ThemedSlider(x, y, w, ROW_H,
+                yLabel,
+                "m", 0.5, 5.0, viewModel.scanRangeY, 1, val -> {
+                    if (!PickupRangeSettings.canEdit()) return;
+                    viewModel.scanRangeY = (float) (Math.round(val * 10.0) / 10.0);
+                    viewModel.pickupRangeChanged = true;
+                }, Tooltip.create(Component.translatable(rangeTooltip)));
+        ySlider.active = editable;
+        this.addScrollableWidget(ySlider);
+        y += ROW_H + ROW_GAP + 4;
+
         // —— 过滤 ——
         y += addSectionHeader(y, "filter", GuiTheme.SECTION_FILTER);
         y = addToggle(x, y, w, "rare_item_filter",
@@ -594,7 +628,9 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
         // —— 合并 ——
         y += addSectionHeader(y, "merge", GuiTheme.SECTION_MERGE);
         y = addToggle(x, y, w, "super_merge",
-                () -> viewModel.enableSuperMerge, () -> viewModel.enableSuperMerge = !viewModel.enableSuperMerge, true);
+                () -> viewModel.enableSuperMerge, () -> viewModel.enableSuperMerge = !viewModel.enableSuperMerge, true,
+                Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config.super_merge"
+                        + (Platform.isModLoaded("create") ? ".create_tooltip" : ".tooltip"))));
 
         if (viewModel.enableSuperMerge) {
             this.addScrollableWidget(new ThemedSlider(x, y, w, ROW_H,
@@ -619,8 +655,13 @@ public class ConditionsScreen extends Screen implements Dropdown.Host {
 
     /** 添加一个开关行，needsRebuild=true 时点击会重建整个界面。 */
     private int addToggle(int x, int y, int w, String key, java.util.function.BooleanSupplier getter, Runnable toggle, boolean needsRebuild) {
-        Component label = Component.translatable("gui." + BetterLooting.MODID + ".config." + key);
         Tooltip tooltip = Tooltip.create(Component.translatable("gui." + BetterLooting.MODID + ".config." + key + ".tooltip"));
+        return addToggle(x, y, w, key, getter, toggle, needsRebuild, tooltip);
+    }
+
+    private int addToggle(int x, int y, int w, String key, java.util.function.BooleanSupplier getter, Runnable toggle,
+                          boolean needsRebuild, Tooltip tooltip) {
+        Component label = Component.translatable("gui." + BetterLooting.MODID + ".config." + key);
         this.addScrollableWidget(new ToggleButton(x, y, w, ROW_H, label, getter, () -> {
             toggle.run();
             if (needsRebuild) {

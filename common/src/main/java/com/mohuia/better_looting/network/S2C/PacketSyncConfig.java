@@ -3,6 +3,8 @@ package com.mohuia.better_looting.network.S2C;
 import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import dev.architectury.networking.NetworkManager;
+import dev.architectury.utils.Env;
+import com.mohuia.better_looting.network.PickupRangeRules;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -49,6 +51,7 @@ public class PacketSyncConfig implements CustomPacketPayload {
     // 数据包处理逻辑 (在客户端执行)
     public void handle(NetworkManager.PacketContext context) {
         // 将任务推送到主线程执行，确保线程安全
+        if (context.getEnvironment() != Env.CLIENT || !PickupRangeRules.isValid(this.scanRangeXZ, this.scanRangeY)) return;
         context.queue(() -> {
             BetterLootingConfig.get().serverScanRangeXZ = this.scanRangeXZ;
             BetterLootingConfig.get().serverScanRangeY = this.scanRangeY;
