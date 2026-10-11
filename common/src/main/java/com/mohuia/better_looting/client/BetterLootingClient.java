@@ -6,6 +6,8 @@ import com.mohuia.better_looting.client.overlay.HotbarIndicator;
 import com.mohuia.better_looting.client.overlay.Overlay;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.client.ClientPlayerEvent;
+import com.mohuia.better_looting.config.BetterLootingConfig;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +20,10 @@ import net.fabricmc.api.Environment;
 public class BetterLootingClient {
 
     public static void init() {
+        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> {
+            BetterLootingConfig.get().serverScanRangeXZ = -1.0f;
+            BetterLootingConfig.get().serverScanRangeY = -1.0f;
+        });
         // 1. 注册所有的按键绑定
         KeyMappingRegistry.register(KeyInit.TOGGLE_FILTER);
         KeyMappingRegistry.register(KeyInit.PICKUP);

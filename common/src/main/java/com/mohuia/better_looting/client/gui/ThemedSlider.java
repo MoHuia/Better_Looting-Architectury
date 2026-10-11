@@ -54,7 +54,7 @@ public class ThemedSlider extends AbstractSliderButton {
 
     @Override
     public void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        boolean hovered = this.isHoveredOrFocused();
+        boolean hovered = this.active && this.isHoveredOrFocused();
         float t = hover.update(hovered);
         int x = getX(), y = getY(), w = width, h = height;
 
@@ -74,6 +74,7 @@ public class ThemedSlider extends AbstractSliderButton {
         // 居中文字
         var font = Minecraft.getInstance().font;
         int tw = font.width(getMessage());
-        gui.drawString(font, getMessage(), x + (w - tw) / 2, y + (h - 8) / 2, GuiTheme.TEXT, false);
+        gui.drawString(font, getMessage(), x + (w - tw) / 2, y + (h - 8) / 2,
+                this.active ? GuiTheme.TEXT : GuiTheme.TEXT_MUTED, false);
     }
 }

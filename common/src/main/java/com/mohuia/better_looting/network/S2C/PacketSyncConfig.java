@@ -2,6 +2,8 @@ package com.mohuia.better_looting.network.S2C;
 
 import com.mohuia.better_looting.config.BetterLootingConfig;
 import dev.architectury.networking.NetworkManager;
+import com.mohuia.better_looting.network.PickupRangeRules;
+import dev.architectury.utils.Env;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.function.Supplier;
@@ -34,6 +36,7 @@ public class PacketSyncConfig {
     // 数据包处理逻辑 (在客户端执行)
     public void handle(Supplier<NetworkManager.PacketContext> contextSupplier) {
         NetworkManager.PacketContext context = contextSupplier.get();
+        if (context.getEnvironment() != Env.CLIENT || !PickupRangeRules.isValid(scanRangeXZ, scanRangeY)) return;
         // 将任务推送到主线程执行策安全操作
         context.queue(() -> {
             BetterLootingConfig.get().serverScanRangeXZ = this.scanRangeXZ;

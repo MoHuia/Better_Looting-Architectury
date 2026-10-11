@@ -3,6 +3,7 @@ package com.mohuia.better_looting.network.C2S;
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.mixin.ItemEntityAccessor;
 import com.mohuia.better_looting.platform.PlatformHooks;
+import com.mohuia.better_looting.network.PickupRangeRules;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
@@ -38,7 +39,7 @@ public class PacketBatchPickup {
      * 用于在客户端收集完需要拾取的实体后，封装成数据包准备发送给服务端。
      */
     public PacketBatchPickup(List<Integer> entityIds, boolean isAuto, boolean limitToMaxStack) {
-        this.entityIds = entityIds;
+        this.entityIds = List.copyOf(entityIds.subList(0, Math.min(entityIds.size(), PickupRangeRules.MAX_ENTITY_IDS)));
         this.isAuto = isAuto;
         this.limitToMaxStack = limitToMaxStack;
     }
@@ -51,6 +52,9 @@ public class PacketBatchPickup {
         this.isAuto = buf.readBoolean();
         this.limitToMaxStack = buf.readBoolean();
         int count = buf.readVarInt();
+        if (count < 0 || count > PickupRangeRules.MAX_ENTITY_IDS || count > buf.readableBytes() / Integer.BYTES) {
+            throw new IllegalArgumentException("Invalid pickup entity count");
+        }
         this.entityIds = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             this.entityIds.add(buf.readInt());
@@ -75,7 +79,7 @@ public class PacketBatchPickup {
     public void handle(Supplier<NetworkManager.PacketContext> ctx) {
         // 将逻辑放入主线程队列执行，确保线程安全（操作实体和背包必须在主线程）
         ctx.get().queue(() -> {
-            ServerPlayer player = (ServerPlayer) ctx.get().getPlayer();
+            if (!(ctx.get().getPlayer() instanceof ServerPlayer player)) return;
             // 基础校验：玩家必须在线且存活
             if (player == null || !player.isAlive()) return;
 
@@ -92,9 +96,9 @@ public class PacketBatchPickup {
                 Entity target = player.level().getEntity(id);
 
                 // --- 1. 安全与防作弊校验 ---
-                // 必须是物品实体、必须存活、距离玩家不能超过 10 格 (100.0 = 10^2)
+                // 两种拾取入口均使用服务端配置的碰撞箱范围，与扫描形状一致。
                 // 如果是自动拾取，原版机制中的“拾取冷却延迟 (PickupDelay)”必须已经归零
-                if (!(target instanceof ItemEntity item) || !item.isAlive() || player.distanceToSqr(item) >= 100.0 ||
+                if (!(target instanceof ItemEntity item) || !PickupRangeRules.canReach(player, item) ||
                         (isAuto && ((ItemEntityAccessor) item).getPickupDelay() > 0)) continue;
 
                 ItemStack stack = item.getItem();

@@ -1,6 +1,7 @@
 package com.mohuia.better_looting.config;
 
 import com.mohuia.better_looting.client.Constants;
+import com.mohuia.better_looting.client.PickupRangeSettings;
 import net.minecraft.util.Mth;
 
 /**
@@ -55,6 +56,8 @@ public class ConfigViewModel {
     public BetterLootingConfig.PickupInterceptMode pickupInterceptMode;
     public BetterLootingConfig.LongPressMode longPressMode;
     public float lookDownAngle;
+    public float scanRangeXZ, scanRangeY;
+    public boolean pickupRangeChanged;
 
     // 白名单稀有物品过滤开关
     public boolean enableRareItemFilter;
@@ -105,6 +108,9 @@ public class ConfigViewModel {
         this.pickupInterceptMode = cfg.pickupInterceptMode;
         this.longPressMode = cfg.longPressMode;
         this.lookDownAngle = cfg.lookDownAngle;
+        this.scanRangeXZ = cfg.getActualScanRangeXZ();
+        this.scanRangeY = cfg.getActualScanRangeY();
+        this.pickupRangeChanged = false;
         this.showHotbarIndicator = cfg.showHotbarIndicator;
 
         // 读取自定义标题；做 null 保护，避免输入框或渲染阶段空指针
@@ -218,6 +224,11 @@ public class ConfigViewModel {
         this.pickupInterceptMode = defaults.pickupInterceptMode;
         this.longPressMode = defaults.longPressMode;
         this.lookDownAngle = defaults.lookDownAngle;
+        if (PickupRangeSettings.canEdit()) {
+            this.scanRangeXZ = defaults.scanRangeXZ;
+            this.scanRangeY = defaults.scanRangeY;
+            this.pickupRangeChanged = true;
+        }
         this.showHotbarIndicator = defaults.showHotbarIndicator;
 
         // 恢复默认标题；同样做 null 保护

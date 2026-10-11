@@ -2,6 +2,7 @@ package com.mohuia.better_looting.network.C2S;
 
 import com.mohuia.better_looting.client.core.ISuperStack;
 import com.mohuia.better_looting.platform.PlatformHooks;
+import com.mohuia.better_looting.network.PickupRangeRules;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,12 +27,15 @@ public class PacketPlaceIntoSlot {
     private final int slotIndex;
 
     public PacketPlaceIntoSlot(List<Integer> entityIds, int slotIndex) {
-        this.entityIds = entityIds;
+        this.entityIds = List.copyOf(entityIds.subList(0, Math.min(entityIds.size(), PickupRangeRules.MAX_ENTITY_IDS)));
         this.slotIndex = slotIndex;
     }
 
     public PacketPlaceIntoSlot(FriendlyByteBuf buf) {
         int count = buf.readVarInt();
+        if (count < 0 || count > PickupRangeRules.MAX_ENTITY_IDS || count > (buf.readableBytes() - 1) / Integer.BYTES) {
+            throw new IllegalArgumentException("Invalid pickup entity count");
+        }
         this.entityIds = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             this.entityIds.add(buf.readInt());
@@ -47,14 +51,15 @@ public class PacketPlaceIntoSlot {
 
     public void handle(Supplier<NetworkManager.PacketContext> ctx) {
         ctx.get().queue(() -> {
-            ServerPlayer player = (ServerPlayer) ctx.get().getPlayer();
+            if (!(ctx.get().getPlayer() instanceof ServerPlayer player)) return;
             if (player == null || !player.isAlive()) return;
+            if (slotIndex < 0 || slotIndex >= player.containerMenu.slots.size()) return;
 
             // 仅处理第一个有效实体
             ItemEntity item = null;
             for (int id : entityIds) {
                 Entity e = player.level().getEntity(id);
-                if (e instanceof ItemEntity ie && ie.isAlive() && player.distanceToSqr(ie) < 100.0) {
+                if (e instanceof ItemEntity ie && PickupRangeRules.canReach(player, ie)) {
                     item = ie;
                     break;
                 }

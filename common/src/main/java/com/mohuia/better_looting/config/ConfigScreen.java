@@ -2,6 +2,7 @@ package com.mohuia.better_looting.config;
 
 import com.mohuia.better_looting.BetterLooting;
 import com.mohuia.better_looting.client.Constants;
+import com.mohuia.better_looting.client.PickupRangeSettings;
 import com.mohuia.better_looting.client.Core;
 import com.mohuia.better_looting.client.core.pipeline.VisualItemEntry;
 import com.mohuia.better_looting.client.gui.CommonSlider;
@@ -100,6 +101,7 @@ public class ConfigScreen extends Screen {
 
         this.addRenderableWidget(new ModernButton(startX + 70, 15, 60, 20, Component.translatable("gui." + BetterLooting.MODID + ".config.save"), () -> {
             viewModel.saveToConfig();
+            PickupRangeSettings.submit(viewModel);
             this.onClose();
         }));
 

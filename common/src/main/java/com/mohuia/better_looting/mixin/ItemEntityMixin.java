@@ -46,6 +46,9 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     @Unique
     private static final String EXTRA_COUNT_NBT_KEY = "BetterLootingExtraCount";
 
+    @Unique
+    private boolean betterlooting$savingItem;
+
     public ItemEntityMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -63,6 +66,29 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     @Override
     public void betterlooting$addExtraCount(int count) {
         this.betterlooting$setExtraCount(this.betterlooting$getExtraCount() + count);
+    }
+
+    /**
+     * Create 的运输和加工读取普通 ItemStack，然后可能直接 discard 实体。
+     * 它无法读取 EXTRA_ITEM_COUNT；脚下方块黑名单也覆盖不到风道和机器吸入范围。
+     * 配置在首次检测 Create 时默认关闭，用户仍可自行选择开启。
+     */
+    @Unique
+    private boolean betterlooting$canSuperMerge() {
+        return BetterLootingConfig.get().enableSuperMerge;
+    }
+
+    /**
+     * 在消费者读取物品之前拆开历史超级堆叠。
+     * 不能只在 tick 尾部补货：Create 可能在方块实体 tick 或 entityInside 中
+     * 读取物品后立即删除实体，根本不会到达补货逻辑。
+     */
+    @Inject(method = "getItem", at = @At("RETURN"))
+    private void betterlooting$unpackForCreate(CallbackInfoReturnable<ItemStack> cir) {
+        if (this.level().isClientSide || betterlooting$savingItem || this.betterlooting$getExtraCount() <= 0) return;
+        if (BetterLootingConfig.get().enableSuperMerge) return;
+        if (!Platform.isModLoaded("create")) return;
+        betterlooting$spillExtra(cir.getReturnValue());
     }
 
     /**
@@ -102,8 +128,15 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     /**
      * 写入 NBT 保存数据
      */
+    @Inject(method = "addAdditionalSaveData", at = @At("HEAD"))
+    private void betterlooting$beginItemSave(CompoundTag tag, CallbackInfo ci) {
+        // 原版保存也会调用 getItem；保存过程中不要向正在序列化的世界添加实体。
+        betterlooting$savingItem = true;
+    }
+
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     private void betterlooting$saveExtraCount(CompoundTag tag, CallbackInfo ci) {
+        betterlooting$savingItem = false;
         int extraCount = this.betterlooting$getExtraCount();
         if (extraCount > 0) {
             tag.putInt(EXTRA_COUNT_NBT_KEY, extraCount);
@@ -133,8 +166,8 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             index = 1
     )
     private AABB betterlooting$expandMergeArea(AABB originalBox) {
-        if (!BetterLootingConfig.get().enableSuperMerge) {
-            return originalBox; // 如果玩家关闭了功能，则不扩大搜索框，直接返回原版参数
+        if (!betterlooting$canSuperMerge()) {
+            return originalBox; // 关闭功能时使用原版搜索范围
         }
 
         // 分别获取 XZ 和 Y 的自定义合并半径
@@ -150,7 +183,7 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
      */
     @Inject(method = "isMergable", at = @At("HEAD"), cancellable = true)
     private void betterlooting$forceMergable(CallbackInfoReturnable<Boolean> cir) {
-        if (!BetterLootingConfig.get().enableSuperMerge) return; // 关闭功能时不干预
+        if (!betterlooting$canSuperMerge()) return;
 
         if (!this.getItem().isStackable()) return;
 
@@ -167,7 +200,7 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
      */
     @Inject(method = "tryToMerge", at = @At("HEAD"), cancellable = true)
     private void betterlooting$superMerge(ItemEntity other, CallbackInfo ci) {
-        if (!BetterLootingConfig.get().enableSuperMerge) return; // 关闭功能时不接管合并逻辑
+        if (!betterlooting$canSuperMerge()) return;
 
         ItemEntity self = (ItemEntity) (Object) this;
         ItemStack stackSelf = self.getItem();
@@ -229,6 +262,9 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         if (extraCount <= 0) return;
 
         ItemStack stack = this.getItem();
+        // getItem 可能已经把旧超级堆叠拆开，不能用读取前的 extraCount 再补一次。
+        extraCount = this.betterlooting$getExtraCount();
+        if (extraCount <= 0) return;
         int maxStackSize = stack.getMaxStackSize();
         int currentCount = stack.getCount();
 
@@ -253,16 +289,25 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
     private void betterlooting$spillExtraOnItemChange(ItemStack newStack, CallbackInfo ci) {
         if (this.level().isClientSide) return;
 
-        int extraCount = this.betterlooting$getExtraCount();
-        if (extraCount <= 0) return;
-
-        ItemEntity self = (ItemEntity) (Object) this;
-        ItemStack oldStack = self.getItem();
+        // getItem 在 Create 兼容模式下可能已经拆开额外数量。
+        // 必须在读取旧栈之后重新读取 extraCount，避免重复生成物品。
+        ItemStack oldStack = this.getItem();
 
         // 如果物品类型或 NBT 未发生变化，说明是模组自身的操作，不需要溢出
         if (ItemStack.isSameItemSameTags(oldStack, newStack)) return;
 
-        // 物品被外部模组改成了不同类型（如矿石→锭），溢出 ExtraCount 中的旧物品
+        betterlooting$spillExtra(oldStack);
+    }
+
+    /** 将隐藏数量物化为正常物品栈；先清零，避免生成实体时重入产生重复物品。 */
+    @Unique
+    private void betterlooting$spillExtra(ItemStack oldStack) {
+        int extraCount = this.betterlooting$getExtraCount();
+        if (extraCount <= 0 || oldStack.isEmpty()) return;
+
+        ItemEntity self = (ItemEntity) (Object) this;
+        ItemEntityAccessor accessor = (ItemEntityAccessor) self;
+        this.betterlooting$setExtraCount(0);
         int maxStack = oldStack.getMaxStackSize();
         while (extraCount > 0) {
             int spillAmount = Math.min(extraCount, maxStack);
@@ -271,11 +316,13 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
             extraCount -= spillAmount;
 
             ItemEntity spill = new ItemEntity(self.level(), self.getX(), self.getY(), self.getZ(), spillStack);
-            spill.setPickUpDelay(10); // 给予短暂冷却，让外部模组有机会处理
+            spill.setPickUpDelay(accessor.getPickupDelay());
+            ((ItemEntityAccessor) spill).setAge(accessor.getAge());
+            spill.setTarget(accessor.betterlooting$getTarget());
+            spill.setThrower(accessor.betterlooting$getThrower());
             spill.setDeltaMovement(self.getDeltaMovement());
             self.level().addFreshEntity(spill);
         }
-        this.betterlooting$setExtraCount(0);
     }
 
     /**
@@ -303,8 +350,6 @@ public abstract class ItemEntityMixin extends Entity implements ISuperStack {
         return false;
     }
 
-    // 注：extraCount 物品丢失保护需要注入 Entity.remove(RemovalReason)，
-    // 但 Mixin refmap 中不包含 ItemEntity 未直接覆写的继承方法。
-    // 作为替代，当运输模组通过 setItem 改变物品类型时会触发 spillExtraOnItemChange 溢出；
-    // 若运输模组直接调用 discard()，则由 superMerge 中 discard 前清零 extraCount 保证不丢失。
+    // Create 通过 getItem 读取物品之前，历史隐藏数量已经拆开。
+    // superMerge 中清零仅负责本模组自己的合并删除，不能保护外部模组的 discard。
 }

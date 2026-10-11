@@ -97,6 +97,7 @@
   "gui.better_looting.config.item_count_render_distance": "Render Distance",
   "gui.better_looting.config.super_merge": "Super Merge",
   "gui.better_looting.config.super_merge.tooltip": "Merge nearby identical items into a super stack",
+  "gui.better_looting.config.super_merge.create_tooltip": "Create detected. Stack optimization is disabled by default to protect transport and processing. You can enable it manually, but items may be lost or get stuck in production lines.",
   "gui.better_looting.config.merge_range_xz": "Horizontal Merge Range",
   "gui.better_looting.config.merge_range_xz.tooltip": "Horizontal detection range for merging identical items",
   "gui.better_looting.config.merge_range_y": "Vertical Merge Range",
@@ -136,5 +137,11 @@
   "gui.better_looting.config.section.scroll_behavior": "Scroll",
   "gui.better_looting.config.section.pickup_timing": "Pickup Timing",
   "gui.better_looting.config.section.filter": "Filter",
-  "gui.better_looting.config.section.merge": "Merge"
+  "gui.better_looting.config.section.merge": "Merge",
+  "gui.better_looting.config.section.pickup_range": "Pickup Range",
+  "gui.better_looting.config.scan_range_xz": "Horizontal Pickup Range",
+  "gui.better_looting.config.scan_range_y": "Vertical Pickup Range",
+  "gui.better_looting.config.readonly": " (Read-only)",
+  "gui.better_looting.config.pickup_range.readonly": "Read-only: enable cheats or obtain operator permissions to edit. The server controls the current range.",
+  "gui.better_looting.config.pickup_range.editable": "Save to update the server's global pickup range. All players receive the new values."
 }
